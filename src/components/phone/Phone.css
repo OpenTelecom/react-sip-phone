@@ -1,0 +1,7 @@
+.dialpadOpen {
+  display: flex;
+}
+
+.dialpadClosed {
+  display: none;
+}

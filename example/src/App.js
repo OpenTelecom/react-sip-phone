@@ -4,7 +4,7 @@ import { ExampleComponent } from 'react-sip-phone'
 import 'react-sip-phone/dist/index.css'
 
 const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+  return <ExampleComponent name="John Smith" sipCredentials={{}} sipConfig={{}} width={400}/>
 }
 
 export default App
