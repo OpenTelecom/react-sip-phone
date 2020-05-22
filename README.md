@@ -15,16 +15,16 @@ npm install --save react-sip-phone
 ```tsx
 import React, { Component } from 'react'
 
-import MyComponent from 'react-sip-phone'
+import ReactSipPhone from 'react-sip-phone'
 import 'react-sip-phone/dist/index.css'
 
 class Example extends Component {
   render() {
-    return <MyComponent />
+    return <ReactSipPhone />
   }
 }
 ```
 
 ## License
 
-MIT © [JaonL](https://github.com/JaonL)
+MIT
