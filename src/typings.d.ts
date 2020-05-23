@@ -6,6 +6,7 @@ declare module '*.css' {
   const content: { [className: string]: string };
   export default content;
 }
+declare module '*.scss'; 
 
 interface SvgrComponent extends React.StatelessComponent<React.SVGAttributes<SVGElement>> {}
 

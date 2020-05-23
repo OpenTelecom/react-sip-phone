@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styles from './Phone.css'
+import styles from './Phone.scss'
 
 interface Props {
   open: boolean

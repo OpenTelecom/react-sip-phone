@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk';
+import thunk from 'redux-thunk'
 import reducers from './reducers/index'
-import styles from './styles.module.css'
+import styles from './styles.module.scss'
 import SipWrapper from './SipWrapper'
 import Status from './components/Status'
+import { SipConfig, SipCredentials } from './models'
 
 export const reactSipPhoneReducers = reducers
 
@@ -15,8 +16,8 @@ function generateOwnStore() {
 interface Props {
   width: number,
   name: string,
-  sipCredentials: Object,
-  sipConfig: Object,
+  sipCredentials: SipCredentials,
+  sipConfig: SipConfig,
   store: any
 }
 

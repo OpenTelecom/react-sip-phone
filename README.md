@@ -15,7 +15,7 @@ npm install --save react-sip-phone
 ```tsx
 import React, { Component } from 'react'
 
-import ReactSipPhone from 'react-sip-phone'
+import { ReactSipPhone } from 'react-sip-phone'
 import 'react-sip-phone/dist/index.css'
 
 class Example extends Component {
