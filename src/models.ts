@@ -4,5 +4,7 @@ export interface SipCredentials {
 }
 
 export interface SipConfig {
-  websocket: string
+  websocket: string,
+  video: boolean,
+  iceServers: Array<string>
 }
