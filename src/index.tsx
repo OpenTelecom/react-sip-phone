@@ -21,8 +21,12 @@ interface Props {
   store: any
 }
 
+export let phoneStore = generateOwnStore()
+
 export const ReactSipPhone = ({ name, width, store, sipConfig, sipCredentials }: Props) => {
-  const phoneStore = store ? store : generateOwnStore()
+  if (store) {
+    phoneStore = store
+  }
   return <Provider store={phoneStore}>
     <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials} >
       <div className={styles.container} style={{ width: `${width}px` }}>
