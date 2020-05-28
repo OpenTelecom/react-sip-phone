@@ -111,7 +111,7 @@ export default class SIPAccount {
         console.log('calling me')
         const inviter = new Inviter(this._userAgent, target)
         inviter.invite()
-
+        //outgoing call listener
         inviter.stateChange.addListener((newState: SessionState) => {
           switch (newState) {
             case SessionState.Establishing:
@@ -119,21 +119,27 @@ export default class SIPAccount {
                 type: SIPSESSION_ESTABLISHING,
                 payload: inviter.state
               })
+              break
             case SessionState.Established:
               phoneStore.dispatch({
                 type: SIPSESSION_ESTABLISHED,
                 payload: inviter.state
               })
+              inviter.bye()
+              break
             case SessionState.Terminating:
               phoneStore.dispatch({
                 type: SIPSESSION_TERMINATING,
                 payload: inviter.state
               })
+              break
             case SessionState.Terminated:
               phoneStore.dispatch({
                 type: SIPSESSION_TERMINATED,
                 payload: inviter.state
               })
+              break
+
             default:
               break
           }
