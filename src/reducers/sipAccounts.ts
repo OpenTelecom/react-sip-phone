@@ -3,7 +3,7 @@ import { INCOMING_CALL, SIPACCOUNT_UNREGISTERED } from '../actions/sipAccounts'
 const sipAccounts = (
   state = {
     incomingCalls: [],
-    status
+    status: ''
   },
   action: Action
 ) => {

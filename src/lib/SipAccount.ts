@@ -13,7 +13,12 @@ import {
 import { TransportOptions } from 'sip.js/lib/platform/web'
 import { phoneStore } from '../index'
 import { INCOMING_CALL, SIPACCOUNT_UNREGISTERED } from '../actions/sipAccounts'
-import { SIPSESSION_ESTABLISHED } from '../actions/sipSessions'
+import {
+  SIPSESSION_ESTABLISHED,
+  SIPSESSION_ESTABLISHING,
+  SIPSESSION_TERMINATING,
+  SIPSESSION_TERMINATED
+} from '../actions/sipSessions'
 
 interface config {
   websocket: string
@@ -106,13 +111,31 @@ export default class SIPAccount {
         console.log('calling me')
         const inviter = new Inviter(this._userAgent, target)
         inviter.invite()
+
         inviter.stateChange.addListener((newState: SessionState) => {
           switch (newState) {
             case SessionState.Establishing:
               phoneStore.dispatch({
+                type: SIPSESSION_ESTABLISHING,
+                payload: inviter.state
+              })
+            case SessionState.Established:
+              phoneStore.dispatch({
                 type: SIPSESSION_ESTABLISHED,
                 payload: inviter.state
               })
+            case SessionState.Terminating:
+              phoneStore.dispatch({
+                type: SIPSESSION_TERMINATING,
+                payload: inviter.state
+              })
+            case SessionState.Terminated:
+              phoneStore.dispatch({
+                type: SIPSESSION_TERMINATED,
+                payload: inviter.state
+              })
+            default:
+              break
           }
         })
       }
