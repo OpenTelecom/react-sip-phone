@@ -1,37 +1,39 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
-import reducers from './reducers/index'
 import styles from './styles.module.scss'
 import SipWrapper from './SipWrapper'
 import Status from './components/Status'
 import { SipConfig, SipCredentials } from './models'
 
-export const reactSipPhoneReducers = reducers
+import defaultStore from './store/configureStore'
 
-function generateOwnStore() {
-  return createStore(reducers, applyMiddleware(thunk))
-}
 interface Props {
-  width: number,
-  name: string,
-  sipCredentials: SipCredentials,
-  sipConfig: SipConfig,
+  width: number
+  name: string
+  sipCredentials: SipCredentials
+  sipConfig: SipConfig
   store: any
 }
 
-export let phoneStore = generateOwnStore()
+export let phoneStore = defaultStore
 
-export const ReactSipPhone = ({ name, width, store, sipConfig, sipCredentials }: Props) => {
-  if (store) {
-    phoneStore = store
-  }
-  return <Provider store={phoneStore}>
-    <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials} >
-      <div className={styles.container} style={{ width: `${width}px` }}>
-        <Status name={name} />
-      </div>
-    </SipWrapper>
-  </Provider>
+export const ReactSipPhone = ({
+  name,
+  width,
+  store,
+  sipConfig,
+  sipCredentials
+}: Props) => {
+  //If no store is passed into component, default store is used
+  const phoneStore = store ? store : defaultStore
+
+  return (
+    <Provider store={phoneStore}>
+      <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials}>
+        <div className={styles.container} style={{ width: `${width}px` }}>
+          <Status name={name} />
+        </div>
+      </SipWrapper>
+    </Provider>
+  )
 }
