@@ -3,8 +3,10 @@ import Dialpad from './Dialpad'
 import { connect } from 'react-redux'
 import { Session, SessionState } from 'sip.js'
 import { endCall, holdCall, unHoldCall } from '../../actions/sipSessions'
-import { UserAgent, Inviter, UserAgentOptions } from 'sip.js'
-import { TransportOptions } from 'sip.js/lib/platform/web'
+import { UserAgent } from 'sip.js'
+
+// import { UserAgent, Inviter, UserAgentOptions } from 'sip.js'
+// import { TransportOptions } from 'sip.js/lib/platform/web'
 
 interface Props {
   session: Session
