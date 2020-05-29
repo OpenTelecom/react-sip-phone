@@ -3,6 +3,8 @@ import { Provider } from 'react-redux'
 import styles from './styles.module.scss'
 import SipWrapper from './SipWrapper'
 import Status from './components/Status'
+import PhoneSessions from './components/PhoneSessions'
+import Dialstring from './components/Dialstring'
 import { SipConfig, SipCredentials } from './models'
 
 import defaultStore from './store/configureStore'
@@ -32,6 +34,8 @@ export const ReactSipPhone = ({
       <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials}>
         <div className={styles.container} style={{ width: `${width}px` }}>
           <Status name={name} />
+          <Dialstring />
+          <PhoneSessions />
         </div>
       </SipWrapper>
     </Provider>

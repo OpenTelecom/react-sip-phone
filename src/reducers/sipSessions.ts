@@ -1,15 +1,13 @@
 import { Action } from './models'
 import {
   NEW_SESSION,
-  SIPSESSION_ESTABLISHED,
-  SIPSESSION_ESTABLISHING,
-  SIPSESSION_TERMINATING,
-  SIPSESSION_TERMINATED
+  CLOSE_SESSION,
+  SIPSESSION_STATECHANGE
 } from '../actions/sipSessions'
 const sipSessions = (
   state = {
-    phone1: { outgoing: '', incoming: '' },
-    phone2: { outgoing: '', incoming: '' }
+    sessions: {},
+    stateChanged: 0
   },
   action: Action
 ) => {
@@ -19,27 +17,19 @@ const sipSessions = (
       console.log('New session added')
       return {
         ...state,
-        sessions: { ...state.phone1, outgoing: payload }
+        sessions: {...state.sessions, [payload.id]: payload}
       }
-    case SIPSESSION_ESTABLISHING:
+    case SIPSESSION_STATECHANGE:
       return {
         ...state,
-        phone1: { ...state.phone1, outgoing: payload }
+        stateChanged: state.stateChanged + 1
       }
-    case SIPSESSION_ESTABLISHED:
+    case CLOSE_SESSION:
+      const newSessions: any = {...state.sessions}
+      delete newSessions[payload]
       return {
         ...state,
-        phone1: { ...state.phone1, outgoing: payload }
-      }
-    case SIPSESSION_TERMINATING:
-      return {
-        ...state,
-        phone1: { ...state.phone1, outgoing: payload }
-      }
-    case SIPSESSION_TERMINATED:
-      return {
-        ...state,
-        phone1: { ...state.phone1, outgoing: payload }
+        sessions: newSessions
       }
     default:
       return state

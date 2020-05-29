@@ -12,12 +12,11 @@ import {
 } from 'sip.js'
 import { TransportOptions } from 'sip.js/lib/platform/web'
 import { phoneStore } from '../index'
-import { INCOMING_CALL, SIPACCOUNT_UNREGISTERED } from '../actions/sipAccounts'
+import { INCOMING_CALL, NEW_USERAGENT } from '../actions/sipAccounts'
 import {
-  SIPSESSION_ESTABLISHED,
-  SIPSESSION_ESTABLISHING,
-  SIPSESSION_TERMINATING,
-  SIPSESSION_TERMINATED
+  SIPSESSION_STATECHANGE,
+  NEW_SESSION,
+  CLOSE_SESSION
 } from '../actions/sipSessions'
 
 interface config {
@@ -27,10 +26,10 @@ interface config {
 }
 
 export default class SIPAccount {
-  _config: config
-  _sessions: any
-  _userAgent: any
-  _registerer: any
+  public _config: config
+  public _sessions: any
+  public _userAgent: any
+  public _registerer: any
 
   constructor(config: config) {
     this._config = config
@@ -44,6 +43,8 @@ export default class SIPAccount {
     }
     const userAgentOptions: UserAgentOptions = {
       autoStart: true,
+      autoStop: true,
+      noAnswerTimeout: 30, // TODO: pass this value in from the config
       logBuiltinEnabled: process.env.NODE_ENV !== 'production',
       logConfiguration: process.env.NODE_ENV !== 'production',
       logLevel: process.env.NODE_ENV !== 'production' ? 'debug' : 'error',
@@ -78,73 +79,9 @@ export default class SIPAccount {
     this.setupDelegate() // Delegate is what handles incoming calls
     this._userAgent.start().then(() => {
       this._registerer.register()
-      this._registerer.stateChange.addListener((newState: RegistererState) => {
-        switch (newState) {
-          case RegistererState.Initial:
-            console.log('The user registration has initialized  ')
-            break
-
-          case RegistererState.Registered:
-            console.log('The user is registered ')
-            break
-
-          case RegistererState.Unregistered:
-            console.log('The user is unregistered ')
-            // this._registerer.retryAfter
-            phoneStore.dispatch({
-              type: SIPACCOUNT_UNREGISTERED,
-              payload: this._registerer.state
-            })
-            break
-
-          case RegistererState.Terminated:
-            console.log('The user is terminated ')
-            break
-        }
-      })
-
-      //make a call
-      const target = UserAgent.makeURI(
-        'sip:+16143543760@sip.reper.io;user=phone'
-      )
-      if (target) {
-        console.log('calling me')
-        const inviter = new Inviter(this._userAgent, target)
-        inviter.invite()
-        //outgoing call listener
-        inviter.stateChange.addListener((newState: SessionState) => {
-          switch (newState) {
-            case SessionState.Establishing:
-              phoneStore.dispatch({
-                type: SIPSESSION_ESTABLISHING,
-                payload: inviter.state
-              })
-              break
-            case SessionState.Established:
-              phoneStore.dispatch({
-                type: SIPSESSION_ESTABLISHED,
-                payload: inviter.state
-              })
-              inviter.bye()
-              break
-            case SessionState.Terminating:
-              phoneStore.dispatch({
-                type: SIPSESSION_TERMINATING,
-                payload: inviter.state
-              })
-              break
-            case SessionState.Terminated:
-              phoneStore.dispatch({
-                type: SIPSESSION_TERMINATED,
-                payload: inviter.state
-              })
-              break
-
-            default:
-              break
-          }
-        })
-      }
+      this.setupRegistererListener()
+      // Push ua to store
+      phoneStore.dispatch({ type: NEW_USERAGENT, payload: this._userAgent})
     })
   }
 
@@ -179,6 +116,80 @@ export default class SIPAccount {
           }
         })
       }
+    }
+  }
+
+  setupRegistererListener() {
+    this._registerer.stateChange.addListener((newState: RegistererState) => {
+      switch (newState) {
+        case RegistererState.Initial:
+          console.log('The user registration has initialized  ')
+          break
+        case RegistererState.Registered:
+          console.log('The user is registered ')
+          break
+        case RegistererState.Unregistered:
+          console.log('The user is unregistered ')
+          break
+        case RegistererState.Terminated:
+          console.log('The user is terminated ')
+          break
+      }
+    })
+  }
+
+  makeCall(number: string) {
+    // Make a call
+    const target = UserAgent.makeURI(
+      `sip:${number}@sip.reper.io;user=phone`
+    )
+    if (target) {
+      console.log(`Calling ${number}`)
+      const inviter = new Inviter(this._userAgent, target)
+      // An Inviter is a Session
+      const outgoingSession: Session = inviter;
+      // Setup outgoing session delegate
+      outgoingSession.delegate = {
+        // Handle incoming REFER request.
+        onRefer(referral: Referral): void {
+          // TODO
+          console.log("Referred: " + referral)
+        }
+      };
+      phoneStore.dispatch({ type: NEW_SESSION, payload: outgoingSession })
+      // Handle outgoing session state changes.
+      outgoingSession.stateChange.addListener((newState: SessionState) => {
+        switch (newState) {
+          case SessionState.Establishing:
+          case SessionState.Established:
+          case SessionState.Terminating:
+            phoneStore.dispatch({
+              type: SIPSESSION_STATECHANGE,
+              payload: { state: newState, id: outgoingSession.id }
+            })
+            break
+          case SessionState.Terminated:
+            phoneStore.dispatch({
+              type: SIPSESSION_STATECHANGE,
+              payload: { state: newState, id: outgoingSession.id }
+            })
+            phoneStore.dispatch({
+              type: CLOSE_SESSION,
+              payload: outgoingSession.id
+            })
+            break
+          default:
+            console.log(`Unknown session state change: ${newState}`)
+            break
+        }
+      })
+      outgoingSession.invite().then(() => {
+        console.log('Invite sent!')
+      }).catch((error: Error) => {
+        console.log(error)
+      })
+    } else {
+      console.log(`Failed to establish session for outgoing call to ${number}`)
     }
   }
 }
