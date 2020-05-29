@@ -57,6 +57,7 @@ class Phone extends React.Component<Props> {
     ) {
       this.props.session.invite()
       this.setState({ onHold: false })
+      this.props.unHoldCall(this.props.session.id)
     }
   }
 

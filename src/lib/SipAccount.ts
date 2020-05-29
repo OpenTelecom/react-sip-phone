@@ -42,7 +42,7 @@ export default class SIPAccount {
       server: config.websocket
     }
     const userAgentOptions: UserAgentOptions = {
-      autoStart: true,
+      autoStart: false,
       autoStop: true,
       noAnswerTimeout: 30, // TODO: pass this value in from the config
       logBuiltinEnabled: process.env.NODE_ENV !== 'production',
