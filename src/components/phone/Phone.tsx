@@ -17,11 +17,14 @@ class Phone extends React.Component<Props> {
   endCall() {
     if (this.props.session.state === SessionState.Established) {
       this.props.session.bye()
-    } else if (this.props.session.state === SessionState.Initial) {
+    } else if (
+      this.props.session.state === SessionState.Initial ||
+      SessionState.Establishing
+    ) {
       // @ts-ignore
       this.props.session.cancel()
     }
-    this.setState({ended: true})
+    this.setState({ ended: true })
     setTimeout(() => {
       this.props.session.dispose()
       this.props.endCall(this.props.session.id)
@@ -29,11 +32,15 @@ class Phone extends React.Component<Props> {
   }
   render() {
     const state = this.state
-    return <React.Fragment>
-      <div>{this.props.session.state}</div>
-      <Dialpad open={state.dialpadOpen} />
-      <button disabled={this.state.ended} onClick={() => this.endCall()}>End Call</button>
-    </React.Fragment>
+    return (
+      <React.Fragment>
+        <div>{this.props.session.state}</div>
+        <Dialpad open={state.dialpadOpen} />
+        <button disabled={this.state.ended} onClick={() => this.endCall()}>
+          End Call
+        </button>
+      </React.Fragment>
+    )
   }
 }
 const mapStateToProps = (state: any) => ({

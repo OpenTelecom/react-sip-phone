@@ -15,21 +15,30 @@ class Dialstring extends React.Component<Props> {
   }
   checkDialstring() {
     const number = this.state.currentDialString
-    if (parseInt(number, 10) && (number.length === 10)) {
+    if (parseInt(number, 11) && number.length === 11) {
       return true
     } else {
       return false
     }
   }
   render() {
-    return <div>
-      <input onChange={(e) => this.setState({currentDialString: e.target.value})}/>
-      <button disabled={this.checkDialstring()} onClick={() => this.handleDial()}>Dial</button>
-    </div>
+    return (
+      <div>
+        <input
+          onChange={(e) => this.setState({ currentDialString: e.target.value })}
+        />
+        <button
+          disabled={this.checkDialstring()}
+          onClick={() => this.handleDial()}
+        >
+          Dial
+        </button>
+      </div>
+    )
   }
 }
-const mapStateToProps = (state: any) => ({ 
-  sipAccount: state.sipAccounts.sipAccount 
+const mapStateToProps = (state: any) => ({
+  sipAccount: state.sipAccounts.sipAccount
 })
 const D = connect(mapStateToProps)(Dialstring)
 export default D
