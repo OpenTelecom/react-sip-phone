@@ -42,7 +42,7 @@ export default class SIPAccount {
       server: config.websocket
     }
     const userAgentOptions: UserAgentOptions = {
-      autoStart: true,
+      autoStart: false,
       autoStop: true,
       noAnswerTimeout: 30, // TODO: pass this value in from the config
       logBuiltinEnabled: process.env.NODE_ENV !== 'production',
@@ -74,6 +74,9 @@ export default class SIPAccount {
       expires: 60,
       logConfiguration: process.env.NODE_ENV !== 'production'
     }
+
+    //check here for register
+
     this._userAgent = new UserAgent(userAgentOptions)
     this._registerer = new Registerer(this._userAgent, registererOptions)
     this.setupDelegate() // Delegate is what handles incoming calls
@@ -81,7 +84,7 @@ export default class SIPAccount {
       this._registerer.register()
       this.setupRegistererListener()
       // Push ua to store
-      phoneStore.dispatch({ type: NEW_USERAGENT, payload: this._userAgent})
+      phoneStore.dispatch({ type: NEW_USERAGENT, payload: this._userAgent })
     })
   }
 
@@ -140,22 +143,20 @@ export default class SIPAccount {
 
   makeCall(number: string) {
     // Make a call
-    const target = UserAgent.makeURI(
-      `sip:${number}@sip.reper.io;user=phone`
-    )
+    const target = UserAgent.makeURI(`sip:${number}@sip.reper.io;user=phone`)
     if (target) {
       console.log(`Calling ${number}`)
       const inviter = new Inviter(this._userAgent, target)
       // An Inviter is a Session
-      const outgoingSession: Session = inviter;
+      const outgoingSession: Session = inviter
       // Setup outgoing session delegate
       outgoingSession.delegate = {
         // Handle incoming REFER request.
         onRefer(referral: Referral): void {
           // TODO
-          console.log("Referred: " + referral)
+          console.log('Referred: ' + referral)
         }
-      };
+      }
       phoneStore.dispatch({ type: NEW_SESSION, payload: outgoingSession })
       // Handle outgoing session state changes.
       outgoingSession.stateChange.addListener((newState: SessionState) => {
@@ -183,11 +184,14 @@ export default class SIPAccount {
             break
         }
       })
-      outgoingSession.invite().then(() => {
-        console.log('Invite sent!')
-      }).catch((error: Error) => {
-        console.log(error)
-      })
+      outgoingSession
+        .invite()
+        .then(() => {
+          console.log('Invite sent!')
+        })
+        .catch((error: Error) => {
+          console.log(error)
+        })
     } else {
       console.log(`Failed to establish session for outgoing call to ${number}`)
     }

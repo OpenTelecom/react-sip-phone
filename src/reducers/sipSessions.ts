@@ -17,7 +17,7 @@ const sipSessions = (
       console.log('New session added')
       return {
         ...state,
-        sessions: {...state.sessions, [payload.id]: payload}
+        sessions: { ...state.sessions, [payload.id]: payload }
       }
     case SIPSESSION_STATECHANGE:
       return {
@@ -25,12 +25,13 @@ const sipSessions = (
         stateChanged: state.stateChanged + 1
       }
     case CLOSE_SESSION:
-      const newSessions: any = {...state.sessions}
+      const newSessions: any = { ...state.sessions }
       delete newSessions[payload]
       return {
         ...state,
         sessions: newSessions
       }
+
     default:
       return state
   }
