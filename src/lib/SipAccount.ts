@@ -74,6 +74,9 @@ export default class SIPAccount {
       expires: 60,
       logConfiguration: process.env.NODE_ENV !== 'production'
     }
+
+    //check here for register
+
     this._userAgent = new UserAgent(userAgentOptions)
     this._registerer = new Registerer(this._userAgent, registererOptions)
     this.setupDelegate() // Delegate is what handles incoming calls

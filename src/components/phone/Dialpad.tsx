@@ -10,7 +10,7 @@ function handleClick(value: string) {
   return value // Placeholder
 }
 
-function getButton(value:string) {
+function getButton(value: string) {
   return <DialButton text={value} click={() => handleClick(value)} />
 }
 
@@ -30,19 +30,13 @@ for (let x = 7; x < 10; x++) {
 }
 
 const Dialpad = ({ open }: Props) => {
-  return <div className={open ? styles.dialpadOpen : styles.dialpadClosed}>
-    <div className="dialpadRow1" >
-      {topRow}
+  return (
+    <div className={open ? styles.dialpadOpen : styles.dialpadClosed}>
+      <div className='dialpadRow1'>{topRow}</div>
+      <div className='dialpadRow2'>{middleRow}</div>
+      <div className='dialpadRow3'>{bottomRow}</div>
+      <div className='dialpadRow4'>{}</div>
     </div>
-    <div className="dialpadRow2" >
-      {middleRow}
-    </div>
-    <div className="dialpadRow3" >
-      {bottomRow}
-    </div>
-    <div className="dialpadRow4" >
-      {}
-    </div>
-  </div>
+  )
 }
 export default Dialpad
