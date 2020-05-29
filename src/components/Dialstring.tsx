@@ -15,7 +15,7 @@ class Dialstring extends React.Component<Props> {
   }
   checkDialstring() {
     const number = this.state.currentDialString
-    if (parseInt(number, 11) && number.length === 11) {
+    if (parseInt(number, 10) && number.length === 10) {
       return true
     } else {
       return false

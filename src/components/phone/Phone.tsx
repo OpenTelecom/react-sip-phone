@@ -3,6 +3,8 @@ import Dialpad from './Dialpad'
 import { connect } from 'react-redux'
 import { Session, SessionState } from 'sip.js'
 import { endCall, holdCall, unHoldCall } from '../../actions/sipSessions'
+import { UserAgent, Inviter, UserAgentOptions } from 'sip.js'
+import { TransportOptions } from 'sip.js/lib/platform/web'
 
 interface Props {
   session: Session
@@ -12,11 +14,15 @@ interface Props {
 }
 
 class Phone extends React.Component<Props> {
+  public _userAgent: any
+
   state = {
     dialpadOpen: true,
     ended: false,
-    onHold: false
+    onHold: false,
+    currentTransferDialString: ''
   }
+
   endCall() {
     if (this.props.session.state === SessionState.Established) {
       this.props.session.bye()
@@ -35,10 +41,7 @@ class Phone extends React.Component<Props> {
   }
 
   holdCall() {
-    if (
-      this.props.session.state === SessionState.Established ||
-      this.props.session.state === SessionState.Establishing
-    ) {
+    if (this.props.session.state === SessionState.Established) {
       this.props.session.sessionDescriptionHandler?.holdModifier
       this.props.session.invite({
         sessionDescriptionHandlerModifiers: [
@@ -61,14 +64,47 @@ class Phone extends React.Component<Props> {
     }
   }
 
-  //call mute
+  sendDTMF(number: string) {
+    if (this.props.session.state === SessionState.Established) {
+      const options = {
+        requestOptions: {
+          body: {
+            contentDisposition: 'render',
+            contentType: 'application/dtmf-relay',
+            content: `Signal=${number}\r\nDuration=1000`
+          }
+        }
+      }
+      this.props.session.info(options)
+      // this.props.session.sessionDescriptionHandler?.sendDtmf('121212121')
+    }
+  }
+
+  //blind tranfer call
+  transferCall() {
+    const target = UserAgent.makeURI(
+      `sip:${this.state.currentTransferDialString}@sip.reper.io;user=phone`
+    )
+    this.props.session.refer(target!)
+  }
+
+  checkTransferDialstring() {
+    const number = this.state.currentTransferDialString
+    if (parseInt(number, 10) && number.length === 10) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  //todo call mute
 
   render() {
     const state = this.state
     return (
       <React.Fragment>
         <div>{this.props.session.state}</div>
-        <Dialpad {...this.props.session} open={state.dialpadOpen} />
+        <Dialpad open={state.dialpadOpen} />
         <button disabled={this.state.ended} onClick={() => this.endCall()}>
           End Call
         </button>
@@ -78,6 +114,19 @@ class Phone extends React.Component<Props> {
         <button disabled={!this.state.onHold} onClick={() => this.unHoldCall()}>
           UnHold Call
         </button>
+
+        <input
+          onChange={(e) =>
+            this.setState({ currentTransferDialString: e.target.value })
+          }
+        />
+        <button
+          disabled={this.checkTransferDialstring()}
+          onClick={() => this.transferCall()}
+        >
+          Transfer Call
+        </button>
+        <button onClick={() => this.sendDTMF('1')}>Send DTMF</button>
       </React.Fragment>
     )
   }
