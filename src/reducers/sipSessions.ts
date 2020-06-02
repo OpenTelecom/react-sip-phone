@@ -2,7 +2,8 @@ import { Action } from './models'
 import {
   NEW_SESSION,
   CLOSE_SESSION,
-  SIPSESSION_STATECHANGE
+  SIPSESSION_STATECHANGE,
+  SEND_DTMF
 } from '../actions/sipSessions'
 const sipSessions = (
   state = {

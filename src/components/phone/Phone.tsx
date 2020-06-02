@@ -66,22 +66,6 @@ class Phone extends React.Component<Props> {
     }
   }
 
-  sendDTMF(number: string) {
-    if (this.props.session.state === SessionState.Established) {
-      const options = {
-        requestOptions: {
-          body: {
-            contentDisposition: 'render',
-            contentType: 'application/dtmf-relay',
-            content: `Signal=${number}\r\nDuration=1000`
-          }
-        }
-      }
-      this.props.session.info(options)
-      // this.props.session.sessionDescriptionHandler?.sendDtmf('121212121')
-    }
-  }
-
   //blind tranfer call
   transferCall() {
     const target = UserAgent.makeURI(
@@ -106,14 +90,14 @@ class Phone extends React.Component<Props> {
     return (
       <React.Fragment>
         <div>{this.props.session.state}</div>
-        <Dialpad open={state.dialpadOpen} />
-        <button disabled={this.state.ended} onClick={() => this.endCall()}>
+        <Dialpad open={state.dialpadOpen} session={this.props.session} />
+        <button disabled={state.ended} onClick={() => this.endCall()}>
           End Call
         </button>
-        <button disabled={this.state.onHold} onClick={() => this.holdCall()}>
+        <button disabled={state.onHold} onClick={() => this.holdCall()}>
           Hold Call
         </button>
-        <button disabled={!this.state.onHold} onClick={() => this.unHoldCall()}>
+        <button disabled={!state.onHold} onClick={() => this.unHoldCall()}>
           UnHold Call
         </button>
 
@@ -128,7 +112,6 @@ class Phone extends React.Component<Props> {
         >
           Transfer Call
         </button>
-        <button onClick={() => this.sendDTMF('1')}>Send DTMF</button>
       </React.Fragment>
     )
   }
@@ -141,5 +124,4 @@ const actions = {
   holdCall,
   unHoldCall
 }
-const P = connect(mapStateToProps, actions)(Phone)
-export default P
+export default connect(mapStateToProps, actions)(Phone)

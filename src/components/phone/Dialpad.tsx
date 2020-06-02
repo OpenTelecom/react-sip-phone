@@ -1,42 +1,67 @@
 import * as React from 'react'
 import styles from './Phone.scss'
 import DialButton from './DialButton'
+import { Session, SessionState } from 'sip.js'
 
 interface Props {
-  open: boolean
+  open: boolean,
+  session: Session
 }
 
-function handleClick(value: string) {
-  return value // Placeholder
-}
+class Dialpad extends React.Component<Props> {
 
-function getButton(value: string) {
-  return <DialButton text={value} click={() => handleClick(value)} />
-}
+  topRow: any = []
+  middleRow: any = []
+  bottomRow: any = []
 
-const topRow: any = []
-for (let x = 1; x < 4; x++) {
-  topRow.push(getButton(x.toString()))
-}
+  populateButtons() {
+    for (let x = 1; x < 4; x++) {
+      this.topRow.push(this.getButton(x.toString()))
+    }
+    for (let x = 4; x < 7; x++) {
+      this.middleRow.push(this.getButton(x.toString()))
+    }
+    for (let x = 7; x < 10; x++) {
+      this.bottomRow.push(this.getButton(x.toString()))
+    }
+  }
 
-const middleRow: any = []
-for (let x = 4; x < 7; x++) {
-  middleRow.push(getButton(x.toString()))
-}
+  getButton(value: string) {
+    return <DialButton text={value} click={() => this.handleClick(value)} />
+  }
 
-const bottomRow: any = []
-for (let x = 7; x < 10; x++) {
-  bottomRow.push(getButton(x.toString()))
-}
+  handleClick(value: string) {
+    if (this.props.session.state === SessionState.Established) {
+      this.sendDTMF(value)
+    }
+  }
 
-const Dialpad = ({ open }: Props) => {
-  return (
-    <div className={open ? styles.dialpadOpen : styles.dialpadClosed}>
-      <div className='dialpadRow1'>{topRow}</div>
-      <div className='dialpadRow2'>{middleRow}</div>
-      <div className='dialpadRow3'>{bottomRow}</div>
-      <div className='dialpadRow4'>{}</div>
-    </div>
-  )
+  sendDTMF(value: string) {
+    const options = {
+      requestOptions: {
+        body: {
+          contentDisposition: 'render',
+          contentType: 'application/dtmf-relay',
+          content: `Signal=${value}\r\nDuration=1000`
+        }
+      }
+    }
+    this.props.session.info(options)
+  }
+  
+  render() {
+    return (
+      <div className={this.props.open ? styles.dialpadOpen : styles.dialpadClosed}>
+        <div className='dialpadRow1'>{this.topRow}</div>
+        <div className='dialpadRow2'>{this.middleRow}</div>
+        <div className='dialpadRow3'>{this.bottomRow}</div>
+        <div className='dialpadRow4'>
+          {this.getButton('*')}
+          {this.getButton('0')}
+          {this.getButton('#')}
+        </div>
+      </div>
+    )
+  }
 }
 export default Dialpad
