@@ -45,6 +45,12 @@ class Phone extends React.Component<Props> {
     attendedTransferSessionPending: null
   }
 
+  componentDidUpdate(newProps: Props) {
+    if (newProps.session.state === SessionState.Terminated) {
+      this.setState({ ended: true })
+    }
+  }
+
   endCall() {
     if (this.props.session.state === SessionState.Established) {
       this.props.session.bye()
@@ -172,6 +178,7 @@ class Phone extends React.Component<Props> {
       phoneStore.dispatch({
         type: SIPSESSION_BLIND_TRANSFER_SUCCESS
       })
+      this.setState({ transferDialString: '' })
     } else {
       phoneStore.dispatch({
         type: SIPSESSION_BLIND_TRANSFER_FAIL
@@ -214,6 +221,7 @@ class Phone extends React.Component<Props> {
               type: SIPSESSION_STATECHANGE,
               payload: { state: newState, id: outgoingSession.id }
             })
+            this.setState({ transferDialString: '' })
             break
           case SessionState.Terminating:
             phoneStore.dispatch({
@@ -328,11 +336,13 @@ class Phone extends React.Component<Props> {
       <React.Fragment>
         <div>{this.props.session.state}</div>
         <Dialpad open={state.dialpadOpen} session={this.props.session} />
-        <button disabled={this.state.ended} onClick={() => this.endCall()}>
+        <button disabled={state.ended} onClick={() => this.endCall()}>
           End Call
         </button>
 
-        <button onClick={() => this.hold()}>{this.checkHold()}</button>
+        <button disabled={state.ended} onClick={() => this.hold()}>
+          {this.checkHold()}
+        </button>
 
         <input
           onChange={(e) =>
@@ -348,14 +358,14 @@ class Phone extends React.Component<Props> {
         {attendedTransferConnect}
         {attendedTransferCancel}
         <button
-          disabled={this.checkTransferDialString()}
+          disabled={this.checkTransferDialString() || state.ended}
           onClick={() => this.blindTransferCall()}
         >
           Blind Transfer Call
         </button>
-        <button onClick={() => this.mute()}>{this.checkMute()}</button>
-        {/* <button onClick={() => this.getMicrophone()}>get mic</button>
-        <button onClick={() => this.stopMicrophone()}>mute mic</button> */}
+        <button disabled={state.ended} onClick={() => this.mute()}>
+          {this.checkMute()}
+        </button>
       </React.Fragment>
     )
   }
