@@ -52,23 +52,15 @@ export default class SIPAccount {
       userAgentString: 'OTF-react-sip-phone',
       hackWssInTransport: true,
       transportOptions,
-      uri
-      // sessionDescriptionHandlerFactoryOptions: {
-      //   constraints: {
-      //     audio: true,
-      //     video: false
-      //   },
-      //   iceCheckingTimeout: 500,
-      //   rtcConfiguration: {
-      //     iceServers: [
-      //       {
-      //         urls: 'stun:stun.l.google.com:19302'
-      //       }
-      //     ],
-      //     iceCandidatePoolSize: 5,
-      //     iceTransportPolicy: 'all' // or relay for TURN only
-      //   }
-      // }
+      uri,
+      sessionDescriptionHandlerFactoryOptions: {
+        constraints: {
+          audio: true,
+          video: false
+        },
+        iceCheckingTimeout: 500
+        // alwaysAcquireMediaFirst: true
+      }
     }
     const registererOptions: RegistererOptions = {
       expires: 60,

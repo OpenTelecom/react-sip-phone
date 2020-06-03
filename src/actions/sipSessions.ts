@@ -1,17 +1,57 @@
 export const NEW_SESSION = 'NEW_SESSION'
 export const SIPSESSION_STATECHANGE = 'SIPSESSION_STATECHANGE'
 export const CLOSE_SESSION = 'CLOSE_SESSION'
-export const HOLD_SESSION = 'HOLD_SESSION'
-export const UNHOLD_SESSION = 'UNHOLD_SESSION'
+
+export const SIPSESSION_MAKECALL_REQUEST = 'SIPSESSION_MAKECALL_REQUEST'
+export const SIPSESSION_MAKECALL_SUCCESS = 'SIPSESSION_MAKECALL_SUCCESS'
+export const SIPSESSION_MAKECALL_FAIL = 'SIPSESSION_MAKECALL_FAIL'
+
+export const SIPSESSION_HOLD_REQUEST = 'SIPSESSION_HOLD_REQUEST'
+export const SIPSESSION_HOLD_SUCCESS = 'SIPSESSION_HOLD_SUCCESS'
+export const SIPSESSION_HOLD_FAIL = 'SIPSESSION_HOLD_FAIL'
+export const SIPSESSION_UNHOLD_REQUEST = 'SIPSESSION_UNHOLD_REQUEST'
+export const SIPSESSION_UNHOLD_SUCCESS = 'SIPSESSION_UNHOLD_SUCCESS'
+export const SIPSESSION_UNHOLD_FAIL = 'SIPSESSION_UNHOLD_FAIL'
+
+export const SIPSESSION_MUTE_TOGGLE_FAIL = 'SIPSESSION_MUTE_TOGGLE_FAIL'
+export const SIPSESSION_MUTE_TOGGLE_SUCCESS = 'SIPSESSION_MUTE_TOGGLE_SUCCESS'
+
+export const SIPSESSION_BLIND_TRANSFER_REQUEST =
+  'SIPSESSION_BLIND_TRANSFER_REQUEST'
+export const SIPSESSION_BLIND_TRANSFER_SUCCESS =
+  'SIPSESSION_BLIND_TRANSFER_SUCCESS'
+export const SIPSESSION_BLIND_TRANSFER_FAIL = 'SIPSESSION_BLIND_TRANSFER_FAIL'
+
+export const SIPSESSION_ATTENDED_TRANSFER_REQUEST =
+  'SIPSESSION_ATTENDED_TRANSFER_REQUEST'
+export const SIPSESSION_ATTENDED_TRANSFER_FAIL =
+  'SIPSESSION_ATTENDED_TRANSFER_FAIL'
+export const SIPSESSION_ATTENDED_TRANSFER_SUCCESS =
+  'SIPSESSION_ATTENDED_TRANSFER_SUCCESS'
+
+export const ATTENDED_TRANSFER_SUCCESS = 'ATTENDED_TRANSFER_SUCCESS'
+export const ATTENDED_TRANSFER_FAIL = 'ATTENDED_TRANSFER_FAIL'
 
 export const endCall = (sessionId: string) => {
   return { type: CLOSE_SESSION, payload: sessionId }
 }
 
-export const holdCall = (sessionId: string) => {
-  return { type: HOLD_SESSION, payload: sessionId }
-}
+// export const holdCall = (sessionId: string) => {
+//   return { type: HOLD_SESSION, payload: sessionId }
+// }
 
-export const unHoldCall = (sessionId: string) => {
-  return { type: UNHOLD_SESSION, payload: sessionId }
-}
+// export const unHoldCall = (sessionId: string) => {
+//   return { type: UNHOLD_SESSION, payload: sessionId }
+// }
+
+// export const attendedTransferRequest = (sessionId: string) => {
+//   return { type: ATTENDED_TRANSFER_REQUEST, payload: sessionId }
+// }
+
+// export const attendedTransferSuccess = (sessionId: string) => {
+//   return { type: ATTENDED_TRANSFER_SUCCESS, payload: sessionId }
+// }
+
+// export const attendedTransferFail = (sessionId: string) => {
+//   return { type: ATTENDED_TRANSFER_FAIL, payload: sessionId }
+// }
