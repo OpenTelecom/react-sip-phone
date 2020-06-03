@@ -174,10 +174,12 @@ export default class SIPAccount {
               type: SIPSESSION_STATECHANGE,
               payload: { state: newState, id: outgoingSession.id }
             })
-            phoneStore.dispatch({
-              type: CLOSE_SESSION,
-              payload: outgoingSession.id
-            })
+            setTimeout(() => {
+              phoneStore.dispatch({
+                type: CLOSE_SESSION,
+                payload: outgoingSession.id
+              })
+            }, 5000)
             break
           default:
             console.log(`Unknown session state change: ${newState}`)

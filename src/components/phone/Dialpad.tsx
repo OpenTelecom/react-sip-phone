@@ -14,7 +14,8 @@ class Dialpad extends React.Component<Props> {
   middleRow: any = []
   bottomRow: any = []
 
-  populateButtons() {
+  constructor(props: Props) {
+    super(props)
     for (let x = 1; x < 4; x++) {
       this.topRow.push(this.getButton(x.toString()))
     }
@@ -52,10 +53,10 @@ class Dialpad extends React.Component<Props> {
   render() {
     return (
       <div className={this.props.open ? styles.dialpadOpen : styles.dialpadClosed}>
-        <div className='dialpadRow1'>{this.topRow}</div>
-        <div className='dialpadRow2'>{this.middleRow}</div>
-        <div className='dialpadRow3'>{this.bottomRow}</div>
-        <div className='dialpadRow4'>
+        <div className={styles.dialpadRow}>{this.topRow}</div>
+        <div className={styles.dialpadRow}>{this.middleRow}</div>
+        <div className={styles.dialpadRow}>{this.bottomRow}</div>
+        <div className={styles.dialpadRow}>
           {this.getButton('*')}
           {this.getButton('0')}
           {this.getButton('#')}

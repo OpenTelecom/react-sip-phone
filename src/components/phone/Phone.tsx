@@ -25,6 +25,12 @@ class Phone extends React.Component<Props> {
     currentTransferDialString: ''
   }
 
+  componentDidUpdate(newProps: Props) {
+    if (newProps.session.state === SessionState.Terminated) {
+      this.setState({ended: true})
+    }
+  }
+
   endCall() {
     if (this.props.session.state === SessionState.Established) {
       this.props.session.bye()
@@ -94,10 +100,10 @@ class Phone extends React.Component<Props> {
         <button disabled={state.ended} onClick={() => this.endCall()}>
           End Call
         </button>
-        <button disabled={state.onHold} onClick={() => this.holdCall()}>
+        <button disabled={state.onHold || state.ended} onClick={() => this.holdCall()}>
           Hold Call
         </button>
-        <button disabled={!state.onHold} onClick={() => this.unHoldCall()}>
+        <button disabled={!state.onHold || state.ended} onClick={() => this.unHoldCall()}>
           UnHold Call
         </button>
 
@@ -107,7 +113,7 @@ class Phone extends React.Component<Props> {
           }
         />
         <button
-          disabled={this.checkTransferDialstring()}
+          disabled={this.checkTransferDialstring() || state.ended}
           onClick={() => this.transferCall()}
         >
           Transfer Call

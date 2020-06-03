@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styles from './Phone.scss'
 
 interface Props {
   text: string,
@@ -7,7 +8,7 @@ interface Props {
 }
 
 const DialButton = ({ text, click, style = {} }: Props) => {
-return <div onClick={click()} style={style}>{text}</div>
+return <div className={styles.dialpadButton} onClick={() => click()} style={style}>{text}</div>
 }
 
 export default DialButton

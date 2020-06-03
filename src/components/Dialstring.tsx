@@ -14,12 +14,7 @@ class Dialstring extends React.Component<Props> {
     this.props.sipAccount.makeCall(`+1${this.state.currentDialString}`)
   }
   checkDialstring() {
-    const number = this.state.currentDialString
-    if (parseInt(number, 10) && number.length === 10) {
-      return true
-    } else {
-      return false
-    }
+    return this.state.currentDialString.length === 0
   }
   render() {
     return (

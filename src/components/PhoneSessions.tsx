@@ -17,6 +17,9 @@ interface Props {
 class PhoneSessions extends React.Component<Props> {
   render() {
     return <React.Fragment>
+      {<Phone 
+        // @ts-ignore
+        session={{}} key={0} />}
       {getSessions(this.props.sessions)}
     </React.Fragment>
   }

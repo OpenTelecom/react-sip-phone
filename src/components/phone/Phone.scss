@@ -1,5 +1,8 @@
 .dialpadOpen {
   display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
 }
 
 .dialpadClosed {
@@ -7,9 +10,20 @@
 }
 
 .dialpadButton {
-
+  width: 50px;
+  height: 50px;
+  border: 1px solid black;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .dialpadButton:hover {
-  
+  opacity: 0.5;
+}
+
+.dialpadRow {
+  display: flex;
+  flex-direction: row;
 }
