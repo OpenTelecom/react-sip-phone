@@ -2,6 +2,7 @@ import * as React from 'react'
 import styles from './Phone.scss'
 import DialButton from './DialButton'
 import { Session, SessionState } from 'sip.js'
+import { getButtonLetters } from '../../util/buttons'
 
 interface Props {
   open: boolean,
@@ -28,7 +29,7 @@ class Dialpad extends React.Component<Props> {
   }
 
   getButton(value: string) {
-    return <DialButton text={value} click={() => this.handleClick(value)} />
+    return <DialButton text={value} letters={getButtonLetters(value)} click={() => this.handleClick(value)} />
   }
 
   handleClick(value: string) {

@@ -15,24 +15,25 @@ interface Props {
   sipCredentials: SipCredentials
   sipConfig: SipConfig
   store: any
+  containerStyle: any
 }
 
 export let phoneStore = defaultStore
 
 export const ReactSipPhone = ({
   name,
-  width,
+  width = 300,
   store,
   sipConfig,
-  sipCredentials
+  sipCredentials,
+  containerStyle = {}
 }: Props) => {
   //If no store is passed into component, default store is used
   const phoneStore = store ? store : defaultStore
-
   return (
     <Provider store={phoneStore}>
       <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials}>
-        <div className={styles.container} style={{ width: `${width}px` }}>
+        <div className={styles.container} style={{ ...containerStyle, width: `${width < 300 ? 300 : width}px` }}>
           <Status name={name} />
           <Dialstring />
           <PhoneSessions />

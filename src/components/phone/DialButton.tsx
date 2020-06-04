@@ -4,11 +4,18 @@ import styles from './Phone.scss'
 interface Props {
   text: string,
   click: Function,
-  style?: any
+  letters: string,
 }
 
-const DialButton = ({ text, click, style = {} }: Props) => {
-return <div className={styles.dialpadButton} onClick={() => click()} style={style}>{text}</div>
+const DialButton = ({ text, click, letters }: Props) => {
+  return <div id="sip-dial-button"
+    className={styles.dialpadButton}
+    onClick={() => click()}>
+    {text}
+    <div className={styles.dialpadButtonLetters}>
+      {letters}
+    </div>
+  </div>
 }
 
 export default DialButton

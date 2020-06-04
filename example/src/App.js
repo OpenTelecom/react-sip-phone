@@ -20,7 +20,7 @@ const App = () => {
       sipConfig={{
         websocket: websocket || 'wss://kazoo-sbc-01-us-west-1.reper.io:5065'
       }}
-      width={400}
+      width={0}
     />
   )
 }
