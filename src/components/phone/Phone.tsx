@@ -32,8 +32,6 @@ interface Props {
 }
 
 class Phone extends React.Component<Props> {
-  public _userAgent: any
-
   state = {
     dialpadOpen: true,
     ended: false,
@@ -190,7 +188,6 @@ class Phone extends React.Component<Props> {
     if (!this.state.onHold) {
       this.hold()
     }
-
     console.log(this.props.userAgent)
     const target = UserAgent.makeURI(
       `sip:${this.state.transferDialString}@sip.reper.io;user=phone`
@@ -305,33 +302,6 @@ class Phone extends React.Component<Props> {
 
   render() {
     const state = this.state
-
-    let attendedTransferConnect = this.state.attendedTransferSession ? (
-      <React.Fragment>
-        <button
-          onClick={() =>
-            this.connectAttendedTransfer(this.state.attendedTransferSession)
-          }
-        >
-          Connect Attended Transfer
-        </button>
-      </React.Fragment>
-    ) : null
-
-    let attendedTransferCancel = this.state.attendedTransferSessionPending ? (
-      <React.Fragment>
-        <button
-          onClick={() =>
-            this.cancelAttendedTransfer(
-              this.state.attendedTransferSessionPending
-            )
-          }
-        >
-          Cancel Attended Transfer
-        </button>
-      </React.Fragment>
-    ) : null
-
     return (
       <React.Fragment>
         <div>{this.props.session.state}</div>
@@ -339,28 +309,38 @@ class Phone extends React.Component<Props> {
         <button disabled={state.ended} onClick={() => this.endCall()}>
           End Call
         </button>
-
         <button disabled={state.ended} onClick={() => this.hold()}>
           {this.checkHold()}
         </button>
-
         <input
           onChange={(e) =>
             this.setState({ transferDialString: e.target.value })
-          }
-        />
+          } />
         <button
           disabled={this.checkTransferDialString()}
-          onClick={() => this.attendedTransferCall()}
-        >
+          onClick={() => this.attendedTransferCall()}>
           Attended Transfer Call
         </button>
-        {attendedTransferConnect}
-        {attendedTransferCancel}
+        {this.state.attendedTransferSession ? (
+          <React.Fragment>
+            <button
+              onClick={() =>
+                this.connectAttendedTransfer(state.attendedTransferSession)}>
+              Connect Attended Transfer
+            </button>
+          </React.Fragment>
+        ) : null}
+        {state.attendedTransferSessionPending ? (
+          <React.Fragment>
+            <button
+              onClick={() => this.cancelAttendedTransfer(state.attendedTransferSessionPending)}>
+              Cancel Attended Transfer
+            </button>
+          </React.Fragment>
+        ) : null}
         <button
           disabled={this.checkTransferDialString() || state.ended}
-          onClick={() => this.blindTransferCall()}
-        >
+          onClick={() => this.blindTransferCall()}>
           Blind Transfer Call
         </button>
         <button disabled={state.ended} onClick={() => this.mute()}>
@@ -373,11 +353,9 @@ class Phone extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
-  userAgent: state.sipAccounts.userAgent,
-  _sessionDescriptionHandler: state.sipSessions._sessionDescriptionHandler
+  userAgent: state.sipAccounts.userAgent
 })
 const actions = {
   endCall
 }
-const P = connect(mapStateToProps, actions)(Phone)
-export default P
+export default connect(mapStateToProps, actions)(Phone)
