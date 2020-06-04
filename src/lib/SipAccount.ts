@@ -90,6 +90,7 @@ export default class SIPAccount {
         incomingSession.delegate = {
           // Handle incoming REFER request.
           onRefer(referral: Referral): void {
+            console.log('ONREFER')
             phoneStore.dispatch({ type: INCOMING_CALL, payload: referral })
           }
         }

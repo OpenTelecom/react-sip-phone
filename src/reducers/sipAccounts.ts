@@ -25,7 +25,7 @@ const sipAccounts = (
       console.log('Incoming call')
       return {
         ...state,
-        incomingCalls: [...state.incomingCalls, payload]
+        incomingCalls: {...state.incomingCalls, [payload.id]: payload}
       }
     default:
       return state
