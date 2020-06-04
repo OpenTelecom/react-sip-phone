@@ -2,33 +2,43 @@ import * as React from 'react'
 import Dialpad from './Dialpad'
 import { connect } from 'react-redux'
 import { Session, SessionState, UserAgent, Inviter } from 'sip.js'
-import { endCall } from '../../actions/sipSessions'
+import {
+  endCall,
+  holdCallRequest,
+  holdCallSuccess,
+  holdCallFail,
+  unHoldCallRequest,
+  unHoldCallSuccess,
+  unHoldCallFail,
+  muteCallToggleSuccess,
+  muteCallToggleFail
+} from '../../actions/sipSessions'
 import { phoneStore } from '../../index'
 
 import {
   SIPSESSION_STATECHANGE,
   NEW_SESSION,
   CLOSE_SESSION,
-  SIPSESSION_HOLD_REQUEST,
-  SIPSESSION_HOLD_SUCCESS,
-  SIPSESSION_HOLD_FAIL,
-  SIPSESSION_UNHOLD_REQUEST,
-  SIPSESSION_UNHOLD_SUCCESS,
-  SIPSESSION_UNHOLD_FAIL,
   SIPSESSION_ATTENDED_TRANSFER_REQUEST,
   SIPSESSION_ATTENDED_TRANSFER_FAIL,
   SIPSESSION_ATTENDED_TRANSFER_SUCCESS,
   SIPSESSION_BLIND_TRANSFER_REQUEST,
   SIPSESSION_BLIND_TRANSFER_SUCCESS,
-  SIPSESSION_BLIND_TRANSFER_FAIL,
-  SIPSESSION_MUTE_TOGGLE_FAIL,
-  SIPSESSION_MUTE_TOGGLE_SUCCESS
+  SIPSESSION_BLIND_TRANSFER_FAIL
 } from '../../actions/sipSessions'
 
 interface Props {
   session: Session
-  endCall: Function
   userAgent: UserAgent
+  endCall: Function
+  holdCallRequest: Function
+  holdCallSuccess: Function
+  holdCallFail: Function
+  unHoldCallRequest: Function
+  unHoldCallSuccess: Function
+  unHoldCallFail: Function
+  muteCallToggleSuccess: Function
+  muteCallToggleFail: Function
 }
 
 class Phone extends React.Component<Props> {
@@ -68,99 +78,123 @@ class Phone extends React.Component<Props> {
 
   hold() {
     if (this.state.onHold) {
-      phoneStore.dispatch({
-        type: SIPSESSION_UNHOLD_REQUEST
+      this.props.unHoldCallRequest()
+      return new Promise((resolve, reject) => {
+        if (
+          !this.props.session.sessionDescriptionHandler ||
+          this.props.session.state !== SessionState.Established
+        ) {
+          this.props.unHoldCallFail()
+          reject('No session')
+          return
+        }
+        try {
+          this.props.session.invite()
+          this.props.unHoldCallSuccess()
+          this.setState({ onHold: false })
+          resolve()
+        } catch (err) {
+          this.props.unHoldCallFail()
+          reject(err)
+          return
+        }
       })
-      if (
-        this.props.session.state === SessionState.Established ||
-        this.props.session.state === SessionState.Establishing
-      ) {
-        this.props.session.invite()
-        this.setState({ onHold: false })
-        phoneStore.dispatch({
-          type: SIPSESSION_UNHOLD_SUCCESS
-        })
-      } else {
-        phoneStore.dispatch({
-          type: SIPSESSION_UNHOLD_FAIL
-        })
-      }
     }
 
     if (!this.state.onHold) {
-      phoneStore.dispatch({
-        type: SIPSESSION_HOLD_REQUEST
+      this.props.holdCallRequest()
+      return new Promise((resolve, reject) => {
+        if (
+          !this.props.session.sessionDescriptionHandler ||
+          this.props.session.state !== SessionState.Established
+        ) {
+          this.props.holdCallFail()
+          reject('No session to hold')
+          return
+        }
+        try {
+          this.props.session.invite({
+            sessionDescriptionHandlerModifiers: [
+              this.props.session.sessionDescriptionHandler!.holdModifier
+            ]
+          })
+          this.props.holdCallSuccess()
+          this.setState({ onHold: true })
+          resolve()
+        } catch (err) {
+          this.props.holdCallFail()
+          reject(err)
+          return
+        }
       })
-      if (
-        this.props.session.state === SessionState.Established &&
-        this.props.session.sessionDescriptionHandler
-      ) {
-        this.props.session.invite({
-          sessionDescriptionHandlerModifiers: [
-            this.props.session.sessionDescriptionHandler.holdModifier
-          ]
-        })
-        phoneStore.dispatch({
-          type: SIPSESSION_HOLD_SUCCESS
-        })
-        this.setState({ onHold: true })
-      } else {
-        phoneStore.dispatch({
-          type: SIPSESSION_HOLD_FAIL
-        })
-      }
     }
+    return
   }
 
-  async mute() {
+  mute() {
     if (this.state.onMute) {
-      if (
-        this.props.session.state === SessionState.Established ||
-        this.props.session.state === SessionState.Establishing
-      ) {
-        // @ts-ignore
-        const pc = this.props.session.sessionDescriptionHandler!.peerConnection
-        pc.getLocalStreams().forEach(function (stream: any) {
-          stream.getAudioTracks().forEach(function (track: any) {
-            track.enabled = true
+      return new Promise((resolve, reject) => {
+        if (
+          !this.props.session.sessionDescriptionHandler ||
+          this.props.session.state !== SessionState.Established
+        ) {
+          this.props.muteCallToggleFail()
+          reject('No session to mute')
+          return
+        }
+        try {
+          const pc =
+            // @ts-ignore
+            this.props.session.sessionDescriptionHandler!.peerConnection
+          pc.getLocalStreams().forEach(function (stream: any) {
+            stream.getAudioTracks().forEach(function (track: any) {
+              track.enabled = true
+            })
           })
-        })
-        phoneStore.dispatch({
-          type: SIPSESSION_MUTE_TOGGLE_SUCCESS
-        })
-        this.setState({ onMute: false })
-      } else {
-        phoneStore.dispatch({
-          type: SIPSESSION_MUTE_TOGGLE_FAIL
-        })
-      }
-
-      return
+          this.setState({ onMute: false })
+          this.props.muteCallToggleSuccess()
+          resolve()
+          return
+        } catch (err) {
+          this.props.muteCallToggleFail()
+          reject(err)
+          return
+        }
+      })
     }
+
     if (!this.state.onMute) {
-      if (
-        this.props.session.state === SessionState.Established ||
-        this.props.session.state === SessionState.Establishing
-      ) {
-        // @ts-ignore
-        const pc = this.props.session.sessionDescriptionHandler!.peerConnection
-        pc.getLocalStreams().forEach(function (stream: any) {
-          stream.getAudioTracks().forEach(function (track: any) {
-            track.enabled = false
+      return new Promise((resolve, reject) => {
+        if (
+          !this.props.session.sessionDescriptionHandler ||
+          this.props.session.state !== SessionState.Established
+        ) {
+          this.props.muteCallToggleFail()
+          reject('No session to mute')
+          return
+        }
+        try {
+          const pc =
+            // @ts-ignore
+            this.props.session.sessionDescriptionHandler!.peerConnection
+          pc.getLocalStreams().forEach(function (stream: any) {
+            stream.getAudioTracks().forEach(function (track: any) {
+              track.enabled = false
+            })
           })
-        })
-        phoneStore.dispatch({
-          type: SIPSESSION_MUTE_TOGGLE_SUCCESS
-        })
-        this.setState({ onMute: true })
-      } else {
-        phoneStore.dispatch({
-          type: SIPSESSION_MUTE_TOGGLE_FAIL
-        })
-      }
-
-      return
+          this.setState({ onMute: true })
+          this.props.muteCallToggleSuccess()
+          resolve()
+          return
+        } catch (err) {
+          this.props.muteCallToggleFail()
+          reject(err)
+          return
+        }
+      })
     }
+    this.props.muteCallToggleFail()
+    return
   }
 
   blindTransferCall() {
@@ -315,17 +349,21 @@ class Phone extends React.Component<Props> {
         <input
           onChange={(e) =>
             this.setState({ transferDialString: e.target.value })
-          } />
+          }
+        />
         <button
           disabled={this.checkTransferDialString()}
-          onClick={() => this.attendedTransferCall()}>
+          onClick={() => this.attendedTransferCall()}
+        >
           Attended Transfer Call
         </button>
         {this.state.attendedTransferSession ? (
           <React.Fragment>
             <button
               onClick={() =>
-                this.connectAttendedTransfer(state.attendedTransferSession)}>
+                this.connectAttendedTransfer(state.attendedTransferSession)
+              }
+            >
               Connect Attended Transfer
             </button>
           </React.Fragment>
@@ -333,14 +371,20 @@ class Phone extends React.Component<Props> {
         {state.attendedTransferSessionPending ? (
           <React.Fragment>
             <button
-              onClick={() => this.cancelAttendedTransfer(state.attendedTransferSessionPending)}>
+              onClick={() =>
+                this.cancelAttendedTransfer(
+                  state.attendedTransferSessionPending
+                )
+              }
+            >
               Cancel Attended Transfer
             </button>
           </React.Fragment>
         ) : null}
         <button
           disabled={this.checkTransferDialString() || state.ended}
-          onClick={() => this.blindTransferCall()}>
+          onClick={() => this.blindTransferCall()}
+        >
           Blind Transfer Call
         </button>
         <button disabled={state.ended} onClick={() => this.mute()}>
@@ -356,6 +400,14 @@ const mapStateToProps = (state: any) => ({
   userAgent: state.sipAccounts.userAgent
 })
 const actions = {
-  endCall
+  endCall,
+  holdCallRequest,
+  holdCallSuccess,
+  holdCallFail,
+  unHoldCallRequest,
+  unHoldCallSuccess,
+  unHoldCallFail,
+  muteCallToggleSuccess,
+  muteCallToggleFail
 }
 export default connect(mapStateToProps, actions)(Phone)

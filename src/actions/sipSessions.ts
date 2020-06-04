@@ -36,10 +36,37 @@ export const endCall = (sessionId: string) => {
   return { type: CLOSE_SESSION, payload: sessionId }
 }
 
-// export const holdCall = (sessionId: string) => {
-//   return { type: HOLD_SESSION, payload: sessionId }
-// }
+export const holdCallRequest = () => {
+  return { type: SIPSESSION_HOLD_REQUEST }
+}
 
+export const holdCallSuccess = () => {
+  return { type: SIPSESSION_HOLD_SUCCESS }
+}
+
+export const holdCallFail = () => {
+  return { type: SIPSESSION_HOLD_FAIL }
+}
+
+export const unHoldCallRequest = () => {
+  return { type: SIPSESSION_UNHOLD_REQUEST }
+}
+
+export const unHoldCallSuccess = () => {
+  return { type: SIPSESSION_UNHOLD_SUCCESS }
+}
+
+export const unHoldCallFail = () => {
+  return { type: SIPSESSION_UNHOLD_FAIL }
+}
+
+export const muteCallToggleSuccess = () => {
+  return { type: SIPSESSION_MUTE_TOGGLE_SUCCESS }
+}
+
+export const muteCallToggleFail = () => {
+  return { type: SIPSESSION_MUTE_TOGGLE_FAIL }
+}
 // export const unHoldCall = (sessionId: string) => {
 //   return { type: UNHOLD_SESSION, payload: sessionId }
 // }
