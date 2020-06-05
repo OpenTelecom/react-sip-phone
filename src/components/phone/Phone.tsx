@@ -2,19 +2,10 @@ import * as React from 'react'
 import Dialpad from './Dialpad'
 import { connect } from 'react-redux'
 import { Session, SessionState, UserAgent, Inviter } from 'sip.js'
-import {
-  endCall,
-  holdCallRequest,
-  holdCallSuccess,
-  holdCallFail,
-  unHoldCallRequest,
-  unHoldCallSuccess,
-  unHoldCallFail,
-  muteCallToggleSuccess,
-  muteCallToggleFail
-} from '../../actions/sipSessions'
+import { endCall } from '../../actions/sipSessions'
 import { phoneStore } from '../../index'
 import Hold from './Hold'
+import Mute from './Mute'
 
 import {
   SIPSESSION_STATECHANGE,
@@ -32,22 +23,12 @@ interface Props {
   session: Session
   userAgent: UserAgent
   endCall: Function
-  holdCallRequest: Function
-  holdCallSuccess: Function
-  holdCallFail: Function
-  unHoldCallRequest: Function
-  unHoldCallSuccess: Function
-  unHoldCallFail: Function
-  muteCallToggleSuccess: Function
-  muteCallToggleFail: Function
 }
 
 class Phone extends React.Component<Props> {
   state = {
     dialpadOpen: true,
     ended: false,
-    onHold: false,
-    onMute: false,
     transferDialString: '',
     audio: null,
     attendedTransferSession: null,
@@ -78,72 +59,6 @@ class Phone extends React.Component<Props> {
       this.props.session.dispose()
       this.props.endCall(this.props.session.id)
     }, 5000)
-  }
-
-  mute() {
-    if (this.state.onMute) {
-      return new Promise((resolve, reject) => {
-        if (
-          !this.props.session.sessionDescriptionHandler ||
-          this.props.session.state !== SessionState.Established
-        ) {
-          this.props.muteCallToggleFail()
-          reject('No session to mute')
-          return
-        }
-        try {
-          const pc =
-            // @ts-ignore
-            this.props.session.sessionDescriptionHandler!.peerConnection
-          pc.getLocalStreams().forEach(function (stream: any) {
-            stream.getAudioTracks().forEach(function (track: any) {
-              track.enabled = true
-            })
-          })
-          this.setState({ onMute: false })
-          this.props.muteCallToggleSuccess()
-          resolve()
-          return
-        } catch (err) {
-          this.props.muteCallToggleFail()
-          reject(err)
-          return
-        }
-      })
-    }
-
-    if (!this.state.onMute) {
-      return new Promise((resolve, reject) => {
-        if (
-          !this.props.session.sessionDescriptionHandler ||
-          this.props.session.state !== SessionState.Established
-        ) {
-          this.props.muteCallToggleFail()
-          reject('No session to mute')
-          return
-        }
-        try {
-          const pc =
-            // @ts-ignore
-            this.props.session.sessionDescriptionHandler!.peerConnection
-          pc.getLocalStreams().forEach(function (stream: any) {
-            stream.getAudioTracks().forEach(function (track: any) {
-              track.enabled = false
-            })
-          })
-          this.setState({ onMute: true })
-          this.props.muteCallToggleSuccess()
-          resolve()
-          return
-        } catch (err) {
-          this.props.muteCallToggleFail()
-          reject(err)
-          return
-        }
-      })
-    }
-    this.props.muteCallToggleFail()
-    return
   }
 
   blindTransferCall() {
@@ -263,16 +178,6 @@ class Phone extends React.Component<Props> {
     }
   }
 
-  checkMute() {
-    if (this.state.onMute) {
-      const muteMarkup = 'Unmute'
-      return muteMarkup
-    } else {
-      const muteMarkup = 'Mute'
-      return muteMarkup
-    }
-  }
-
   render() {
     const state = this.state
     return (
@@ -282,6 +187,7 @@ class Phone extends React.Component<Props> {
         <button disabled={state.ended} onClick={() => this.endCall()}>
           End Call
         </button>
+        <Mute session={this.props.session} />
         <Hold session={this.props.session} />
         <input
           onChange={(e) =>
@@ -324,9 +230,6 @@ class Phone extends React.Component<Props> {
         >
           Blind Transfer Call
         </button>
-        <button disabled={state.ended} onClick={() => this.mute()}>
-          {this.checkMute()}
-        </button>
       </React.Fragment>
     )
   }
@@ -337,14 +240,6 @@ const mapStateToProps = (state: any) => ({
   userAgent: state.sipAccounts.userAgent
 })
 const actions = {
-  endCall,
-  holdCallRequest,
-  holdCallSuccess,
-  holdCallFail,
-  unHoldCallRequest,
-  unHoldCallSuccess,
-  unHoldCallFail,
-  muteCallToggleSuccess,
-  muteCallToggleFail
+  endCall
 }
 export default connect(mapStateToProps, actions)(Phone)
