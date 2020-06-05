@@ -100,3 +100,14 @@ export const unMuteCallSuccess = () => {
 export const unMuteCallFail = () => {
   return { type: SIPSESSION_UNMUTE_FAIL }
 }
+
+export const blindTransferRequest = () => {
+  return { type: SIPSESSION_BLIND_TRANSFER_REQUEST }
+}
+export const blindTransferSuccess = () => {
+  return { type: SIPSESSION_BLIND_TRANSFER_SUCCESS }
+}
+
+export const blindTransferFail = () => {
+  return { SIPSESSION_BLIND_TRANSFER_FAIL }
+}

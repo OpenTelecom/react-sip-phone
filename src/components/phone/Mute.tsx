@@ -22,7 +22,6 @@ interface Props {
   unMuteCallFail: Function
 
   onMute: Array<Object>
-  //   onHold: any
 }
 
 class Mute extends React.Component<Props> {
