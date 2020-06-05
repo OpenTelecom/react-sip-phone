@@ -19,8 +19,12 @@ export const SIPSESSION_UNHOLD_REQUEST = 'SIPSESSION_UNHOLD_REQUEST'
 export const SIPSESSION_UNHOLD_SUCCESS = 'SIPSESSION_UNHOLD_SUCCESS'
 export const SIPSESSION_UNHOLD_FAIL = 'SIPSESSION_UNHOLD_FAIL'
 
-export const SIPSESSION_MUTE_TOGGLE_FAIL = 'SIPSESSION_MUTE_TOGGLE_FAIL'
-export const SIPSESSION_MUTE_TOGGLE_SUCCESS = 'SIPSESSION_MUTE_TOGGLE_SUCCESS'
+export const SIPSESSION_MUTE_REQUEST = 'SIPSESSION_MUTE_REQUEST'
+export const SIPSESSION_MUTE_SUCCESS = 'SIPSESSION_MUTE_SUCCESS'
+export const SIPSESSION_MUTE_FAIL = 'SIPSESSION_MUTE_FAIL'
+export const SIPSESSION_UNMUTE_REQUEST = 'SIPSESSION_UNMUTE_REQUEST'
+export const SIPSESSION_UNMUTE_SUCCESS = 'SIPSESSION_UNMUTE_SUCCESS'
+export const SIPSESSION_UNMUTE_FAIL = 'SIPSESSION_UNMUTE_FAIL'
 
 export const SIPSESSION_BLIND_TRANSFER_REQUEST =
   'SIPSESSION_BLIND_TRANSFER_REQUEST'
@@ -74,10 +78,25 @@ export const unHoldCallFail = () => {
   return { type: SIPSESSION_UNHOLD_FAIL }
 }
 
-export const muteCallToggleSuccess = () => {
-  return { type: SIPSESSION_MUTE_TOGGLE_SUCCESS }
+export const muteCallRequest = (sessionId: string) => {
+  return { type: SIPSESSION_MUTE_REQUEST, payload: sessionId }
 }
 
-export const muteCallToggleFail = () => {
-  return { type: SIPSESSION_MUTE_TOGGLE_FAIL }
+export const muteCallSuccess = () => {
+  return { type: SIPSESSION_MUTE_SUCCESS }
+}
+
+export const muteCallFail = () => {
+  return { type: SIPSESSION_MUTE_FAIL }
+}
+
+export const unMuteCallRequest = (sessionId: string) => {
+  return { type: SIPSESSION_UNMUTE_REQUEST, payload: sessionId }
+}
+export const unMuteCallSuccess = () => {
+  return { type: SIPSESSION_UNMUTE_SUCCESS }
+}
+
+export const unMuteCallFail = () => {
+  return { type: SIPSESSION_UNMUTE_FAIL }
 }

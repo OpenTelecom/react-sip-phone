@@ -7,14 +7,17 @@ import {
   ACCEPT_CALL,
   DECLINE_CALL,
   SIPSESSION_HOLD_REQUEST,
-  SIPSESSION_UNHOLD_REQUEST
+  SIPSESSION_UNHOLD_REQUEST,
+  SIPSESSION_MUTE_REQUEST,
+  SIPSESSION_UNMUTE_REQUEST
 } from '../actions/sipSessions'
 const sipSessions = (
   state = {
     sessions: {},
     incomingCalls: {},
     stateChanged: 0,
-    onHold: {}
+    onHold: {},
+    onMute: {}
   },
   action: Action
 ) => {
@@ -73,6 +76,18 @@ const sipSessions = (
       return {
         ...state,
         onHold: newHold
+      }
+    case SIPSESSION_MUTE_REQUEST:
+      return {
+        ...state,
+        onMute: { ...state.onMute, [payload]: true }
+      }
+    case SIPSESSION_UNMUTE_REQUEST:
+      const newMute: any = { ...state.onMute }
+      delete newMute[payload]
+      return {
+        ...state,
+        onMute: newMute
       }
     default:
       return state
