@@ -25,7 +25,6 @@ interface Props {
 
 class Hold extends React.Component<Props> {
   hold() {
-    //&& if this.props.onHold.(session id ) == true
     if (this.props.session.id in this.props.onHold) {
       this.props.unHoldCallRequest(this.props.session.id)
       return new Promise((resolve, reject) => {

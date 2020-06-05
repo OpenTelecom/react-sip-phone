@@ -34,13 +34,16 @@ export const SIPSESSION_BLIND_TRANSFER_FAIL = 'SIPSESSION_BLIND_TRANSFER_FAIL'
 
 export const SIPSESSION_ATTENDED_TRANSFER_REQUEST =
   'SIPSESSION_ATTENDED_TRANSFER_REQUEST'
+export const SIPSESSION_ATTENDED_TRANSFER_PENDING =
+  'SIPSESSION_ATTENDED_TRANSFER_PENDING'
+export const SIPSESSION_ATTENDED_TRANSFER_READY =
+  'SIPSESSION_ATTENDED_TRANSFER_READY'
+export const SIPSESSION_ATTENDED_TRANSFER_CANCEL =
+  'SIPSESSION_ATTENDED_TRANSFER_CANCEL'
 export const SIPSESSION_ATTENDED_TRANSFER_FAIL =
   'SIPSESSION_ATTENDED_TRANSFER_FAIL'
 export const SIPSESSION_ATTENDED_TRANSFER_SUCCESS =
   'SIPSESSION_ATTENDED_TRANSFER_SUCCESS'
-
-export const ATTENDED_TRANSFER_SUCCESS = 'ATTENDED_TRANSFER_SUCCESS'
-export const ATTENDED_TRANSFER_FAIL = 'ATTENDED_TRANSFER_FAIL'
 
 export const acceptCall = (session: Session) => {
   return { type: ACCEPT_CALL, payload: session }
@@ -109,5 +112,28 @@ export const blindTransferSuccess = () => {
 }
 
 export const blindTransferFail = () => {
-  return { SIPSESSION_BLIND_TRANSFER_FAIL }
+  return { SIPSESSION_ATTENDED_TRANSFER_FAIL }
+}
+
+export const attendedTransferRequest = () => {
+  return { type: SIPSESSION_ATTENDED_TRANSFER_REQUEST }
+}
+export const attendedTransferPending = () => {
+  return { type: SIPSESSION_ATTENDED_TRANSFER_PENDING }
+}
+
+export const attendedTransferReady = () => {
+  return { type: SIPSESSION_ATTENDED_TRANSFER_READY }
+}
+
+export const attendedTransferCancel = () => {
+  return { type: SIPSESSION_ATTENDED_TRANSFER_CANCEL }
+}
+
+export const attendedTransferSuccess = () => {
+  return { type: SIPSESSION_ATTENDED_TRANSFER_SUCCESS }
+}
+
+export const attendedTransferFail = () => {
+  return { SIPSESSION_ATTENDED_TRANSFER_FAIL }
 }
