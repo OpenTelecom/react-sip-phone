@@ -59,7 +59,6 @@ class AttendedTransfer extends React.Component<Props> {
             this.props.attendedTransferPending()
             break
           case SessionState.Established:
-            //ready and pending bc we have cancel and connect
             this.setState({ attendedTransferSessionReady: outgoingSession })
             this.props.attendedTransferReady()
             this.setState({ attendedTransferSessionPending: false })
@@ -114,40 +113,51 @@ class AttendedTransfer extends React.Component<Props> {
     this.setState({ attendedTransferSession: null })
   }
 
-  render() {
-    const state = this.state
+  checkAttendedTransferMarkup() {
+    if (this.state.attendedTransferSessionReady) {
+      const attendedTransferMarkup = (
+        <React.Fragment>
+          <button
+            onClick={() =>
+              this.connectAttendedTransfer(
+                this.state.attendedTransferSessionReady
+              )
+            }
+          >
+            Connect Attended Transfer
+          </button>
+        </React.Fragment>
+      )
+      return attendedTransferMarkup
+    } else if (this.state.attendedTransferSessionPending) {
+      let attendedTransferMarkup = (
+        <React.Fragment>
+          <button
+            onClick={() =>
+              this.cancelAttendedTransfer(
+                this.state.attendedTransferSessionPending
+              )
+            }
+          >
+            Cancel Attended Transfer
+          </button>
+        </React.Fragment>
+      )
+      return attendedTransferMarkup
+    } else {
+      const attendedTransferMarkup = (
+        <React.Fragment>
+          <button onClick={() => this.attendedTransferCall()}>
+            Attended Transfer Call
+          </button>
+        </React.Fragment>
+      )
+      return attendedTransferMarkup
+    }
+  }
 
-    return (
-      <React.Fragment>
-        <button onClick={() => this.attendedTransferCall()}>
-          Attended Transfer Call
-        </button>
-        {state.attendedTransferSessionReady ? (
-          <React.Fragment>
-            <button
-              onClick={() =>
-                this.connectAttendedTransfer(state.attendedTransferSessionReady)
-              }
-            >
-              Connect Attended Transfer
-            </button>
-          </React.Fragment>
-        ) : null}
-        {state.attendedTransferSessionPending ? (
-          <React.Fragment>
-            <button
-              onClick={() =>
-                this.cancelAttendedTransfer(
-                  state.attendedTransferSessionPending
-                )
-              }
-            >
-              Cancel Attended Transfer
-            </button>
-          </React.Fragment>
-        ) : null}
-      </React.Fragment>
-    )
+  render() {
+    return <React.Fragment>{this.checkAttendedTransferMarkup()}</React.Fragment>
   }
 }
 

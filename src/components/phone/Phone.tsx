@@ -18,8 +18,7 @@ class Phone extends React.Component<Props> {
   state = {
     dialpadOpen: true,
     ended: false,
-    transferDialString: '',
-    audio: null
+    transferDialString: ''
   }
 
   componentDidUpdate(newProps: Props) {
