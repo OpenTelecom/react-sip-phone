@@ -1,10 +1,9 @@
 import { Action } from './models'
-import { INCOMING_CALL, NEW_USERAGENT, NEW_ACCOUNT } from '../actions/sipAccounts'
+import { NEW_USERAGENT, NEW_ACCOUNT } from '../actions/sipAccounts'
 const sipAccounts = (
   state = {
     sipAccount: null,
     userAgent: null,
-    incomingCalls: [],
     status: ''
   },
   action: Action
@@ -20,12 +19,6 @@ const sipAccounts = (
       return {
         ...state,
         userAgent: payload
-      }
-    case INCOMING_CALL:
-      console.log('Incoming call')
-      return {
-        ...state,
-        incomingCalls: {...state.incomingCalls, [payload.id]: payload}
       }
     default:
       return state

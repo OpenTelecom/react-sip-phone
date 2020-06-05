@@ -1,4 +1,10 @@
+import { Session } from 'sip.js'
 export const NEW_SESSION = 'NEW_SESSION'
+export const INCOMING_CALL = 'INCOMING_CALL'
+
+export const ACCEPT_CALL = 'ACCEPT_CALL'
+export const DECLINE_CALL = 'DECLINE_CALL'
+
 export const SIPSESSION_STATECHANGE = 'SIPSESSION_STATECHANGE'
 export const CLOSE_SESSION = 'CLOSE_SESSION'
 
@@ -31,6 +37,14 @@ export const SIPSESSION_ATTENDED_TRANSFER_SUCCESS =
 
 export const ATTENDED_TRANSFER_SUCCESS = 'ATTENDED_TRANSFER_SUCCESS'
 export const ATTENDED_TRANSFER_FAIL = 'ATTENDED_TRANSFER_FAIL'
+
+export const acceptCall = (session: Session) => {
+  return { type: ACCEPT_CALL, payload: session }
+}
+
+export const declineCall = (session: Session) => {
+  return { type: DECLINE_CALL, payload: session }
+}
 
 export const endCall = (sessionId: string) => {
   return { type: CLOSE_SESSION, payload: sessionId }
@@ -67,18 +81,3 @@ export const muteCallToggleSuccess = () => {
 export const muteCallToggleFail = () => {
   return { type: SIPSESSION_MUTE_TOGGLE_FAIL }
 }
-// export const unHoldCall = (sessionId: string) => {
-//   return { type: UNHOLD_SESSION, payload: sessionId }
-// }
-
-// export const attendedTransferRequest = (sessionId: string) => {
-//   return { type: ATTENDED_TRANSFER_REQUEST, payload: sessionId }
-// }
-
-// export const attendedTransferSuccess = (sessionId: string) => {
-//   return { type: ATTENDED_TRANSFER_SUCCESS, payload: sessionId }
-// }
-
-// export const attendedTransferFail = (sessionId: string) => {
-//   return { type: ATTENDED_TRANSFER_FAIL, payload: sessionId }
-// }

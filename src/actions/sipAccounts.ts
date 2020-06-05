@@ -1,6 +1,5 @@
 import SIPAccount from "../lib/SipAccount"
 
-export const INCOMING_CALL = 'INCOMING_CALL'
 export const SIPACCOUNT_UNREGISTERED = 'SIPACCOUNT_UNREGISTERED'
 export const NEW_USERAGENT = 'NEW_USERAGENT'
 export const NEW_ACCOUNT = 'NEW_ACCOUNT'

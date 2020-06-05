@@ -8,6 +8,11 @@ declare module '*.css' {
 }
 declare module '*.scss'; 
 
+declare module '*.mp3' {
+  const src: string;
+  export default src;
+}
+
 interface SvgrComponent extends React.StatelessComponent<React.SVGAttributes<SVGElement>> {}
 
 declare module '*.svg' {
