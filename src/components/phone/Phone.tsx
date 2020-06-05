@@ -6,6 +6,7 @@ import { endCall } from '../../actions/sipSessions'
 import { phoneStore } from '../../index'
 import Hold from './Hold'
 import Mute from './Mute'
+import BlindTranfer from './BlindTransfer'
 
 import {
   SIPSESSION_STATECHANGE,
@@ -13,10 +14,7 @@ import {
   CLOSE_SESSION,
   SIPSESSION_ATTENDED_TRANSFER_REQUEST,
   SIPSESSION_ATTENDED_TRANSFER_FAIL,
-  SIPSESSION_ATTENDED_TRANSFER_SUCCESS,
-  SIPSESSION_BLIND_TRANSFER_REQUEST,
-  SIPSESSION_BLIND_TRANSFER_SUCCESS,
-  SIPSESSION_BLIND_TRANSFER_FAIL
+  SIPSESSION_ATTENDED_TRANSFER_SUCCESS
 } from '../../actions/sipSessions'
 
 interface Props {
@@ -59,27 +57,6 @@ class Phone extends React.Component<Props> {
       this.props.session.dispose()
       this.props.endCall(this.props.session.id)
     }, 5000)
-  }
-
-  blindTransferCall() {
-    phoneStore.dispatch({
-      type: SIPSESSION_BLIND_TRANSFER_REQUEST
-    })
-    const target = UserAgent.makeURI(
-      `sip:${this.state.transferDialString}@sip.reper.io;user=phone`
-    )
-    console.log(target)
-    if (target) {
-      this.props.session.refer(target)
-      phoneStore.dispatch({
-        type: SIPSESSION_BLIND_TRANSFER_SUCCESS
-      })
-      this.setState({ transferDialString: '' })
-    } else {
-      phoneStore.dispatch({
-        type: SIPSESSION_BLIND_TRANSFER_FAIL
-      })
-    }
   }
 
   attendedTransferCall() {
@@ -224,12 +201,10 @@ class Phone extends React.Component<Props> {
             </button>
           </React.Fragment>
         ) : null}
-        <button
-          disabled={this.checkTransferDialString() || state.ended}
-          onClick={() => this.blindTransferCall()}
-        >
-          Blind Transfer Call
-        </button>
+        <BlindTranfer
+          destination={state.transferDialString}
+          session={this.props.session}
+        />
       </React.Fragment>
     )
   }
