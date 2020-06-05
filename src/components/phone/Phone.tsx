@@ -14,6 +14,7 @@ import {
   muteCallToggleFail
 } from '../../actions/sipSessions'
 import { phoneStore } from '../../index'
+import Hold from './Hold'
 
 import {
   SIPSESSION_STATECHANGE,
@@ -54,7 +55,10 @@ class Phone extends React.Component<Props> {
   }
 
   componentDidUpdate(newProps: Props) {
-    if (newProps.session.state === SessionState.Terminated && this.state.ended === false) {
+    if (
+      newProps.session.state === SessionState.Terminated &&
+      this.state.ended === false
+    ) {
       this.setState({ ended: true })
     }
   }
@@ -74,61 +78,6 @@ class Phone extends React.Component<Props> {
       this.props.session.dispose()
       this.props.endCall(this.props.session.id)
     }, 5000)
-  }
-
-  hold() {
-    if (this.state.onHold) {
-      this.props.unHoldCallRequest()
-      return new Promise((resolve, reject) => {
-        if (
-          !this.props.session.sessionDescriptionHandler ||
-          this.props.session.state !== SessionState.Established
-        ) {
-          this.props.unHoldCallFail()
-          reject('No session')
-          return
-        }
-        try {
-          this.props.session.invite()
-          this.props.unHoldCallSuccess()
-          this.setState({ onHold: false })
-          resolve()
-        } catch (err) {
-          this.props.unHoldCallFail()
-          reject(err)
-          return
-        }
-      })
-    }
-
-    if (!this.state.onHold) {
-      this.props.holdCallRequest()
-      return new Promise((resolve, reject) => {
-        if (
-          !this.props.session.sessionDescriptionHandler ||
-          this.props.session.state !== SessionState.Established
-        ) {
-          this.props.holdCallFail()
-          reject('No session to hold')
-          return
-        }
-        try {
-          this.props.session.invite({
-            sessionDescriptionHandlerModifiers: [
-              this.props.session.sessionDescriptionHandler!.holdModifier
-            ]
-          })
-          this.props.holdCallSuccess()
-          this.setState({ onHold: true })
-          resolve()
-        } catch (err) {
-          this.props.holdCallFail()
-          reject(err)
-          return
-        }
-      })
-    }
-    return
   }
 
   mute() {
@@ -219,9 +168,9 @@ class Phone extends React.Component<Props> {
   }
 
   attendedTransferCall() {
-    if (!this.state.onHold) {
-      this.hold()
-    }
+    // if (!this.state.onHold) {
+    //   this.hold()
+    // }
     console.log(this.props.userAgent)
     const target = UserAgent.makeURI(
       `sip:${this.state.transferDialString}@sip.reper.io;user=phone`
@@ -324,16 +273,6 @@ class Phone extends React.Component<Props> {
     }
   }
 
-  checkHold() {
-    if (this.state.onHold) {
-      const holdMarkup = 'Unhold'
-      return holdMarkup
-    } else {
-      const holdMarkup = 'Hold'
-      return holdMarkup
-    }
-  }
-
   render() {
     const state = this.state
     return (
@@ -343,9 +282,7 @@ class Phone extends React.Component<Props> {
         <button disabled={state.ended} onClick={() => this.endCall()}>
           End Call
         </button>
-        <button disabled={state.ended} onClick={() => this.hold()}>
-          {this.checkHold()}
-        </button>
+        <Hold session={this.props.session} />
         <input
           onChange={(e) =>
             this.setState({ transferDialString: e.target.value })
