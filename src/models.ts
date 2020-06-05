@@ -6,5 +6,7 @@ export interface SipCredentials {
 export interface SipConfig {
   websocket: string,
   video: boolean,
-  iceServers: Array<string>
+  iceServers: Array<string>,
+  defaultCountryCode: string,
+  noAnswerTimeout: number
 }
