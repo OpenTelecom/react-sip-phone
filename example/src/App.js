@@ -14,8 +14,8 @@ const App = () => {
     <ReactSipPhone
       name={name || 'Jason Lu'}
       sipCredentials={{
-        sipuri: sipuri || 'user_5Mx2k54qRf@sip.reper.io',
-        password: password || 'uYtbDuAmMJXW'
+        sipuri: sipuri || 'user_EYrB693q6Z@sip.reper.io',
+        password: password || 'J8wKwN5YUYtv'
       }}
       sipConfig={{
         websocket: websocket || 'wss://kazoo-sbc-01-us-west-1.reper.io:5065'

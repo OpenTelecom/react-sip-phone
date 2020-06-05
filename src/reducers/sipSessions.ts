@@ -5,13 +5,16 @@ import {
   SIPSESSION_STATECHANGE,
   INCOMING_CALL,
   ACCEPT_CALL,
-  DECLINE_CALL
+  DECLINE_CALL,
+  SIPSESSION_HOLD_REQUEST,
+  SIPSESSION_UNHOLD_REQUEST
 } from '../actions/sipSessions'
 const sipSessions = (
   state = {
     sessions: {},
     incomingCalls: {},
-    stateChanged: 0
+    stateChanged: 0,
+    onHold: {}
   },
   action: Action
 ) => {
@@ -35,7 +38,7 @@ const sipSessions = (
       return {
         ...state,
         incomingCalls: acceptedIncoming,
-        sessions: { ...state.sessions, [payload.id]: payload}
+        sessions: { ...state.sessions, [payload.id]: payload }
       }
     case DECLINE_CALL:
       const declinedIncoming: any = { ...state.incomingCalls }
@@ -59,7 +62,18 @@ const sipSessions = (
         sessions: newSessions,
         incomingCalls: newIncoming
       }
-
+    case SIPSESSION_HOLD_REQUEST:
+      return {
+        ...state,
+        onHold: { ...state.onHold, [payload]: true }
+      }
+    case SIPSESSION_UNHOLD_REQUEST:
+      const newHold: any = { ...state.onHold }
+      delete newHold[payload]
+      return {
+        ...state,
+        onHold: newHold
+      }
     default:
       return state
   }
