@@ -17,7 +17,9 @@ const sipSessions = (
     incomingCalls: {},
     stateChanged: 0,
     onHold: {},
-    onMute: {}
+    onMute: {},
+    attendedTransferPending: {},
+    attendedTransferReady: {}
   },
   action: Action
 ) => {
@@ -89,6 +91,37 @@ const sipSessions = (
         ...state,
         onMute: newMute
       }
+    // case SIPSESSION_ATTENDED_TRANSFER_PENDING:
+    //   return {
+    //     ...state,
+    //     attendedTransferPending: {
+    //       ...state.attendedTransferPending,
+    //       [payload.id]: payload
+    //     }
+    //   }
+    // case SIPSESSION_ATTENDED_TRANSFER_READY:
+    //   let newAttendedTransferPending: any = {
+    //     ...state.attendedTransferPending
+    //   }
+    //   delete newAttendedTransferPending[payload]
+    //   return {
+    //     ...state,
+    //     attendedTransferPending: newAttendedTransferPending,
+    //     attendedTransferReady: {
+    //       ...state.attendedTransferReady,
+    //       [payload.id]: payload
+    //     }
+    //   }
+
+    // case SIPSESSION_ATTENDED_TRANSFER_CANCEL:
+    //   let newAttendedTransferCancel: any = {
+    //     ...state.attendedTransferPending
+    //   }
+    //   delete newAttendedTransferPending[payload]
+    //   return {
+    //     ...state,
+    //     attendedTransferPending: newAttendedTransferCancel
+    //   }
     default:
       return state
   }
