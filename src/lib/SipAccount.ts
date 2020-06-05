@@ -6,17 +6,16 @@ import {
   RegistererState,
   RegistererOptions,
   Session,
-  SessionState,
   UserAgent,
   UserAgentOptions
 } from 'sip.js'
 import { TransportOptions } from 'sip.js/lib/platform/web'
 import { phoneStore } from '../index'
-import { INCOMING_CALL, NEW_USERAGENT } from '../actions/sipAccounts'
+import { NEW_USERAGENT } from '../actions/sipAccounts'
+import { SessionStateHandler } from '../util/sessions'
 import {
-  SIPSESSION_STATECHANGE,
   NEW_SESSION,
-  CLOSE_SESSION
+  INCOMING_CALL,
 } from '../actions/sipSessions'
 
 interface config {
@@ -90,27 +89,15 @@ export default class SIPAccount {
         incomingSession.delegate = {
           // Handle incoming REFER request.
           onRefer(referral: Referral): void {
-            console.log('ONREFER')
-            phoneStore.dispatch({ type: INCOMING_CALL, payload: referral })
+            console.log(referral)
           }
         }
 
+        phoneStore.dispatch({ type: INCOMING_CALL, payload: incomingSession })
+
+        const stateHandler = new SessionStateHandler(incomingSession.id)
         // Handle incoming session state changes.
-        incomingSession.stateChange.addListener((newState: SessionState) => {
-          switch (newState) {
-            case SessionState.Establishing:
-              // Session is establishing.
-              break
-            case SessionState.Established:
-              // Session has been established.
-              break
-            case SessionState.Terminated:
-              // Session has terminated.
-              break
-            default:
-              break
-          }
-        })
+        incomingSession.stateChange.addListener(stateHandler.stateChange)
       }
     }
   }
@@ -152,33 +139,8 @@ export default class SIPAccount {
       }
       phoneStore.dispatch({ type: NEW_SESSION, payload: outgoingSession })
       // Handle outgoing session state changes.
-      outgoingSession.stateChange.addListener((newState: SessionState) => {
-        switch (newState) {
-          case SessionState.Establishing:
-          case SessionState.Established:
-          case SessionState.Terminating:
-            phoneStore.dispatch({
-              type: SIPSESSION_STATECHANGE,
-              payload: { state: newState, id: outgoingSession.id }
-            })
-            break
-          case SessionState.Terminated:
-            phoneStore.dispatch({
-              type: SIPSESSION_STATECHANGE,
-              payload: { state: newState, id: outgoingSession.id }
-            })
-            setTimeout(() => {
-              phoneStore.dispatch({
-                type: CLOSE_SESSION,
-                payload: outgoingSession.id
-              })
-            }, 5000)
-            break
-          default:
-            console.log(`Unknown session state change: ${newState}`)
-            break
-        }
-      })
+      const stateHandler = new SessionStateHandler(outgoingSession.id)
+      outgoingSession.stateChange.addListener(stateHandler.stateChange)
       outgoingSession
         .invite()
         .then(() => {

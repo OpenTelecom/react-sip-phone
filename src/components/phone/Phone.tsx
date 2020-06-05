@@ -54,7 +54,7 @@ class Phone extends React.Component<Props> {
   }
 
   componentDidUpdate(newProps: Props) {
-    if (newProps.session.state === SessionState.Terminated) {
+    if (newProps.session.state === SessionState.Terminated && this.state.ended === false) {
       this.setState({ ended: true })
     }
   }

@@ -28,9 +28,9 @@ interface Props {
 class PhoneSessions extends React.Component<Props> {
   render() {
     return <React.Fragment>
-      {<Phone 
+      {/* {<Incoming 
         // @ts-ignore
-        session={{}} key={0} />}
+        session={{}} key={0} />} */}
       {getIncomingCallReferrals(this.props.incomingCalls)}
       {getSessions(this.props.sessions)}
     </React.Fragment>
@@ -38,7 +38,7 @@ class PhoneSessions extends React.Component<Props> {
 }
 const mapStateToProps = (state: any) => ({ 
   sessions: state.sipSessions.sessions,
-  incomingCalls: state.sipAccounts.incomingCalls
+  incomingCalls: state.sipSessions.incomingCalls
 })
 const PS = connect(mapStateToProps)(PhoneSessions)
 export default PS
