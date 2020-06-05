@@ -50,8 +50,8 @@ export const endCall = (sessionId: string) => {
   return { type: CLOSE_SESSION, payload: sessionId }
 }
 
-export const holdCallRequest = () => {
-  return { type: SIPSESSION_HOLD_REQUEST }
+export const holdCallRequest = (sessionId: string) => {
+  return { type: SIPSESSION_HOLD_REQUEST, payload: sessionId }
 }
 
 export const holdCallSuccess = () => {
@@ -62,8 +62,8 @@ export const holdCallFail = () => {
   return { type: SIPSESSION_HOLD_FAIL }
 }
 
-export const unHoldCallRequest = () => {
-  return { type: SIPSESSION_UNHOLD_REQUEST }
+export const unHoldCallRequest = (sessionId: string) => {
+  return { type: SIPSESSION_UNHOLD_REQUEST, payload: sessionId }
 }
 
 export const unHoldCallSuccess = () => {
