@@ -23,11 +23,7 @@ class SipWrapper extends React.Component<Props> {
   }
 
   initializeSip() {
-    const account = new SIPAccount({
-      websocket: this.props.sipConfig.websocket,
-      sipuri: this.props.sipCredentials.sipuri,
-      password: this.props.sipCredentials.password
-    })
+    const account = new SIPAccount(this.props.sipConfig, this.props.sipCredentials)
     this.props.setNewAccount(account)
   }
 

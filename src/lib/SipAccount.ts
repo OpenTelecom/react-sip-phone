@@ -17,37 +17,32 @@ import {
   NEW_SESSION,
   INCOMING_CALL,
 } from '../actions/sipSessions'
-
-interface config {
-  websocket: string
-  sipuri: string
-  password: string
-}
+import { SipConfig, SipCredentials } from '../models'
 
 export default class SIPAccount {
-  public _config: config
-  public _sessions: any
+  public _config: SipConfig
+  public _credentials: SipCredentials
   public _userAgent: any
   public _registerer: any
 
-  constructor(config: config) {
-    this._config = config
-    this._sessions = {}
-    const uri = UserAgent.makeURI('sip:' + config.sipuri)
+  constructor(sipConfig: SipConfig, sipCredentials: SipCredentials) {
+    this._config = sipConfig
+    this._credentials = sipCredentials
+    const uri = UserAgent.makeURI('sip:' + sipCredentials.sipuri)
     if (!uri) {
       throw new Error('Failed to create URI')
     }
     const transportOptions: TransportOptions = {
-      server: config.websocket
+      server: sipConfig.websocket
     }
     const userAgentOptions: UserAgentOptions = {
       autoStart: false,
       autoStop: true,
-      noAnswerTimeout: 30, // TODO: pass this value in from the config
+      noAnswerTimeout: sipConfig.noAnswerTimeout || 30,
       logBuiltinEnabled: process.env.NODE_ENV !== 'production',
       logConfiguration: process.env.NODE_ENV !== 'production',
       logLevel: process.env.NODE_ENV !== 'production' ? 'debug' : 'error',
-      authorizationPassword: config.password,
+      authorizationPassword: sipCredentials.password,
       userAgentString: 'OTF-react-sip-phone',
       hackWssInTransport: true,
       transportOptions,
@@ -123,7 +118,11 @@ export default class SIPAccount {
 
   makeCall(number: string) {
     // Make a call
-    const target = UserAgent.makeURI(`sip:${number}@sip.reper.io;user=phone`)
+    let fullNumber = `+${this._config.defaultCountryCode}${number}`
+    if (number.includes('+')) {
+      fullNumber = `${number}`
+    }
+    const target = UserAgent.makeURI(`sip:${fullNumber}@sip.reper.io;user=phone`)
     if (target) {
       console.log(`Calling ${number}`)
       const inviter = new Inviter(this._userAgent, target)

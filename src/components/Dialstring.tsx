@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import SIPAccount from '../lib/SipAccount'
 
 interface Props {
-  sipAccount: SIPAccount
+  sipAccount: SIPAccount,
 }
 
 class Dialstring extends React.Component<Props> {
@@ -11,7 +11,7 @@ class Dialstring extends React.Component<Props> {
     currentDialString: ''
   }
   handleDial() {
-    this.props.sipAccount.makeCall(`+1${this.state.currentDialString}`)
+    this.props.sipAccount.makeCall(`${this.state.currentDialString}`)
   }
   checkDialstring() {
     return this.state.currentDialString.length === 0
