@@ -29,7 +29,7 @@ export const ReactSipPhone = ({
   containerStyle = {}
 }: Props) => {
   //If no store is passed into component, default store is used
-  const phoneStore = store ? store : defaultStore
+  phoneStore = store ? store : defaultStore
   return (
     <Provider store={phoneStore}>
       <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials}>
