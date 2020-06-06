@@ -1,0 +1,41 @@
+@import './variables';
+
+@mixin common-button {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  &:hover {
+    opacity: 0.5;
+  }
+  background-color: $primary-color;
+  color: $almost-black;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+}
+
+@mixin common-input {
+  border: none;
+  padding: none;
+  &:focus {
+    outline: none;
+  }
+  font-size: 1em;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  border: 1px solid green;
+  font-family: Arial, Helvetica, sans-serif
+}

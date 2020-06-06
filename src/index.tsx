@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import styles from './styles.module.scss'
+import styles from './styles.scss'
 import SipWrapper from './SipWrapper'
 import Status from './components/Status'
 import PhoneSessions from './components/PhoneSessions'

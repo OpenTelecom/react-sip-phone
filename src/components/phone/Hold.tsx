@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-
+import styles from './Phone.scss'
 import { Session, SessionState, UserAgent } from 'sip.js'
 import {
   holdCallRequest,
@@ -89,10 +89,7 @@ class Hold extends React.Component<Props> {
 
   render() {
     return (
-      <React.Fragment>
-        <button onClick={() => this.hold()}>{this.checkHold()}</button>
-        {/* <button onClick={() => this.hold()}>hold</button> */}
-      </React.Fragment>
+        <button className={styles.holdButton} onClick={() => this.hold()}>{this.checkHold()}</button>
     )
   }
 }

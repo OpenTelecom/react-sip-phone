@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styles from './Status.css'
+import styles from './Status.scss'
 
 interface Props {
   name: string

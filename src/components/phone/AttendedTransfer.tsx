@@ -116,7 +116,6 @@ class AttendedTransfer extends React.Component<Props> {
   checkAttendedTransferMarkup() {
     if (this.state.attendedTransferSessionReady) {
       const attendedTransferMarkup = (
-        <React.Fragment>
           <button
             onClick={() =>
               this.connectAttendedTransfer(
@@ -126,12 +125,10 @@ class AttendedTransfer extends React.Component<Props> {
           >
             Connect Attended Transfer
           </button>
-        </React.Fragment>
       )
       return attendedTransferMarkup
     } else if (this.state.attendedTransferSessionPending) {
       let attendedTransferMarkup = (
-        <React.Fragment>
           <button
             onClick={() =>
               this.cancelAttendedTransfer(
@@ -141,16 +138,13 @@ class AttendedTransfer extends React.Component<Props> {
           >
             Cancel Attended Transfer
           </button>
-        </React.Fragment>
       )
       return attendedTransferMarkup
     } else {
       const attendedTransferMarkup = (
-        <React.Fragment>
           <button onClick={() => this.attendedTransferCall()}>
             Attended Transfer Call
           </button>
-        </React.Fragment>
       )
       return attendedTransferMarkup
     }

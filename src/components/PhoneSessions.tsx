@@ -2,7 +2,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import Phone from './phone/Phone'
 import Incoming from './phone/Incoming'
-import { Referral } from 'sip.js'
 
 const getSessions = (sessions: any) => {
   const elements = []
@@ -22,15 +21,15 @@ const getIncomingCallReferrals = (sessions: any) => {
 
 interface Props {
   sessions: any,
-  incomingCalls: Array<Referral>
+  incomingCalls: any
 }
 
 class PhoneSessions extends React.Component<Props> {
   render() {
     return <React.Fragment>
-      {/* {<Incoming 
+      {<Phone 
         // @ts-ignore
-        session={{}} key={0} />} */}
+        session={{}} key={0} />}
       {getIncomingCallReferrals(this.props.incomingCalls)}
       {getSessions(this.props.sessions)}
     </React.Fragment>

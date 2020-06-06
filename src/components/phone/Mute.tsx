@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-
+import styles from './Phone.scss'
 import { Session, SessionState, UserAgent } from 'sip.js'
 import {
   muteCallRequest,
@@ -10,6 +10,8 @@ import {
   unMuteCallSuccess,
   unMuteCallFail
 } from '../../actions/sipSessions'
+import micIcon from '../../assets/mic-24px.svg'
+import micOffIcon from '../../assets/mic_off-24px.svg'
 
 interface Props {
   session: Session
@@ -93,19 +95,15 @@ class Mute extends React.Component<Props> {
   }
   checkMute() {
     if (this.props.session.id in this.props.onMute === true) {
-      const muteMarkup = 'Unmute'
-      return muteMarkup
+      return <img src={micIcon} />
     } else {
-      const muteMarkup = 'Mute'
-      return muteMarkup
+      return <img src={micOffIcon} />
     }
   }
 
   render() {
     return (
-      <React.Fragment>
-        <button onClick={() => this.mute()}>{this.checkMute()}</button>{' '}
-      </React.Fragment>
+      <button className={styles.muteButton} onClick={() => this.mute()}>{this.checkMute()}</button>
     )
   }
 }
