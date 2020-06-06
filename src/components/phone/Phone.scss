@@ -1,4 +1,9 @@
 @import '../../variables';
+@import '../../styles.scss';
+
+@mixin phone-buttons {
+  margin: 10px;
+}
 
 .dialpadOpen {
   display: flex;
@@ -12,23 +17,9 @@
 }
 
 .dialpadButton {
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
-  background-color: $primary-color;
-  color: $almost-black;
-  margin: 10px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  @include common-button;
+  @include phone-buttons;
   font-size: 1.5em;
-  transition: opacity 0.5s ease;
-}
-
-.dialpadButton:hover {
-  opacity: 0.5;
 }
 
 .dialpadButtonLetters {
@@ -39,4 +30,28 @@
 .dialpadRow {
   display: flex;
   flex-direction: row;
+}
+
+.muteButton {
+  @include common-button;
+  @include phone-buttons;
+}
+
+.holdButton {
+  @include common-button;
+  @include phone-buttons;
+}
+
+.endCallButton {
+  @include common-button;
+  @include phone-buttons;
+  background-color: #ff6961;
+}
+
+.actionsContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }

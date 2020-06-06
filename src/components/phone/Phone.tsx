@@ -7,6 +7,8 @@ import Hold from './Hold'
 import Mute from './Mute'
 import BlindTranfer from './BlindTransfer'
 import AttendedTransfer from './AttendedTransfer'
+import styles from './Phone.scss'
+import endCallIcon from '../../assets/call_end-24px.svg'
 
 interface Props {
   session: Session
@@ -53,25 +55,26 @@ class Phone extends React.Component<Props> {
       <React.Fragment>
         <div>{this.props.session.state}</div>
         <Dialpad open={state.dialpadOpen} session={this.props.session} />
-        <button disabled={state.ended} onClick={() => this.endCall()}>
-          End Call
-        </button>
-
-        <Mute session={this.props.session} />
-        <Hold session={this.props.session} />
-        <input
-          onChange={(e) =>
-            this.setState({ transferDialString: e.target.value })
-          }
-        />
-        <AttendedTransfer
-          destination={state.transferDialString}
-          session={this.props.session}
-        />
-        <BlindTranfer
-          destination={state.transferDialString}
-          session={this.props.session}
-        />
+        <div className={styles.actionsContainer}>
+          <Mute session={this.props.session} />
+          <button className={styles.endCallButton} disabled={state.ended} onClick={() => this.endCall()}>
+            <img src={endCallIcon} />
+          </button>
+          <Hold session={this.props.session} />
+          <input
+            onChange={(e) =>
+              this.setState({ transferDialString: e.target.value })
+            }
+          />
+          <AttendedTransfer
+            destination={state.transferDialString}
+            session={this.props.session}
+          />
+          <BlindTranfer
+            destination={state.transferDialString}
+            session={this.props.session}
+          />
+        </div>
       </React.Fragment>
     )
   }

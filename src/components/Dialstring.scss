@@ -1,0 +1,20 @@
+@import '../styles.scss';
+
+.dialButton {
+  @include common-button;
+  height: 40px;
+  width: 40px;
+  background: none;
+}
+
+.dialInput {
+  @include common-input;
+}
+
+.dialstringContainer {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid black;
+  border-radius: 20px;
+  padding: 0 0 0 20px;
+}

@@ -1,5 +1,7 @@
 export const getButtonLetters = (value: string) => {
   switch (value) {
+    case '1':
+      return '1'
     case '2':
       return 'ABC'
     case '3':
