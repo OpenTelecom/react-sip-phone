@@ -4,27 +4,23 @@ import { phoneStore } from '../../index'
 import styles from './Phone.scss'
 import { Session, SessionState, UserAgent, Inviter } from 'sip.js'
 import {
-  attendedTransferRequest,
-  attendedTransferPending,
-  attendedTransferReady,
-  attendedTransferCancel,
-  attendedTransferSuccess,
-  attendedTransferFail,
+  SIPSESSION_ATTENDED_TRANSFER_REQUEST,
+  SIPSESSION_ATTENDED_TRANSFER_CANCEL,
+  SIPSESSION_ATTENDED_TRANSFER_READY,
+  SIPSESSION_ATTENDED_TRANSFER_PENDING,
+  SIPSESSION_ATTENDED_TRANSFER_SUCCESS,
+  SIPSESSION_ATTENDED_TRANSFER_FAIL,
   SIPSESSION_STATECHANGE,
   NEW_SESSION,
-  CLOSE_SESSION
+  CLOSE_SESSION,
+  holdCallRequest
 } from '../../actions/sipSessions'
 
 interface Props {
   session: Session
   userAgent: UserAgent
   destination: string
-  attendedTransferRequest: Function
-  attendedTransferPending: Function
-  attendedTransferReady: Function
-  attendedTransferCancel: Function
-  attendedTransferSuccess: Function
-  attendedTransferFail: Function
+  holdCallRequest: Function
 }
 
 class AttendedTransfer extends React.Component<Props> {
@@ -34,10 +30,11 @@ class AttendedTransfer extends React.Component<Props> {
   }
 
   attendedTransferCall() {
-    // if (!this.state.onHold) {
-    //   this.hold()
-    // }
-    this.props.attendedTransferRequest()
+    this.holdAll()
+
+    phoneStore.dispatch({
+      type: SIPSESSION_ATTENDED_TRANSFER_REQUEST
+    })
     const target = UserAgent.makeURI(
       `sip:${this.props.destination}@sip.reper.io;user=phone`
     )
@@ -56,11 +53,15 @@ class AttendedTransfer extends React.Component<Props> {
 
             //add new session to local state
             this.setState({ attendedTransferSessionPending: outgoingSession })
-            this.props.attendedTransferPending()
+            phoneStore.dispatch({
+              type: SIPSESSION_ATTENDED_TRANSFER_PENDING
+            })
             break
           case SessionState.Established:
             this.setState({ attendedTransferSessionReady: outgoingSession })
-            this.props.attendedTransferReady()
+            phoneStore.dispatch({
+              type: SIPSESSION_ATTENDED_TRANSFER_READY
+            })
             this.setState({ attendedTransferSessionPending: false })
             phoneStore.dispatch({
               type: SIPSESSION_STATECHANGE,
@@ -91,26 +92,59 @@ class AttendedTransfer extends React.Component<Props> {
         }
       })
       outgoingSession.invite().catch((error: Error) => {
-        this.props.attendedTransferFail()
+        phoneStore.dispatch({
+          type: SIPSESSION_ATTENDED_TRANSFER_FAIL
+        })
         console.log(error)
       })
     } else {
-      this.props.attendedTransferFail()
+      phoneStore.dispatch({
+        type: SIPSESSION_ATTENDED_TRANSFER_FAIL
+      })
     }
   }
 
   //refers the session in local state
   connectAttendedTransfer(attendedTransferSession: any) {
-    this.props.session.refer(attendedTransferSession)
-    this.props.attendedTransferSuccess()
-    this.setState({ attendedTransferSessionReady: null })
+    try {
+      this.props.session.refer(attendedTransferSession)
+      phoneStore.dispatch({
+        type: SIPSESSION_ATTENDED_TRANSFER_SUCCESS
+      })
+      this.setState({ attendedTransferSessionReady: null })
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   cancelAttendedTransfer(attendedTransferSession: any) {
     attendedTransferSession.cancel()
-    this.props.attendedTransferCancel()
+    phoneStore.dispatch({
+      type: SIPSESSION_ATTENDED_TRANSFER_CANCEL
+    })
     this.setState({ attendedTransferSessionPending: null })
     this.setState({ attendedTransferSession: null })
+  }
+
+  holdAll() {
+    const state = phoneStore.getState()
+
+    //@ts-ignore
+    const onHolds = state.sipSessions.onHold
+
+    //@ts-ignore
+    const sessions = state.sipSessions.sessions
+
+    if (this.props.session.id in onHolds === false) {
+      try {
+        //@ts-ignore
+        this.props.holdCallRequest(this.props.session)
+
+        return
+      } catch (err) {
+        return
+      }
+    }
   }
 
   render() {
@@ -144,7 +178,8 @@ class AttendedTransfer extends React.Component<Props> {
       return (
         <button
           className={styles.transferButtons}
-          onClick={() => this.attendedTransferCall()}>
+          onClick={() => this.attendedTransferCall()}
+        >
           Attended
         </button>
       )
@@ -155,17 +190,10 @@ class AttendedTransfer extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
-  userAgent: state.sipAccounts.userAgent,
-  attendedTransferReady: state.sipSessions.attendedTransferReady,
-  attendedTransferPending: state.sipSessions.attendedTransferPending
+  userAgent: state.sipAccounts.userAgent
 })
 const actions = {
-  attendedTransferRequest,
-  attendedTransferPending,
-  attendedTransferReady,
-  attendedTransferCancel,
-  attendedTransferSuccess,
-  attendedTransferFail
+  holdCallRequest
 }
 
 export default connect(mapStateToProps, actions)(AttendedTransfer)
