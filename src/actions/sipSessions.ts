@@ -1,4 +1,4 @@
-import { Session } from 'sip.js'
+import { Session, SessionState } from 'sip.js'
 export const NEW_SESSION = 'NEW_SESSION'
 export const INCOMING_CALL = 'INCOMING_CALL'
 
@@ -57,83 +57,35 @@ export const endCall = (sessionId: string) => {
   return { type: CLOSE_SESSION, payload: sessionId }
 }
 
-export const holdCallRequest = (sessionId: string) => {
-  return { type: SIPSESSION_HOLD_REQUEST, payload: sessionId }
+export const holdCallRequest = (session: Session) => {
+  if (
+    !session.sessionDescriptionHandler ||
+    session.state !== SessionState.Established
+  ) {
+    return { type: SIPSESSION_HOLD_FAIL }
+  }
+  try {
+    session.invite({
+      sessionDescriptionHandlerModifiers: [
+        session.sessionDescriptionHandler!.holdModifier
+      ]
+    })
+    return { type: SIPSESSION_HOLD_REQUEST, payload: session.id }
+  } catch (err) {
+    return { type: SIPSESSION_HOLD_FAIL }
+  }
 }
-
-export const holdCallSuccess = () => {
-  return { type: SIPSESSION_HOLD_SUCCESS }
-}
-
-export const holdCallFail = () => {
-  return { type: SIPSESSION_HOLD_FAIL }
-}
-
-export const unHoldCallRequest = (sessionId: string) => {
-  return { type: SIPSESSION_UNHOLD_REQUEST, payload: sessionId }
-}
-
-export const unHoldCallSuccess = () => {
-  return { type: SIPSESSION_UNHOLD_SUCCESS }
-}
-
-export const unHoldCallFail = () => {
-  return { type: SIPSESSION_UNHOLD_FAIL }
-}
-
-export const muteCallRequest = (sessionId: string) => {
-  return { type: SIPSESSION_MUTE_REQUEST, payload: sessionId }
-}
-
-export const muteCallSuccess = () => {
-  return { type: SIPSESSION_MUTE_SUCCESS }
-}
-
-export const muteCallFail = () => {
-  return { type: SIPSESSION_MUTE_FAIL }
-}
-
-export const unMuteCallRequest = (sessionId: string) => {
-  return { type: SIPSESSION_UNMUTE_REQUEST, payload: sessionId }
-}
-export const unMuteCallSuccess = () => {
-  return { type: SIPSESSION_UNMUTE_SUCCESS }
-}
-
-export const unMuteCallFail = () => {
-  return { type: SIPSESSION_UNMUTE_FAIL }
-}
-
-export const blindTransferRequest = () => {
-  return { type: SIPSESSION_BLIND_TRANSFER_REQUEST }
-}
-export const blindTransferSuccess = () => {
-  return { type: SIPSESSION_BLIND_TRANSFER_SUCCESS }
-}
-
-export const blindTransferFail = () => {
-  return { SIPSESSION_ATTENDED_TRANSFER_FAIL }
-}
-
-export const attendedTransferRequest = () => {
-  return { type: SIPSESSION_ATTENDED_TRANSFER_REQUEST }
-}
-export const attendedTransferPending = () => {
-  return { type: SIPSESSION_ATTENDED_TRANSFER_PENDING }
-}
-
-export const attendedTransferReady = () => {
-  return { type: SIPSESSION_ATTENDED_TRANSFER_READY }
-}
-
-export const attendedTransferCancel = () => {
-  return { type: SIPSESSION_ATTENDED_TRANSFER_CANCEL }
-}
-
-export const attendedTransferSuccess = () => {
-  return { type: SIPSESSION_ATTENDED_TRANSFER_SUCCESS }
-}
-
-export const attendedTransferFail = () => {
-  return { SIPSESSION_ATTENDED_TRANSFER_FAIL }
+export const unHoldCallRequest = (session: Session) => {
+  if (
+    !session.sessionDescriptionHandler ||
+    session.state !== SessionState.Established
+  ) {
+    return { type: SIPSESSION_UNHOLD_FAIL }
+  }
+  try {
+    session.invite()
+    return { type: SIPSESSION_UNHOLD_REQUEST, payload: session.id }
+  } catch (err) {
+    return { type: SIPSESSION_UNHOLD_FAIL }
+  }
 }

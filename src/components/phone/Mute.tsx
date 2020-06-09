@@ -1,40 +1,44 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { phoneStore } from '../../index'
+
 import styles from './Phone.scss'
 import { Session, SessionState, UserAgent } from 'sip.js'
-import {
-  muteCallRequest,
-  muteCallSuccess,
-  muteCallFail,
-  unMuteCallRequest,
-  unMuteCallSuccess,
-  unMuteCallFail
-} from '../../actions/sipSessions'
+
 import micOffIcon from '../../assets/mic_off-24px.svg'
+
+import {
+  SIPSESSION_MUTE_REQUEST,
+  SIPSESSION_MUTE_SUCCESS,
+  SIPSESSION_MUTE_FAIL,
+  SIPSESSION_UNMUTE_REQUEST,
+  SIPSESSION_UNMUTE_SUCCESS,
+  SIPSESSION_UNMUTE_FAIL
+} from '../../actions/sipSessions'
 
 interface Props {
   session: Session
   userAgent: UserAgent
-  muteCallRequest: Function
-  muteCallSuccess: Function
-  muteCallFail: Function
-  unMuteCallRequest: Function
-  unMuteCallSuccess: Function
-  unMuteCallFail: Function
-
-  onMute: Array<Object>
 }
 
 class Mute extends React.Component<Props> {
+  state = {
+    onMute: false
+  }
+
   mute() {
-    if (this.props.session.id in this.props.onMute) {
-      this.props.unMuteCallRequest(this.props.session.id)
+    if (this.state.onMute) {
+      phoneStore.dispatch({
+        type: SIPSESSION_UNMUTE_REQUEST
+      })
       return new Promise((resolve, reject) => {
         if (
           !this.props.session.sessionDescriptionHandler ||
           this.props.session.state !== SessionState.Established
         ) {
-          this.props.unMuteCallFail()
+          phoneStore.dispatch({
+            type: SIPSESSION_UNMUTE_FAIL
+          })
           reject('No session to mute')
           return
         }
@@ -47,30 +51,38 @@ class Mute extends React.Component<Props> {
               track.enabled = true
             })
           })
-          this.props.unMuteCallSuccess()
+          phoneStore.dispatch({
+            type: SIPSESSION_UNMUTE_SUCCESS
+          })
+          this.setState({ onMute: false })
           resolve()
           return
         } catch (err) {
-          this.props.unMuteCallFail()
+          phoneStore.dispatch({
+            type: SIPSESSION_UNMUTE_FAIL
+          })
           reject(err)
           return
         }
       })
     }
 
-    if (!(this.props.session.id in this.props.onMute)) {
+    if (!this.state.onMute) {
       return new Promise((resolve, reject) => {
         if (
           !this.props.session.sessionDescriptionHandler ||
           this.props.session.state !== SessionState.Established
         ) {
-          this.props.muteCallFail()
+          phoneStore.dispatch({
+            type: SIPSESSION_MUTE_FAIL
+          })
           reject('No session to mute')
           return
         }
         try {
-          this.props.muteCallRequest(this.props.session.id)
-
+          phoneStore.dispatch({
+            type: SIPSESSION_MUTE_REQUEST
+          })
           const pc =
             // @ts-ignore
             this.props.session.sessionDescriptionHandler!.peerConnection
@@ -79,24 +91,35 @@ class Mute extends React.Component<Props> {
               track.enabled = false
             })
           })
-          this.props.muteCallSuccess()
+          phoneStore.dispatch({
+            type: SIPSESSION_MUTE_SUCCESS
+          })
+          this.setState({ onMute: true })
+
           resolve()
           return
         } catch (err) {
-          this.props.muteCallFail()
+          phoneStore.dispatch({
+            type: SIPSESSION_MUTE_FAIL
+          })
           reject(err)
           return
         }
       })
     }
-    this.props.muteCallFail()
+    phoneStore.dispatch({
+      type: SIPSESSION_MUTE_FAIL
+    })
     return
   }
+
   checkMute() {
-    if (this.props.session.id in this.props.onMute === true) {
-      return <img src={''} />
+    if (this.state.onMute) {
+      const muteMarkup = 'Unmute'
+      return muteMarkup
     } else {
-      return <img src={micOffIcon} />
+      const muteMarkup = 'Mute'
+      return muteMarkup
     }
   }
 
@@ -112,16 +135,8 @@ class Mute extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
-  userAgent: state.sipAccounts.userAgent,
-  onMute: state.sipSessions.onMute
+  userAgent: state.sipAccounts.userAgent
 })
-const actions = {
-  muteCallRequest,
-  muteCallSuccess,
-  muteCallFail,
-  unMuteCallRequest,
-  unMuteCallSuccess,
-  unMuteCallFail
-}
+const actions = {}
 
 export default connect(mapStateToProps, actions)(Mute)

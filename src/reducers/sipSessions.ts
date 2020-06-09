@@ -7,17 +7,14 @@ import {
   ACCEPT_CALL,
   DECLINE_CALL,
   SIPSESSION_HOLD_REQUEST,
-  SIPSESSION_UNHOLD_REQUEST,
-  SIPSESSION_MUTE_REQUEST,
-  SIPSESSION_UNMUTE_REQUEST
+  SIPSESSION_UNHOLD_REQUEST
 } from '../actions/sipSessions'
 const sipSessions = (
   state = {
     sessions: {},
     incomingCalls: {},
     stateChanged: 0,
-    onHold: {},
-    onMute: {}
+    onHold: []
   },
   action: Action
 ) => {
@@ -60,34 +57,25 @@ const sipSessions = (
       const newSessions: any = { ...state.sessions }
       delete newSessions[payload]
       delete newIncoming[payload]
+      const endHold = [...state.onHold].filter((session) => session !== payload)
+
       return {
         ...state,
         sessions: newSessions,
-        incomingCalls: newIncoming
+        incomingCalls: newIncoming,
+        onHold: endHold
       }
     case SIPSESSION_HOLD_REQUEST:
       return {
         ...state,
-        onHold: { ...state.onHold, [payload]: true }
+        onHold: [...state.onHold, payload]
       }
     case SIPSESSION_UNHOLD_REQUEST:
-      const newHold: any = { ...state.onHold }
-      delete newHold[payload]
+      const newHold = [...state.onHold].filter((session) => session !== payload)
+
       return {
         ...state,
         onHold: newHold
-      }
-    case SIPSESSION_MUTE_REQUEST:
-      return {
-        ...state,
-        onMute: { ...state.onMute, [payload]: true }
-      }
-    case SIPSESSION_UNMUTE_REQUEST:
-      const newMute: any = { ...state.onMute }
-      delete newMute[payload]
-      return {
-        ...state,
-        onMute: newMute
       }
     default:
       return state

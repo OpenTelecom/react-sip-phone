@@ -1,34 +1,43 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { phoneStore } from '../../index'
+
 import styles from './Phone.scss'
+
 import { Session, UserAgent } from 'sip.js'
 import {
-  blindTransferRequest,
-  blindTransferSuccess,
-  blindTransferFail
+  SIPSESSION_BLIND_TRANSFER_REQUEST,
+  SIPSESSION_BLIND_TRANSFER_SUCCESS,
+  SIPSESSION_BLIND_TRANSFER_FAIL
 } from '../../actions/sipSessions'
 
 interface Props {
   session: Session
   userAgent: UserAgent
   destination: string
-  blindTransferRequest: Function
-  blindTransferSuccess: Function
-  blindTransferFail: Function
 }
 
 class BlindTransfer extends React.Component<Props> {
   blindTransferCall() {
-    this.props.blindTransferRequest
+    phoneStore.dispatch({
+      type: SIPSESSION_BLIND_TRANSFER_REQUEST
+    })
     const target = UserAgent.makeURI(
       `sip:${this.props.destination}@sip.reper.io;user=phone`
     )
-    console.log(target)
     if (target) {
-      this.props.session.refer(target)
-      this.props.blindTransferSuccess
+      try {
+        this.props.session.refer(target)
+        phoneStore.dispatch({
+          type: SIPSESSION_BLIND_TRANSFER_SUCCESS
+        })
+      } catch (err) {
+        console.log(err)
+      }
     } else {
-      this.props.blindTransferFail
+      phoneStore.dispatch({
+        type: SIPSESSION_BLIND_TRANSFER_FAIL
+      })
     }
   }
 
@@ -37,7 +46,8 @@ class BlindTransfer extends React.Component<Props> {
       <React.Fragment>
         <button
           className={styles.transferButtons}
-          onClick={() => this.blindTransferCall()}>
+          onClick={() => this.blindTransferCall()}
+        >
           Blind
         </button>
       </React.Fragment>
@@ -48,13 +58,8 @@ class BlindTransfer extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
-  userAgent: state.sipAccounts.userAgent,
-  onHold: state.sipSessions.onHold
+  userAgent: state.sipAccounts.userAgent
 })
-const actions = {
-  blindTransferRequest,
-  blindTransferSuccess,
-  blindTransferFail
-}
+const actions = {}
 
 export default connect(mapStateToProps, actions)(BlindTransfer)
