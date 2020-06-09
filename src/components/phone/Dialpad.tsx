@@ -29,7 +29,7 @@ class Dialpad extends React.Component<Props> {
   }
 
   getButton(value: string) {
-    return <DialButton text={value} letters={getButtonLetters(value)} click={() => this.handleClick(value)} />
+    return <DialButton key={value} text={value} letters={getButtonLetters(value)} click={() => this.handleClick(value)} />
   }
 
   handleClick(value: string) {
@@ -53,7 +53,7 @@ class Dialpad extends React.Component<Props> {
   
   render() {
     return (
-      <div className={this.props.open ? styles.dialpadOpen : styles.dialpadClosed}>
+      <div className={this.props.open ? '' : styles.closed} id={styles.dialpad}>
         <div className={styles.dialpadRow}>{this.topRow}</div>
         <div className={styles.dialpadRow}>{this.middleRow}</div>
         <div className={styles.dialpadRow}>{this.bottomRow}</div>

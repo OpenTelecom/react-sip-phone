@@ -10,7 +10,6 @@ import {
   unMuteCallSuccess,
   unMuteCallFail
 } from '../../actions/sipSessions'
-import micIcon from '../../assets/mic-24px.svg'
 import micOffIcon from '../../assets/mic_off-24px.svg'
 
 interface Props {
@@ -95,7 +94,7 @@ class Mute extends React.Component<Props> {
   }
   checkMute() {
     if (this.props.session.id in this.props.onMute === true) {
-      return <img src={micIcon} />
+      return <img src={''} />
     } else {
       return <img src={micOffIcon} />
     }
@@ -103,7 +102,9 @@ class Mute extends React.Component<Props> {
 
   render() {
     return (
-      <button className={styles.muteButton} onClick={() => this.mute()}>{this.checkMute()}</button>
+      <button id={styles.actionButton} onClick={() => this.mute()}>
+        <img src={micOffIcon} />
+      </button>
     )
   }
 }

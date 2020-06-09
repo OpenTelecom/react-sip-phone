@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { phoneStore } from '../../index'
-
+import styles from './Phone.scss'
 import { Session, SessionState, UserAgent, Inviter } from 'sip.js'
 import {
   attendedTransferRequest,
@@ -113,45 +113,42 @@ class AttendedTransfer extends React.Component<Props> {
     this.setState({ attendedTransferSession: null })
   }
 
-  checkAttendedTransferMarkup() {
-    if (this.state.attendedTransferSessionReady) {
-      const attendedTransferMarkup = (
-          <button
-            onClick={() =>
-              this.connectAttendedTransfer(
-                this.state.attendedTransferSessionReady
-              )
-            }
-          >
-            Connect Attended Transfer
-          </button>
-      )
-      return attendedTransferMarkup
-    } else if (this.state.attendedTransferSessionPending) {
-      let attendedTransferMarkup = (
-          <button
-            onClick={() =>
-              this.cancelAttendedTransfer(
-                this.state.attendedTransferSessionPending
-              )
-            }
-          >
-            Cancel Attended Transfer
-          </button>
-      )
-      return attendedTransferMarkup
-    } else {
-      const attendedTransferMarkup = (
-          <button onClick={() => this.attendedTransferCall()}>
-            Attended Transfer Call
-          </button>
-      )
-      return attendedTransferMarkup
-    }
-  }
-
   render() {
-    return <React.Fragment>{this.checkAttendedTransferMarkup()}</React.Fragment>
+    if (this.state.attendedTransferSessionReady) {
+      return (
+        <button
+          className={styles.transferButtons}
+          onClick={() =>
+            this.connectAttendedTransfer(
+              this.state.attendedTransferSessionReady
+            )
+          }
+        >
+          Connect
+        </button>
+      )
+    } else if (this.state.attendedTransferSessionPending) {
+      return (
+        <button
+          className={styles.transferButtons}
+          onClick={() =>
+            this.cancelAttendedTransfer(
+              this.state.attendedTransferSessionPending
+            )
+          }
+        >
+          Cancel
+        </button>
+      )
+    } else {
+      return (
+        <button
+          className={styles.transferButtons}
+          onClick={() => this.attendedTransferCall()}>
+          Attended
+        </button>
+      )
+    }
   }
 }
 

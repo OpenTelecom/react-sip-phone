@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { Invitation } from 'sip.js'
 import { connect } from 'react-redux'
+import styles from './Phone.scss'
 import { acceptCall, declineCall } from '../../actions/sipSessions'
+import acceptIcon from '../../assets/call-24px.svg'
+import declineIcon from '../../assets/call_end-24px.svg'
 const ring = require('./assets/ring.mp3')
 interface Props {
   session: Invitation,
@@ -27,10 +30,10 @@ class Incoming extends React.Component<Props> {
   }
 
   render() {
-    return <div id="sip-incoming">
+    return <div id={styles.incoming}>
       Incoming
-      <button onClick={() => this.handleDecline()} >Decline</button>
-      <button onClick={() => this.handleAccept()} >Accept</button>
+      <div className={styles.endCallButton} onClick={() => this.handleDecline()} ><img src={declineIcon} /></div>
+      <div className={styles.startCallButton} onClick={() => this.handleAccept()} ><img src={acceptIcon} /></div>
       <audio loop autoPlay>
         <source src={ring} type="audio/mpeg" />
       </audio>

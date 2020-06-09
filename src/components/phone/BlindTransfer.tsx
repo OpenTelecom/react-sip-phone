@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-
+import styles from './Phone.scss'
 import { Session, UserAgent } from 'sip.js'
 import {
   blindTransferRequest,
@@ -35,8 +35,10 @@ class BlindTransfer extends React.Component<Props> {
   render() {
     return (
       <React.Fragment>
-        <button onClick={() => this.blindTransferCall()}>
-          Blind Transfer Call
+        <button
+          className={styles.transferButtons}
+          onClick={() => this.blindTransferCall()}>
+          Blind
         </button>
       </React.Fragment>
     )
