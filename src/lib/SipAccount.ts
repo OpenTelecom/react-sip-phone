@@ -13,10 +13,9 @@ import { TransportOptions } from 'sip.js/lib/platform/web'
 import { phoneStore } from '../index'
 import { NEW_USERAGENT } from '../actions/sipAccounts'
 import { SessionStateHandler } from '../util/sessions'
-import {
-  NEW_SESSION,
-  INCOMING_CALL,
-} from '../actions/sipSessions'
+import { IncomingSessionStateHandler } from '../util/incomingSession'
+
+import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
 
 export default class SIPAccount {
@@ -90,7 +89,7 @@ export default class SIPAccount {
 
         phoneStore.dispatch({ type: INCOMING_CALL, payload: incomingSession })
 
-        const stateHandler = new SessionStateHandler(incomingSession.id)
+        const stateHandler = new IncomingSessionStateHandler(incomingSession)
         // Handle incoming session state changes.
         incomingSession.stateChange.addListener(stateHandler.stateChange)
       }
@@ -122,7 +121,9 @@ export default class SIPAccount {
     if (number.includes('+')) {
       fullNumber = `${number}`
     }
-    const target = UserAgent.makeURI(`sip:${fullNumber}@sip.reper.io;user=phone`)
+    const target = UserAgent.makeURI(
+      `sip:${fullNumber}@sip.reper.io;user=phone`
+    )
     if (target) {
       console.log(`Calling ${number}`)
       const inviter = new Inviter(this._userAgent, target)

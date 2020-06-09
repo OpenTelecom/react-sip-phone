@@ -1,85 +1,42 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import styles from './Phone.scss'
-import { Session, SessionState, UserAgent } from 'sip.js'
-import {
-  holdCallRequest,
-  holdCallSuccess,
-  holdCallFail,
-  unHoldCallRequest,
-  unHoldCallSuccess,
-  unHoldCallFail
-} from '../../actions/sipSessions'
+import { Session, UserAgent } from 'sip.js'
+
 import holdIcon from '../../assets/phone_paused-24px.svg'
+
+import { holdCallRequest, unHoldCallRequest } from '../../actions/sipSessions'
 
 interface Props {
   session: Session
   userAgent: UserAgent
   holdCallRequest: Function
-  holdCallSuccess: Function
-  holdCallFail: Function
   unHoldCallRequest: Function
-  unHoldCallSuccess: Function
-  unHoldCallFail: Function
   onHold: Array<Object>
+  sessions: Array<Object>
 }
 
 class Hold extends React.Component<Props> {
   hold() {
-    if (this.props.session.id in this.props.onHold) {
-      this.props.unHoldCallRequest(this.props.session.id)
-      return new Promise((resolve, reject) => {
-        if (
-          !this.props.session.sessionDescriptionHandler ||
-          this.props.session.state !== SessionState.Established
-        ) {
-          this.props.unHoldCallFail()
-          reject('No session')
-          return
-        }
-        try {
-          this.props.session.invite()
-          this.props.unHoldCallSuccess()
-          resolve()
-        } catch (err) {
-          this.props.unHoldCallFail()
-          reject(err)
-          return
-        }
-      })
-    }
-
-    if (!(this.props.session.id in this.props.onHold)) {
-      this.props.holdCallRequest(this.props.session.id)
-      return new Promise((resolve, reject) => {
-        if (
-          !this.props.session.sessionDescriptionHandler ||
-          this.props.session.state !== SessionState.Established
-        ) {
-          this.props.holdCallFail()
-          reject('No session to hold')
-          return
-        }
-        try {
-          this.props.session.invite({
-            sessionDescriptionHandlerModifiers: [
-              this.props.session.sessionDescriptionHandler!.holdModifier
-            ]
-          })
-          this.props.holdCallSuccess()
-          resolve()
-        } catch (err) {
-          this.props.holdCallFail()
-          reject(err)
-          return
-        }
-      })
+    if (this.checkHoldState()) {
+      this.props.unHoldCallRequest(this.props.session)
+    } else {
+      this.props.holdCallRequest(this.props.session)
     }
     return
   }
 
-  checkHold() {
-    if (this.props.session.id in this.props.onHold === true) {
+  checkHoldState() {
+    for (const session in this.props.onHold) {
+      if (this.props.onHold[session] === this.props.session.id) {
+        return true
+      }
+    }
+    return false
+  }
+
+  checkHoldButton() {
+    if (this.checkHoldState() === true) {
       const holdMarkup = 'Unhold'
       return holdMarkup
     } else {
@@ -90,9 +47,9 @@ class Hold extends React.Component<Props> {
 
   render() {
     return (
-        <button id={styles.actionButton} onClick={() => this.hold()}>
-          <img src={holdIcon}/>
-        </button>
+      <button id={styles.actionButton} onClick={() => this.hold()}>
+        <img src={holdIcon} />
+      </button>
     )
   }
 }
@@ -105,11 +62,7 @@ const mapStateToProps = (state: any) => ({
 })
 const actions = {
   holdCallRequest,
-  holdCallSuccess,
-  holdCallFail,
-  unHoldCallRequest,
-  unHoldCallSuccess,
-  unHoldCallFail
+  unHoldCallRequest
 }
 
 export default connect(mapStateToProps, actions)(Hold)
