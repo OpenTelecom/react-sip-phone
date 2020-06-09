@@ -9,6 +9,8 @@ import BlindTranfer from './BlindTransfer'
 import AttendedTransfer from './AttendedTransfer'
 import styles from './Phone.scss'
 import endCallIcon from '../../assets/call_end-24px.svg'
+import dialpadIcon from '../../assets/dialpad-24px.svg'
+import transferIcon from '../../assets/phone_forwarded-24px.svg'
 
 interface Props {
   session: Session
@@ -18,7 +20,8 @@ interface Props {
 
 class Phone extends React.Component<Props> {
   state = {
-    dialpadOpen: true,
+    dialpadOpen: false,
+    transferMenu: false,
     ended: false,
     transferDialString: ''
   }
@@ -61,20 +64,36 @@ class Phone extends React.Component<Props> {
             <img src={endCallIcon} />
           </button>
           <Hold session={this.props.session} />
-          <input
-            onChange={(e) =>
-              this.setState({ transferDialString: e.target.value })
-            }
-          />
-          <AttendedTransfer
-            destination={state.transferDialString}
-            session={this.props.session}
-          />
-          <BlindTranfer
-            destination={state.transferDialString}
-            session={this.props.session}
-          />
+          <div
+            id={styles.actionButton}
+            className={state.dialpadOpen ? styles.on : ''}
+            onClick={() => this.setState({ dialpadOpen: !state.dialpadOpen })}>
+            <img src={dialpadIcon} />
+          </div>
+          <div
+            id={styles.actionButton}
+            className={state.transferMenu ? styles.on : ''}
+            onClick={() => this.setState({ transferMenu: !state.transferMenu })}>
+            <img src={transferIcon} />
+          </div>
+          <div id={styles.transferMenu} className={state.transferMenu ? '' : styles.closed} >
+            <input
+              id={styles.transferInput}
+              onChange={(e) =>
+                this.setState({ transferDialString: e.target.value })
+              }
+            />
+            <AttendedTransfer
+              destination={state.transferDialString}
+              session={this.props.session}
+            />
+            <BlindTranfer
+              destination={state.transferDialString}
+              session={this.props.session}
+            />
+          </div>
         </div>
+        <hr style={{width: '100%'}} />
       </React.Fragment>
     )
   }

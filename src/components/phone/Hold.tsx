@@ -10,6 +10,7 @@ import {
   unHoldCallSuccess,
   unHoldCallFail
 } from '../../actions/sipSessions'
+import holdIcon from '../../assets/phone_paused-24px.svg'
 
 interface Props {
   session: Session
@@ -89,7 +90,9 @@ class Hold extends React.Component<Props> {
 
   render() {
     return (
-        <button className={styles.holdButton} onClick={() => this.hold()}>{this.checkHold()}</button>
+        <button id={styles.actionButton} onClick={() => this.hold()}>
+          <img src={holdIcon}/>
+        </button>
     )
   }
 }
