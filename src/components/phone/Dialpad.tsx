@@ -3,14 +3,13 @@ import styles from './Phone.scss'
 import DialButton from './DialButton'
 import { Session, SessionState } from 'sip.js'
 import { getButtonLetters } from '../../util/buttons'
-
+import { playDTMF } from '../../util/TonePlayer'
 interface Props {
-  open: boolean,
+  open: boolean
   session: Session
 }
 
 class Dialpad extends React.Component<Props> {
-
   topRow: any = []
   middleRow: any = []
   bottomRow: any = []
@@ -29,12 +28,20 @@ class Dialpad extends React.Component<Props> {
   }
 
   getButton(value: string) {
-    return <DialButton key={value} text={value} letters={getButtonLetters(value)} click={() => this.handleClick(value)} />
+    return (
+      <DialButton
+        key={value}
+        text={value}
+        letters={getButtonLetters(value)}
+        click={() => this.handleClick(value)}
+      />
+    )
   }
 
   handleClick(value: string) {
     if (this.props.session.state === SessionState.Established) {
       this.sendDTMF(value)
+      playDTMF(value)
     }
   }
 
@@ -50,7 +57,7 @@ class Dialpad extends React.Component<Props> {
     }
     this.props.session.info(options)
   }
-  
+
   render() {
     return (
       <div className={this.props.open ? '' : styles.closed} id={styles.dialpad}>
