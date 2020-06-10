@@ -11,7 +11,8 @@ import styles from './Phone.scss'
 import endCallIcon from '../../assets/call_end-24px.svg'
 import dialpadIcon from '../../assets/dialpad-24px.svg'
 import transferIcon from '../../assets/phone_forwarded-24px.svg'
-
+import { callDisconnect } from '../../util/TonePlayer'
+import toneManager from '../../util/ToneManager'
 interface Props {
   session: Session
   userAgent: UserAgent
@@ -43,7 +44,10 @@ class Phone extends React.Component<Props> {
       SessionState.Establishing
     ) {
       // @ts-ignore
+
       this.props.session.cancel()
+      toneManager.stopAll()
+      callDisconnect()
     }
     this.setState({ ended: true })
     setTimeout(() => {
@@ -60,23 +64,32 @@ class Phone extends React.Component<Props> {
         <Dialpad open={state.dialpadOpen} session={this.props.session} />
         <div className={styles.actionsContainer}>
           <Mute session={this.props.session} />
-          <button className={styles.endCallButton} disabled={state.ended} onClick={() => this.endCall()}>
+          <button
+            className={styles.endCallButton}
+            disabled={state.ended}
+            onClick={() => this.endCall()}
+          >
             <img src={endCallIcon} />
           </button>
           <Hold session={this.props.session} />
           <div
             id={styles.actionButton}
             className={state.dialpadOpen ? styles.on : ''}
-            onClick={() => this.setState({ dialpadOpen: !state.dialpadOpen })}>
+            onClick={() => this.setState({ dialpadOpen: !state.dialpadOpen })}
+          >
             <img src={dialpadIcon} />
           </div>
           <div
             id={styles.actionButton}
             className={state.transferMenu ? styles.on : ''}
-            onClick={() => this.setState({ transferMenu: !state.transferMenu })}>
+            onClick={() => this.setState({ transferMenu: !state.transferMenu })}
+          >
             <img src={transferIcon} />
           </div>
-          <div id={styles.transferMenu} className={state.transferMenu ? '' : styles.closed} >
+          <div
+            id={styles.transferMenu}
+            className={state.transferMenu ? '' : styles.closed}
+          >
             <input
               id={styles.transferInput}
               onChange={(e) =>
@@ -93,7 +106,7 @@ class Phone extends React.Component<Props> {
             />
           </div>
         </div>
-        <hr style={{width: '100%'}} />
+        <hr style={{ width: '100%' }} />
       </React.Fragment>
     )
   }

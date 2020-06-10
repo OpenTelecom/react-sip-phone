@@ -17,6 +17,7 @@ import { IncomingSessionStateHandler } from '../util/incomingSession'
 
 import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
+import toneManager from '../util/ToneManager'
 
 export default class SIPAccount {
   public _config: SipConfig
@@ -116,6 +117,8 @@ export default class SIPAccount {
   }
 
   makeCall(number: string) {
+    toneManager.ringback()
+
     // Make a call
     let fullNumber = `+${this._config.defaultCountryCode}${number}`
     if (number.includes('+')) {
