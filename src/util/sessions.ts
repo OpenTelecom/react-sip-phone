@@ -1,10 +1,7 @@
 import { phoneStore } from '../index'
 import { SessionState } from 'sip.js'
-import {
-  SIPSESSION_STATECHANGE,
-  CLOSE_SESSION
-} from '../actions/sipSessions'
-
+import { SIPSESSION_STATECHANGE, CLOSE_SESSION } from '../actions/sipSessions'
+import toneManager from './ToneManager'
 export class SessionStateHandler {
   private id: string
   constructor(id: string) {
@@ -13,15 +10,24 @@ export class SessionStateHandler {
   public stateChange = (newState: SessionState) => {
     switch (newState) {
       case SessionState.Establishing:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        })
+        break
       case SessionState.Established:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        })
+        toneManager.stopAll()
+        break
       case SessionState.Terminating:
         phoneStore.dispatch({
-          type: SIPSESSION_STATECHANGE,
+          type: SIPSESSION_STATECHANGE
         })
         break
       case SessionState.Terminated:
         phoneStore.dispatch({
-          type: SIPSESSION_STATECHANGE,
+          type: SIPSESSION_STATECHANGE
         })
         setTimeout(() => {
           phoneStore.dispatch({
