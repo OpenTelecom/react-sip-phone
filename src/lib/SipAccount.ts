@@ -12,7 +12,7 @@ import {
 import { TransportOptions } from 'sip.js/lib/platform/web'
 import { phoneStore } from '../index'
 import { NEW_USERAGENT } from '../actions/sipAccounts'
-import { SessionStateHandler } from '../util/sessions'
+import { SessionStateHandler, getFullNumber } from '../util/sessions'
 import { IncomingSessionStateHandler } from '../util/incomingSession'
 
 import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
@@ -57,7 +57,7 @@ export default class SIPAccount {
       // }
     }
     const registererOptions: RegistererOptions = {
-      expires: 60,
+      expires: 300,
       logConfiguration: process.env.NODE_ENV !== 'production'
     }
 
@@ -120,12 +120,8 @@ export default class SIPAccount {
     toneManager.ringback()
 
     // Make a call
-    let fullNumber = `+${this._config.defaultCountryCode}${number}`
-    if (number.includes('+')) {
-      fullNumber = `${number}`
-    }
     const target = UserAgent.makeURI(
-      `sip:${fullNumber}@sip.reper.io;user=phone`
+      `sip:${getFullNumber(number)}@sip.reper.io;user=phone`
     )
     if (target) {
       console.log(`Calling ${number}`)

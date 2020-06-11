@@ -35,19 +35,9 @@ class Hold extends React.Component<Props> {
     return false
   }
 
-  checkHoldButton() {
-    if (this.checkHoldState() === true) {
-      const holdMarkup = 'Unhold'
-      return holdMarkup
-    } else {
-      const holdMarkup = 'Hold'
-      return holdMarkup
-    }
-  }
-
   render() {
     return (
-      <button id={styles.actionButton} onClick={() => this.hold()}>
+      <button className={this.checkHoldState() ? styles.on : ''} id={styles.actionButton} onClick={() => this.hold()}>
         <img src={holdIcon} />
       </button>
     )

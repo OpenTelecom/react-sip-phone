@@ -15,12 +15,17 @@ import {
   CLOSE_SESSION,
   holdCallRequest
 } from '../../actions/sipSessions'
+import { getFullNumber } from '../../util/sessions'
+import attendedIcon from '../../assets/phone_in_talk-24px.svg'
+import cancelIcon from '../../assets/call_end-24px.svg'
+import connectIcon from '../../assets/arrow_forward-24px.svg'
 
 interface Props {
   session: Session
   userAgent: UserAgent
   destination: string
   holdCallRequest: Function
+  started: Function
 }
 
 class AttendedTransfer extends React.Component<Props> {
@@ -36,7 +41,7 @@ class AttendedTransfer extends React.Component<Props> {
       type: SIPSESSION_ATTENDED_TRANSFER_REQUEST
     })
     const target = UserAgent.makeURI(
-      `sip:${this.props.destination}@sip.reper.io;user=phone`
+      `sip:${getFullNumber(this.props.destination)}@sip.reper.io;user=phone`
     )
     if (target) {
       const inviter = new Inviter(this.props.userAgent, target)
@@ -152,35 +157,33 @@ class AttendedTransfer extends React.Component<Props> {
       return (
         <button
           className={styles.transferButtons}
-          onClick={() =>
-            this.connectAttendedTransfer(
-              this.state.attendedTransferSessionReady
-            )
-          }
-        >
-          Connect
+          onClick={() =>{
+            this.props.started(false)
+            this.connectAttendedTransfer(this.state.attendedTransferSessionReady)
+          }}>
+          <img src={connectIcon} />
         </button>
       )
     } else if (this.state.attendedTransferSessionPending) {
       return (
         <button
-          className={styles.transferButtons}
-          onClick={() =>
-            this.cancelAttendedTransfer(
-              this.state.attendedTransferSessionPending
-            )
-          }
-        >
-          Cancel
+          className={styles.endCallButton}
+          onClick={() =>{
+            this.props.started(false)
+            this.cancelAttendedTransfer(this.state.attendedTransferSessionPending)
+          }}>
+          <img src={cancelIcon} />
         </button>
       )
     } else {
       return (
         <button
           className={styles.transferButtons}
-          onClick={() => this.attendedTransferCall()}
-        >
-          Attended
+          onClick={() => {
+            this.props.started(true)
+            this.attendedTransferCall()
+          }}>
+          <img src={attendedIcon} />
         </button>
       )
     }

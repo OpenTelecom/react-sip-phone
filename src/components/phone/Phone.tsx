@@ -10,7 +10,7 @@ import AttendedTransfer from './AttendedTransfer'
 import styles from './Phone.scss'
 import endCallIcon from '../../assets/call_end-24px.svg'
 import dialpadIcon from '../../assets/dialpad-24px.svg'
-import transferIcon from '../../assets/phone_forwarded-24px.svg'
+import transferIcon from '../../assets/arrow_forward-24px.svg'
 import { callDisconnect } from '../../util/TonePlayer'
 import toneManager from '../../util/ToneManager'
 interface Props {
@@ -24,7 +24,13 @@ class Phone extends React.Component<Props> {
     dialpadOpen: false,
     transferMenu: false,
     ended: false,
-    transferDialString: ''
+    transferDialString: '',
+    attendedTransferStarted: false
+  }
+
+  constructor(props: any) {
+    super(props)
+    this.attendedProcess = this.attendedProcess.bind(this);
   }
 
   componentDidUpdate(newProps: Props) {
@@ -56,56 +62,67 @@ class Phone extends React.Component<Props> {
     }, 5000)
   }
 
+  attendedProcess(bool: boolean) {
+    this.setState({ attendedTransferStarted: bool })
+  }
+
   render() {
     const state = this.state
     return (
       <React.Fragment>
         <div>{this.props.session.state}</div>
-        <Dialpad open={state.dialpadOpen} session={this.props.session} />
-        <div className={styles.actionsContainer}>
-          <Mute session={this.props.session} />
-          <button
-            className={styles.endCallButton}
-            disabled={state.ended}
-            onClick={() => this.endCall()}
-          >
-            <img src={endCallIcon} />
-          </button>
-          <Hold session={this.props.session} />
-          <div
-            id={styles.actionButton}
-            className={state.dialpadOpen ? styles.on : ''}
-            onClick={() => this.setState({ dialpadOpen: !state.dialpadOpen })}
-          >
-            <img src={dialpadIcon} />
-          </div>
-          <div
-            id={styles.actionButton}
-            className={state.transferMenu ? styles.on : ''}
-            onClick={() => this.setState({ transferMenu: !state.transferMenu })}
-          >
-            <img src={transferIcon} />
-          </div>
-          <div
-            id={styles.transferMenu}
-            className={state.transferMenu ? '' : styles.closed}
-          >
-            <input
-              id={styles.transferInput}
-              onChange={(e) =>
-                this.setState({ transferDialString: e.target.value })
-              }
-            />
-            <AttendedTransfer
-              destination={state.transferDialString}
-              session={this.props.session}
-            />
-            <BlindTranfer
-              destination={state.transferDialString}
-              session={this.props.session}
-            />
-          </div>
-        </div>
+        {
+          this.state.ended ? null :
+            <React.Fragment>
+              <Dialpad open={state.dialpadOpen} session={this.props.session} />
+              <div className={styles.actionsContainer}>
+                <Mute session={this.props.session} />
+                <button
+                  className={styles.endCallButton}
+                  disabled={state.ended}
+                  onClick={() => this.endCall()}
+                >
+                  <img src={endCallIcon} />
+                </button>
+                <Hold session={this.props.session} />
+                <div
+                  id={styles.actionButton}
+                  className={state.dialpadOpen ? styles.on : ''}
+                  onClick={() => this.setState({ dialpadOpen: !state.dialpadOpen })}
+                >
+                  <img src={dialpadIcon} />
+                </div>
+                <div
+                  id={styles.actionButton}
+                  className={state.transferMenu ? styles.on : ''}
+                  onClick={() => this.setState({ transferMenu: !state.transferMenu })}
+                >
+                  <img src={transferIcon} />
+                </div>
+                <div
+                  id={styles.transferMenu}
+                  className={state.transferMenu ? '' : styles.closed}
+                >
+                  <input
+                    id={styles.transferInput}
+                    onChange={(e) =>
+                      this.setState({ transferDialString: e.target.value })
+                    }
+                  />
+                  {this.state.attendedTransferStarted ? null :
+                    <BlindTranfer
+                      destination={state.transferDialString}
+                      session={this.props.session}
+                    />}
+                  <AttendedTransfer
+                    started={this.attendedProcess}
+                    destination={state.transferDialString}
+                    session={this.props.session}
+                  />
+                </div>
+              </div>
+            </React.Fragment>
+        }
         <hr style={{ width: '100%' }} />
       </React.Fragment>
     )
