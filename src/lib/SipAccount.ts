@@ -46,15 +46,18 @@ export default class SIPAccount {
       userAgentString: 'OTF-react-sip-phone',
       hackWssInTransport: true,
       transportOptions,
-      uri
-      // sessionDescriptionHandlerFactoryOptions: {
-      //   constraints: {
-      //     audio: true,
-      //     video: false
-      //   },
-      //   iceCheckingTimeout: 500
-      //   // alwaysAcquireMediaFirst: true
-      // }
+      uri,
+      sessionDescriptionHandlerFactoryOptions: {
+        constraints: {
+          audio: {
+            deviceId: 'default'
+          },
+          video: false
+        },
+        alwaysAcquireMediaFirst: true,
+        iceCheckingTimeout: 500
+        // alwaysAcquireMediaFirst: true
+      }
     }
     const registererOptions: RegistererOptions = {
       expires: 300,
@@ -138,7 +141,7 @@ export default class SIPAccount {
       }
       phoneStore.dispatch({ type: NEW_SESSION, payload: outgoingSession })
       // Handle outgoing session state changes.
-      const stateHandler = new SessionStateHandler(outgoingSession.id)
+      const stateHandler = new SessionStateHandler(outgoingSession)
       outgoingSession.stateChange.addListener(stateHandler.stateChange)
       outgoingSession
         .invite()

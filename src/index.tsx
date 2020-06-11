@@ -37,6 +37,7 @@ export const ReactSipPhone = ({
           <Status name={name} />
           <Dialstring />
           <PhoneSessions />
+          <audio id='mediaElement' autoPlay />
         </div>
       </SipWrapper>
     </Provider>
