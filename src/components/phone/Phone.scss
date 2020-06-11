@@ -91,12 +91,11 @@
   @include common-input;
   border: 2px solid $almost-black;
   border-radius: 100px;
+  width: 80%;
   padding: 5px 10px 5px 10px;
 }
 
 .transferButtons {
   @include common-button;
-  height: 40px;
-  width: 45%;
-  margin: 5px 2.5% 5px 2.5%;
+  @include phone-buttons;
 }

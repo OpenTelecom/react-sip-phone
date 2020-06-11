@@ -8,6 +8,10 @@
   height: 60px;
   border-radius: 100px;
   transition: opacity 0.5s ease;
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
   &:hover {
     opacity: 0.5;
   }

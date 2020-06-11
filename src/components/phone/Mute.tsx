@@ -113,21 +113,13 @@ class Mute extends React.Component<Props> {
     return
   }
 
-  checkMute() {
-    if (this.state.onMute) {
-      const muteMarkup = 'Unmute'
-      return muteMarkup
-    } else {
-      const muteMarkup = 'Mute'
-      return muteMarkup
-    }
-  }
-
   render() {
     return (
-      <button id={styles.actionButton} onClick={() => this.mute()}>
+      <div
+        className={this.state.onMute ? styles.on : ''}
+        id={styles.actionButton} onClick={() => this.mute()}>
         <img src={micOffIcon} />
-      </button>
+      </div>
     )
   }
 }

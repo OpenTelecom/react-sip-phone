@@ -12,7 +12,9 @@ class Dialstring extends React.Component<Props> {
     currentDialString: ''
   }
   handleDial() {
-    this.props.sipAccount.makeCall(`${this.state.currentDialString}`)
+    if (!this.checkDialstring()) {
+      this.props.sipAccount.makeCall(`${this.state.currentDialString}`)
+    }
   }
   checkDialstring() {
     return this.state.currentDialString.length === 0
@@ -21,7 +23,13 @@ class Dialstring extends React.Component<Props> {
     return (
       <div className={styles.dialstringContainer}>
         <input
-        className={styles.dialInput}
+          className={styles.dialInput}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              this.handleDial()
+              e.preventDefault()
+            }
+          }}
           onChange={(e) => this.setState({ currentDialString: e.target.value })}
         />
         <button

@@ -10,6 +10,8 @@ import {
   SIPSESSION_BLIND_TRANSFER_SUCCESS,
   SIPSESSION_BLIND_TRANSFER_FAIL
 } from '../../actions/sipSessions'
+import { getFullNumber } from '../../util/sessions'
+import blindIcon from '../../assets/arrow_forward-24px.svg'
 
 interface Props {
   session: Session
@@ -23,7 +25,7 @@ class BlindTransfer extends React.Component<Props> {
       type: SIPSESSION_BLIND_TRANSFER_REQUEST
     })
     const target = UserAgent.makeURI(
-      `sip:${this.props.destination}@sip.reper.io;user=phone`
+      `sip:${getFullNumber(this.props.destination)}@sip.reper.io;user=phone`
     )
     if (target) {
       try {
@@ -48,7 +50,7 @@ class BlindTransfer extends React.Component<Props> {
           className={styles.transferButtons}
           onClick={() => this.blindTransferCall()}
         >
-          Blind
+          <img src={blindIcon} />
         </button>
       </React.Fragment>
     )
