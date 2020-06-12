@@ -13,6 +13,7 @@ import dialpadIcon from '../../assets/dialpad-24px.svg'
 import transferIcon from '../../assets/arrow_forward-24px.svg'
 import { callDisconnect } from '../../util/TonePlayer'
 import toneManager from '../../util/ToneManager'
+import { statusMask } from '../../util/sessions'
 import { PhoneConfig } from '../../models'
 interface Props {
   session: Session
@@ -69,11 +70,14 @@ class Phone extends React.Component<Props> {
   }
 
   render() {
-    const {state, props} = this
+    const { state, props } = this
     return (
       <React.Fragment>
         <hr style={{ width: '100%' }} />
-        <div>{props.session.state}</div>
+        <div>{// @ts-ignore
+          `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
+        </div>
+        <div>{statusMask(props.session.state)}</div>
         {
           state.ended ? null :
             <React.Fragment>

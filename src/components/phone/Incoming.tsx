@@ -30,8 +30,11 @@ class Incoming extends React.Component<Props> {
   }
 
   render() {
+    const props = this.props
     return <div id={styles.incoming}>
-      Incoming
+      { // @ts-ignore
+      `Incoming: ${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`
+      }
       <div className={styles.endCallButton} onClick={() => this.handleDecline()} ><img src={declineIcon} /></div>
       <div className={styles.startCallButton} onClick={() => this.handleAccept()} ><img src={acceptIcon} /></div>
       <audio loop autoPlay>
