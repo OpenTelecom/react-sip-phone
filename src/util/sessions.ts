@@ -146,7 +146,7 @@ export const statusMask = (status: string) => {
     case 'Establishing':
       return 'Calling...'
     case 'Initial':
-      return 'Incoming'
+      return 'Initial'
     case 'Terminating':
     case 'Terminated':
       return 'Ended'
