@@ -99,3 +99,19 @@ export const getFullNumber = (number: string) => {
   console.log(fullNumber)
   return fullNumber
 }
+
+export const statusMask = (status: string) => {
+  switch(status) {
+    case 'Established':
+      return 'Connected'
+    case 'Establishing':
+      return 'Calling...'
+    case 'Initial':
+      return 'Incoming'
+    case 'Terminating':
+    case 'Terminated':
+      return 'Ended'
+    default:
+      return 'Unknown Status'
+  }
+}
