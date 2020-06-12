@@ -3,9 +3,14 @@ import { SessionState, Session } from 'sip.js'
 import {
   SIPSESSION_STATECHANGE,
   CLOSE_SESSION,
-  holdCallRequest,
-  SIPSESSION_HOLD_REQUEST
+  SIPSESSION_HOLD_REQUEST,
+  holdCallRequest
 } from '../actions/sipSessions'
+
+import {
+  REMOTE_AUDIO_CONNECTED,
+  LOCAL_AUDIO_CONNECTED
+} from '../actions/device'
 
 export class IncomingSessionStateHandler {
   private incomingSession: Session
@@ -13,14 +18,16 @@ export class IncomingSessionStateHandler {
     this.incomingSession = incomingSession
   }
 
-  public setLocalAudio(session: Session) {
+  //creates new audio track then replaces audio track in getSender stream w/ new track
+  public setLocalAudioIncoming() {
     //@ts-ignore
-    session.sessionDescriptionHandler.peerConnection
+    this.incomingSession.sessionDescriptionHandler.peerConnection
       .getSenders()
       .forEach(function (sender: any) {
-        if (sender.track.kind === 'audio') {
+        console.log(sender)
+        if (sender.track && sender.track.kind === 'audio') {
           let audioDeviceId =
-            // audio input device_id 
+            // audio input device_id
             'default'
           navigator.mediaDevices
             // @ts-ignore
@@ -34,14 +41,17 @@ export class IncomingSessionStateHandler {
             })
         }
       })
+    phoneStore.dispatch({
+      type: LOCAL_AUDIO_CONNECTED
+    })
   }
 
   //takes track from getReceiver stream and adds to new track
-  public setRemoteAudio(session: Session) {
+  public setRemoteAudio() {
     const mediaElement = document.getElementById('mediaElement')
     const remoteStream = new MediaStream()
     //@ts-ignore
-    session.sessionDescriptionHandler.peerConnection
+    this.incomingSession.sessionDescriptionHandler.peerConnection
       .getReceivers()
       .forEach((receiver: any) => {
         if (receiver.track) {
@@ -52,8 +62,7 @@ export class IncomingSessionStateHandler {
       // @ts-ignore
 
       mediaElement.setSinkId(
-
-        // audio output device_id 
+        // audio output device_id
         'default'
       )
       // @ts-ignore
@@ -64,6 +73,9 @@ export class IncomingSessionStateHandler {
     } else {
       console.log('no media Element')
     }
+    phoneStore.dispatch({
+      type: REMOTE_AUDIO_CONNECTED
+    })
   }
 
   public cleanupMedia() {
@@ -91,8 +103,9 @@ export class IncomingSessionStateHandler {
 
         //hold all sessions
         this.holdAll()
-        this.setLocalAudio(this.incomingSession)
-        this.setRemoteAudio(this.incomingSession)
+        this.setLocalAudioIncoming()
+
+        this.setRemoteAudio()
 
         break
       case SessionState.Terminating:
