@@ -13,10 +13,12 @@ import dialpadIcon from '../../assets/dialpad-24px.svg'
 import transferIcon from '../../assets/arrow_forward-24px.svg'
 import { callDisconnect } from '../../util/TonePlayer'
 import toneManager from '../../util/ToneManager'
+import { PhoneConfig } from '../../models'
 interface Props {
   session: Session
   userAgent: UserAgent
   endCall: Function
+  phoneConfig: PhoneConfig
 }
 
 class Phone extends React.Component<Props> {
@@ -67,16 +69,18 @@ class Phone extends React.Component<Props> {
   }
 
   render() {
-    const state = this.state
+    const {state, props} = this
     return (
       <React.Fragment>
-        <div>{this.props.session.state}</div>
+        <hr style={{ width: '100%' }} />
+        <div>{props.session.state}</div>
         {
-          this.state.ended ? null :
+          state.ended ? null :
             <React.Fragment>
-              <Dialpad open={state.dialpadOpen} session={this.props.session} />
+              <Dialpad open={state.dialpadOpen} session={props.session} />
               <div className={styles.actionsContainer}>
-                <Mute session={this.props.session} />
+                {props.phoneConfig.disabledButtons.includes('mute') ? null :
+                  <Mute session={props.session} />}
                 <button
                   className={styles.endCallButton}
                   disabled={state.ended}
@@ -84,21 +88,24 @@ class Phone extends React.Component<Props> {
                 >
                   <img src={endCallIcon} />
                 </button>
-                <Hold session={this.props.session} />
-                <div
-                  id={styles.actionButton}
-                  className={state.dialpadOpen ? styles.on : ''}
-                  onClick={() => this.setState({ dialpadOpen: !state.dialpadOpen })}
-                >
-                  <img src={dialpadIcon} />
-                </div>
-                <div
-                  id={styles.actionButton}
-                  className={state.transferMenu ? styles.on : ''}
-                  onClick={() => this.setState({ transferMenu: !state.transferMenu })}
-                >
-                  <img src={transferIcon} />
-                </div>
+                {props.phoneConfig.disabledButtons.includes('hold') ? null :
+                  <Hold session={props.session} />}
+                {props.phoneConfig.disabledButtons.includes('numpad') ? null :
+                  <div
+                    id={styles.actionButton}
+                    className={state.dialpadOpen ? styles.on : ''}
+                    onClick={() => this.setState({ dialpadOpen: !state.dialpadOpen })}
+                  >
+                    <img src={dialpadIcon} />
+                  </div>}
+                {props.phoneConfig.disabledButtons.includes('transfer') ? null :
+                  <div
+                    id={styles.actionButton}
+                    className={state.transferMenu ? styles.on : ''}
+                    onClick={() => this.setState({ transferMenu: !state.transferMenu })}
+                  >
+                    <img src={transferIcon} />
+                  </div>}
                 <div
                   id={styles.transferMenu}
                   className={state.transferMenu ? '' : styles.closed}
@@ -112,18 +119,17 @@ class Phone extends React.Component<Props> {
                   {this.state.attendedTransferStarted ? null :
                     <BlindTranfer
                       destination={state.transferDialString}
-                      session={this.props.session}
+                      session={props.session}
                     />}
                   <AttendedTransfer
                     started={this.attendedProcess}
                     destination={state.transferDialString}
-                    session={this.props.session}
+                    session={props.session}
                   />
                 </div>
               </div>
             </React.Fragment>
         }
-        <hr style={{ width: '100%' }} />
       </React.Fragment>
     )
   }
