@@ -27,12 +27,7 @@ class Hold extends React.Component<Props> {
   }
 
   checkHoldState() {
-    for (const session in this.props.onHold) {
-      if (this.props.onHold[session] === this.props.session.id) {
-        return true
-      }
-    }
-    return false
+    return this.props.onHold.includes(this.props.session.id)
   }
 
   render() {
