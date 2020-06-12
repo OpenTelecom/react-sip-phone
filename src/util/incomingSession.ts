@@ -13,9 +13,32 @@ export class IncomingSessionStateHandler {
     this.incomingSession = incomingSession
   }
 
-  public setupRemoteMedia(session: Session) {
+  public setLocalAudio(session: Session) {
+    //@ts-ignore
+    session.sessionDescriptionHandler.peerConnection
+      .getSenders()
+      .forEach(function (sender: any) {
+        if (sender.track.kind === 'audio') {
+          let audioDeviceId =
+            // audio input device_id 
+            'default'
+          navigator.mediaDevices
+            // @ts-ignore
+
+            //creates a stream w track
+            .getUserMedia({ audio: { deviceId: audioDeviceId } })
+            .then(function (stream) {
+              let audioTrack = stream.getAudioTracks()
+              console.log(audioTrack)
+              sender.replaceTrack(audioTrack[0])
+            })
+        }
+      })
+  }
+
+  //takes track from getReceiver stream and adds to new track
+  public setRemoteAudio(session: Session) {
     const mediaElement = document.getElementById('mediaElement')
-    console.log(mediaElement)
     const remoteStream = new MediaStream()
     //@ts-ignore
     session.sessionDescriptionHandler.peerConnection
@@ -26,9 +49,11 @@ export class IncomingSessionStateHandler {
         }
       })
     if (mediaElement) {
-      //@ts-ignore
+      // @ts-ignore
+
       mediaElement.setSinkId(
-        // '9fd92da2563c9c2168af72a2cae2850e8a7959c800eeed8b3f09c0d52eff2bfe'
+
+        // audio output device_id 
         'default'
       )
       // @ts-ignore
@@ -41,17 +66,15 @@ export class IncomingSessionStateHandler {
     }
   }
 
-
   public cleanupMedia() {
     const mediaElement = document.getElementById('mediaElement')
     // @ts-ignore
 
-    mediaElement.srcObject = null;
+    mediaElement.srcObject = null
     // @ts-ignore
 
-    mediaElement.pause();
+    mediaElement.pause()
   }
-
 
   public stateChange = (newState: SessionState) => {
     switch (newState) {
@@ -68,8 +91,8 @@ export class IncomingSessionStateHandler {
 
         //hold all sessions
         this.holdAll()
-
-        this.setupRemoteMedia(this.incomingSession)
+        this.setLocalAudio(this.incomingSession)
+        this.setRemoteAudio(this.incomingSession)
 
         break
       case SessionState.Terminating:
@@ -94,9 +117,6 @@ export class IncomingSessionStateHandler {
         break
     }
   }
-
-
-
 
   public holdAll() {
     const state = phoneStore.getState()

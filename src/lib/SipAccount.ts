@@ -50,13 +50,14 @@ export default class SIPAccount {
       sessionDescriptionHandlerFactoryOptions: {
         constraints: {
           audio: {
-            deviceId: 'default'
+            deviceId:
+              // '5f0dfd826388eaf731ff99ebb0a1717570611901459d8baef942908b7cf5fe12'
+              'default'
           },
           video: false
         },
         alwaysAcquireMediaFirst: true,
         iceCheckingTimeout: 500
-        // alwaysAcquireMediaFirst: true
       }
     }
     const registererOptions: RegistererOptions = {
