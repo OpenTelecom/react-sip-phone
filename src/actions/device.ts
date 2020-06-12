@@ -1,5 +1,9 @@
+
 export const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED'
 export const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED'
+export const REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED'
+export const LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED'
+
 
 export const getInputAudioDevices = () => {
   let inputArray: Array<Object> = []
@@ -34,3 +38,8 @@ export const getOutputAudioDevices = () => {
     payload: outputArray
   }
 }
+
+
+
+
+
