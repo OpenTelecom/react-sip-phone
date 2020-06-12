@@ -1,5 +1,6 @@
 import { Session, SessionState } from 'sip.js'
 export const NEW_SESSION = 'NEW_SESSION'
+export const NEW_ATTENDED_TRANSFER = 'NEW_ATTENDED_TRANSFER'
 export const INCOMING_CALL = 'INCOMING_CALL'
 
 export const ACCEPT_CALL = 'ACCEPT_CALL'

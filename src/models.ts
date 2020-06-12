@@ -10,3 +10,7 @@ export interface SipConfig {
   defaultCountryCode: string,
   noAnswerTimeout: number
 }
+
+export interface PhoneConfig {
+  disabledButtons: Array<string>
+}

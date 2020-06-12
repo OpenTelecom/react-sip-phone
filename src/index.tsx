@@ -5,13 +5,14 @@ import SipWrapper from './SipWrapper'
 import Status from './components/Status'
 import PhoneSessions from './components/PhoneSessions'
 import Dialstring from './components/Dialstring'
-import { SipConfig, SipCredentials } from './models'
+import { SipConfig, SipCredentials, PhoneConfig } from './models'
 
 import defaultStore from './store/configureStore'
 
 interface Props {
   width: number
   name: string
+  phoneConfig: PhoneConfig
   sipCredentials: SipCredentials
   sipConfig: SipConfig
   store: any
@@ -24,6 +25,7 @@ export const ReactSipPhone = ({
   name,
   width = 300,
   store,
+  phoneConfig = {disabledButtons: []},
   sipConfig,
   sipCredentials,
   containerStyle = {}
@@ -36,7 +38,7 @@ export const ReactSipPhone = ({
         <div className={styles.container} style={{ ...containerStyle, width: `${width < 300 ? 300 : width}px` }}>
           <Status name={name} />
           <Dialstring />
-          <PhoneSessions />
+          <PhoneSessions phoneConfig={phoneConfig} />
           <audio id='mediaElement' autoPlay />
         </div>
       </SipWrapper>

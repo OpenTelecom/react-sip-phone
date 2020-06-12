@@ -1,6 +1,7 @@
 import { Action } from './models'
 import {
   NEW_SESSION,
+  NEW_ATTENDED_TRANSFER,
   CLOSE_SESSION,
   SIPSESSION_STATECHANGE,
   INCOMING_CALL,
@@ -14,7 +15,8 @@ const sipSessions = (
     sessions: {},
     incomingCalls: {},
     stateChanged: 0,
-    onHold: []
+    onHold: [],
+    attendedTransfers: []
   },
   action: Action
 ) => {
@@ -31,6 +33,12 @@ const sipSessions = (
       return {
         ...state,
         sessions: { ...state.sessions, [payload.id]: payload }
+      }
+    case NEW_ATTENDED_TRANSFER:
+      return {
+        ...state,
+        sessions: { ...state.sessions, [payload.id]: payload },
+        attendedTransfers: [...state.attendedTransfers, payload.id]
       }
     case ACCEPT_CALL:
       const acceptedIncoming: any = { ...state.incomingCalls }
