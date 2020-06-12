@@ -11,6 +11,7 @@ import defaultStore from './store/configureStore'
 
 interface Props {
   width: number
+  height: number
   name: string
   phoneConfig: PhoneConfig
   sipCredentials: SipCredentials
@@ -24,8 +25,9 @@ export let phoneStore = defaultStore
 export const ReactSipPhone = ({
   name,
   width = 300,
+  height = 600,
   store,
-  phoneConfig = {disabledButtons: []},
+  phoneConfig = { disabledButtons: [] },
   sipConfig,
   sipCredentials,
   containerStyle = {}
@@ -35,7 +37,12 @@ export const ReactSipPhone = ({
   return (
     <Provider store={phoneStore}>
       <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials}>
-        <div className={styles.container} style={{ ...containerStyle, width: `${width < 300 ? 300 : width}px` }}>
+        <div className={styles.container}
+          style={{
+            ...containerStyle,
+            width: `${width < 300 ? 300 : width}px`,
+            height: `${height < 600 ? 600 : height}px`
+          }}>
           <Status name={name} />
           <Dialstring />
           <PhoneSessions phoneConfig={phoneConfig} />
