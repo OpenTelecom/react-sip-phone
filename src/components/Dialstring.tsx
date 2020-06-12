@@ -3,18 +3,12 @@ import { connect } from 'react-redux'
 import SIPAccount from '../lib/SipAccount'
 import styles from './Dialstring.scss'
 import callIcon from '../assets/call-24px.svg'
-import { phoneStore } from '../index'
-
-import {
-  AUDIO_OUTPUT_DEVICE_DETECTED,
-  AUDIO_INPUT_DEVICE_DETECTED
-} from '../actions/device'
-
+import { getInputAudioDevices, getOutputAudioDevices } from '../actions/device'
 
 interface Props {
-  sipAccount: SIPAccount,
-  devices: any
-
+  sipAccount: SIPAccount
+  getInputAudioDevices: Function
+  getOutputAudioDevices: Function
 }
 
 class Dialstring extends React.Component<Props> {
@@ -31,31 +25,8 @@ class Dialstring extends React.Component<Props> {
   }
 
   componentDidMount() {
-    navigator.mediaDevices.enumerateDevices().then(function (devices: any) {
-      devices.forEach(function (device: any) {
-        console.log(device)
-        console.log(device.kind)
-        if (device.kind === 'audioinput') {
-          phoneStore.dispatch({
-            type: AUDIO_INPUT_DEVICE_DETECTED,
-            payload: {
-              kind: device.kind,
-              label: device.label,
-              id: device.deviceId
-            }
-          })
-        } else if (device.kind === 'audiooutput') {
-          phoneStore.dispatch({
-            type: AUDIO_OUTPUT_DEVICE_DETECTED,
-            payload: {
-              kind: device.kind,
-              label: device.label,
-              id: device.deviceId
-            }
-          })
-        }
-      })
-    })
+    this.props.getInputAudioDevices()
+    this.props.getOutputAudioDevices()
   }
 
   render() {
@@ -76,15 +47,21 @@ class Dialstring extends React.Component<Props> {
           disabled={this.checkDialstring()}
           onClick={() => this.handleDial()}
         >
-          <img src={callIcon}/>
+          <img src={callIcon} />
         </button>
       </div>
     )
   }
 }
+
 const mapStateToProps = (state: any) => ({
-  sipAccount: state.sipAccounts.sipAccount,
-  devices: state.device.devices
+  sipAccount: state.sipAccounts.sipAccount
 })
-const D = connect(mapStateToProps)(Dialstring)
+
+const actions = {
+  getInputAudioDevices,
+  getOutputAudioDevices
+}
+
+const D = connect(mapStateToProps, actions)(Dialstring)
 export default D

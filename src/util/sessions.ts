@@ -8,9 +8,33 @@ export class SessionStateHandler {
     this.session = session
   }
 
-  public setupRemoteMedia(session: Session) {
+  //creates new audio track then replaces audio track in getSender stream w/ new track
+  public setLocalAudio(session: Session) {
+    //@ts-ignore
+    session.sessionDescriptionHandler.peerConnection
+      .getSenders()
+      .forEach(function (sender: any) {
+        if (sender.track.kind === 'audio') {
+          let audioDeviceId =
+            // audio input device_id 
+            'default'
+          navigator.mediaDevices
+            // @ts-ignore
+
+            //creates a stream w track
+            .getUserMedia({ audio: { deviceId: audioDeviceId } })
+            .then(function (stream) {
+              let audioTrack = stream.getAudioTracks()
+              console.log(audioTrack)
+              sender.replaceTrack(audioTrack[0])
+            })
+        }
+      })
+  }
+
+  //takes track from getReceiver stream and adds to new track
+  public setRemoteAudio(session: Session) {
     const mediaElement = document.getElementById('mediaElement')
-    console.log(mediaElement)
     const remoteStream = new MediaStream()
     //@ts-ignore
     session.sessionDescriptionHandler.peerConnection
@@ -24,7 +48,8 @@ export class SessionStateHandler {
       // @ts-ignore
 
       mediaElement.setSinkId(
-        // '9fd92da2563c9c2168af72a2cae2850e8a7959c800eeed8b3f09c0d52eff2bfe'
+
+        // audio output device_id 
         'default'
       )
       // @ts-ignore
@@ -41,10 +66,10 @@ export class SessionStateHandler {
     const mediaElement = document.getElementById('mediaElement')
     // @ts-ignore
 
-    mediaElement.srcObject = null;
+    mediaElement.srcObject = null
     // @ts-ignore
 
-    mediaElement.pause();
+    mediaElement.pause()
   }
 
   public stateChange = (newState: SessionState) => {
@@ -59,7 +84,8 @@ export class SessionStateHandler {
           type: SIPSESSION_STATECHANGE
         })
         toneManager.stopAll()
-        this.setupRemoteMedia(this.session)
+        this.setLocalAudio(this.session)
+        this.setRemoteAudio(this.session)
 
         break
       case SessionState.Terminating:
@@ -91,8 +117,7 @@ export const getFullNumber = (number: string) => {
     return number
   }
   // @ts-ignore
-  let fullNumber = `+${phoneStore.getState().sipAccounts.sipAccount._config.defaultCountryCode
-    }${number}`
+  let fullNumber = `+${phoneStore.getState().sipAccounts.sipAccount._config.defaultCountryCode}${number}`
   if (number.includes('+') && number.length === 10) {
     fullNumber = `${number}`
   }
@@ -101,7 +126,7 @@ export const getFullNumber = (number: string) => {
 }
 
 export const statusMask = (status: string) => {
-  switch(status) {
+  switch (status) {
     case 'Established':
       return 'Connected'
     case 'Establishing':
