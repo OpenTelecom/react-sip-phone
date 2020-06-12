@@ -1,13 +1,36 @@
-export const AUDIO_GET_DEVICES_REQUEST = 'AUDIO_GET_DEVICES_REQUEST'
-export const AUDIO_GET_DEVICES_SUCCESS = 'AUDIO_GET_DEVICES_SUCCESS'
-export const AUDIO_GET_DEVICES_FAIL = 'AUDIO_GET_DEVICES_FAIL'
-export const AUDIO_CHANGE_DEVICE = 'AUDIO_CHANGE_DEVICE'
-export const AUDIO_INPUT_DEVICE_DETECTED = 'AUDIO_INPUT_DEVICE_DETECTED'
-export const AUDIO_OUTPUT_DEVICE_DETECTED = 'AUDIO_OUTPUT_DEVICE_DETECTED'
+export const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED'
+export const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED'
 
-export const DEVICE_TYPES = {
-    PHONE_INPUT: 'PHONE_INPUT',
-    PHONE_OUTPUT: 'PHONE_OUTPUT',
-    PHONE_RINGING: 'PHONE_RINGING',
-    AUDIO_SOUNDS: 'AUDIO_SOUNDS'
+export const getInputAudioDevices = () => {
+  let inputArray: Array<Object> = []
+  navigator.mediaDevices
+    .enumerateDevices()
+    .then(function (devices: Array<Object>) {
+      devices.forEach(function (device: any) {
+        if (device.kind === 'audioinput') {
+          inputArray.push(device)
+        }
+      })
+    })
+  return {
+    type: AUDIO_INPUT_DEVICES_DETECTED,
+    payload: inputArray
+  }
+}
+
+export const getOutputAudioDevices = () => {
+  let outputArray: Array<Object> = []
+  navigator.mediaDevices
+    .enumerateDevices()
+    .then(function (devices: Array<Object>) {
+      devices.forEach(function (device: any) {
+        if (device.kind === 'audiooutput') {
+          outputArray.push(device)
+        }
+      })
+    })
+  return {
+    type: AUDIO_OUTPUT_DEVICES_DETECTED,
+    payload: outputArray
+  }
 }

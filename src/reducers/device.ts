@@ -1,7 +1,7 @@
 import { Action } from './models'
 import {
-    AUDIO_INPUT_DEVICE_DETECTED,
-    AUDIO_OUTPUT_DEVICE_DETECTED
+    AUDIO_INPUT_DEVICES_DETECTED,
+    AUDIO_OUTPUT_DEVICES_DETECTED
 } from '../actions/device'
 const device = (
     state = {
@@ -12,15 +12,15 @@ const device = (
 ) => {
     const { type, payload } = action
     switch (type) {
-        case AUDIO_INPUT_DEVICE_DETECTED:
+        case AUDIO_INPUT_DEVICES_DETECTED:
             return {
                 ...state,
-                audioInput: [...state.audioInput, payload]
+                audioInput: payload
             }
-        case AUDIO_OUTPUT_DEVICE_DETECTED:
+        case AUDIO_OUTPUT_DEVICES_DETECTED:
             return {
                 ...state,
-                audioOutput: [...state.audioOutput, payload]
+                audioOutput: payload
             }
 
         default:
