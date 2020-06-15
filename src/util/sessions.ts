@@ -106,12 +106,17 @@ export class SessionStateHandler {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
+        toneManager.stopAll()
+
         this.cleanupMedia()
         break
       case SessionState.Terminated:
+
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
+        toneManager.stopAll()
+
         setTimeout(() => {
           phoneStore.dispatch({
             type: CLOSE_SESSION,
