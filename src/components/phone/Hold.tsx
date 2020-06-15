@@ -19,7 +19,7 @@ interface Props {
 class Hold extends React.Component<Props> {
   hold() {
     if (this.checkHoldState()) {
-      this.props.unHoldCallRequest(this.props.session)
+      this.props.unHoldCallRequest(this.props.session, this.props.onHold, this.props.sessions)
     } else {
       this.props.holdCallRequest(this.props.session)
     }
