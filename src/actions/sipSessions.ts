@@ -1,4 +1,6 @@
 import { Session, SessionState } from 'sip.js'
+import { phoneStore } from '../index';
+
 export const NEW_SESSION = 'NEW_SESSION'
 export const NEW_ATTENDED_TRANSFER = 'NEW_ATTENDED_TRANSFER'
 export const INCOMING_CALL = 'INCOMING_CALL'
@@ -19,6 +21,8 @@ export const SIPSESSION_HOLD_FAIL = 'SIPSESSION_HOLD_FAIL'
 export const SIPSESSION_UNHOLD_REQUEST = 'SIPSESSION_UNHOLD_REQUEST'
 export const SIPSESSION_UNHOLD_SUCCESS = 'SIPSESSION_UNHOLD_SUCCESS'
 export const SIPSESSION_UNHOLD_FAIL = 'SIPSESSION_UNHOLD_FAIL'
+
+export const SIPSESSION_HOLD_ALL_REQUEST = 'SIPSESSION_HOLD_ALL_REQUEST'
 
 export const SIPSESSION_MUTE_REQUEST = 'SIPSESSION_MUTE_REQUEST'
 export const SIPSESSION_MUTE_SUCCESS = 'SIPSESSION_MUTE_SUCCESS'
@@ -76,17 +80,37 @@ export const holdCallRequest = (session: Session) => {
     return { type: SIPSESSION_HOLD_FAIL }
   }
 }
-export const unHoldCallRequest = (session: Session) => {
-  if (
-    !session.sessionDescriptionHandler ||
-    session.state !== SessionState.Established
-  ) {
-    return { type: SIPSESSION_UNHOLD_FAIL }
+
+//maps thru onHold and sessions arrays looking for a call to put on hold before unHolding a call 
+export const unHoldCallRequest = (session: Session, onHolds: Array<any>, sessions: Array<any>) => {
+
+  //checks for sessions that exist but are not on hold
+  for (let [sessionId, session] of Object.entries(sessions)) {
+    if (
+      sessionId in onHolds === false &&
+      sessionId !== session.id
+    ) {
+
+      // hold session if not on hold
+      try {
+        session.invite({
+          sessionDescriptionHandlerModifiers: [
+            session.sessionDescriptionHandler!.holdModifier
+          ]
+        })
+        phoneStore.dispatch({ type: SIPSESSION_HOLD_REQUEST, payload: session.id })
+      } catch (err) {
+        phoneStore.dispatch({ type: SIPSESSION_HOLD_FAIL })
+      }
+
+    }
   }
+  // unhold original call 
   try {
     session.invite()
     return { type: SIPSESSION_UNHOLD_REQUEST, payload: session.id }
   } catch (err) {
     return { type: SIPSESSION_UNHOLD_FAIL }
   }
+
 }
