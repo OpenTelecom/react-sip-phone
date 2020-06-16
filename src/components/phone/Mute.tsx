@@ -8,17 +8,21 @@ import { Session, SessionState, UserAgent } from 'sip.js'
 import micOffIcon from '../../assets/mic_off-24px.svg'
 
 import {
-  SIPSESSION_MUTE_REQUEST,
-  SIPSESSION_MUTE_SUCCESS,
-  SIPSESSION_MUTE_FAIL,
+
   SIPSESSION_UNMUTE_REQUEST,
   SIPSESSION_UNMUTE_SUCCESS,
-  SIPSESSION_UNMUTE_FAIL
+  SIPSESSION_UNMUTE_FAIL,
+  muteRequest,
+  muteSuccess,
+  muteFail
 } from '../../actions/sipSessions'
 
 interface Props {
   session: Session
   userAgent: UserAgent
+  muteRequest: Function
+  muteSuccess: Function
+  muteFail: Function
 }
 
 class Mute extends React.Component<Props> {
@@ -73,16 +77,13 @@ class Mute extends React.Component<Props> {
           !this.props.session.sessionDescriptionHandler ||
           this.props.session.state !== SessionState.Established
         ) {
-          phoneStore.dispatch({
-            type: SIPSESSION_MUTE_FAIL
-          })
+          this.props.muteFail()
           reject('No session to mute')
           return
         }
         try {
-          phoneStore.dispatch({
-            type: SIPSESSION_MUTE_REQUEST
-          })
+          this.props.muteRequest()
+
           const pc =
             // @ts-ignore
             this.props.session.sessionDescriptionHandler!.peerConnection
@@ -91,25 +92,21 @@ class Mute extends React.Component<Props> {
               track.enabled = false
             })
           })
-          phoneStore.dispatch({
-            type: SIPSESSION_MUTE_SUCCESS
-          })
-          this.setState({ onMute: true })
+          this.props.muteSuccess()
 
+          this.setState({ onMute: true })
           resolve()
           return
         } catch (err) {
-          phoneStore.dispatch({
-            type: SIPSESSION_MUTE_FAIL
-          })
+          this.props.muteFail()
+
           reject(err)
           return
         }
       })
     }
-    phoneStore.dispatch({
-      type: SIPSESSION_MUTE_FAIL
-    })
+    this.props.muteFail()
+
     return
   }
 
@@ -129,6 +126,10 @@ const mapStateToProps = (state: any) => ({
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent
 })
-const actions = {}
+const actions = {
+  muteRequest,
+  muteSuccess,
+  muteFail
+}
 
 export default connect(mapStateToProps, actions)(Mute)
