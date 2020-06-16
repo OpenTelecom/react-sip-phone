@@ -29,7 +29,6 @@ export class IncomingSessionStateHandler {
         this.holdAll()
         setLocalAudio(this.incomingSession)
         setRemoteAudio(this.incomingSession)
-
         break
       case SessionState.Terminating:
         phoneStore.dispatch({
@@ -56,13 +55,10 @@ export class IncomingSessionStateHandler {
 
   public holdAll() {
     const state = phoneStore.getState()
-
     //@ts-ignore
     const onHolds = state.sipSessions.onHold
-
     //@ts-ignore
     const sessions = state.sipSessions.sessions
-
     for (let [sessionId, session] of Object.entries(sessions)) {
       if (
         sessionId in onHolds === false &&

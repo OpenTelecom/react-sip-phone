@@ -20,7 +20,6 @@ class ToneManager {
       this.currentTone = new TonePlayer()
       this.currentTone.ringtone(deviceId)
     }
-
   }
 
   public stopAll() {
@@ -32,5 +31,4 @@ class ToneManager {
 }
 
 const toneManager = new ToneManager()
-
 export default toneManager

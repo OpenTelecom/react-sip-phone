@@ -21,7 +21,6 @@ interface Props {
   endCall: Function
   phoneConfig: PhoneConfig
   deviceId: string
-
 }
 
 class Phone extends React.Component<Props> {
@@ -94,7 +93,8 @@ class Phone extends React.Component<Props> {
     return (
       <React.Fragment>
         <hr style={{ width: '100%' }} />
-        <div>{// @ts-ignore
+        <div>{
+          // @ts-ignore
           `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
         </div>
         <div>{statusMask(props.session.state)}</div>
