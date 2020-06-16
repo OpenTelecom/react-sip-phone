@@ -20,6 +20,11 @@ export class IncomingSessionStateHandler {
 
   //creates new audio track then replaces audio track in getSender stream w/ new track
   public setLocalAudioIncoming() {
+    const state = phoneStore.getState()
+
+    //@ts-ignore
+    const deviceId = state.device.primaryAudioInput
+
     //@ts-ignore
     this.incomingSession.sessionDescriptionHandler.peerConnection
       .getSenders()
@@ -28,7 +33,8 @@ export class IncomingSessionStateHandler {
         if (sender.track && sender.track.kind === 'audio') {
           let audioDeviceId =
             // audio input device_id
-            'default'
+            // 'default'
+            deviceId
           navigator.mediaDevices
             // @ts-ignore
 
@@ -46,9 +52,16 @@ export class IncomingSessionStateHandler {
     })
   }
 
-  //takes track from getReceiver stream and adds to new track
+  //adds track from getReceiver stream to <audio id={sessionId}> in Incoming.tsx
   public setRemoteAudio() {
-    const mediaElement = document.getElementById('mediaElement')
+    const state = phoneStore.getState()
+    //@ts-ignore
+    const deviceId = state.device.primaryAudioOutput
+
+    //@ts-ignore
+
+    const mediaElement = document.getElementById(this.incomingSession.id)
+
     const remoteStream = new MediaStream()
     //@ts-ignore
     this.incomingSession.sessionDescriptionHandler.peerConnection
@@ -61,15 +74,21 @@ export class IncomingSessionStateHandler {
     if (mediaElement) {
       // @ts-ignore
 
+      console.log(mediaElement.sinkId)
+      // @ts-ignore
+
       mediaElement.setSinkId(
         // audio output device_id
-        'default'
-      )
-      // @ts-ignore
-      mediaElement.srcObject = remoteStream
-      //@ts-ignore
+        // 'default'
+        deviceId
+      ).then(() => {
+        // @ts-ignore
+        mediaElement.srcObject = remoteStream
+        //@ts-ignore
+        mediaElement.play()
+      })
 
-      mediaElement.play()
+
     } else {
       console.log('no media Element')
     }
@@ -79,7 +98,8 @@ export class IncomingSessionStateHandler {
   }
 
   public cleanupMedia() {
-    const mediaElement = document.getElementById('mediaElement')
+    //@ts-ignore
+    const mediaElement: HTMLMediaElement = document.getElementById(this.incomingSession.id)
     // @ts-ignore
 
     mediaElement.srcObject = null
@@ -148,6 +168,7 @@ export class IncomingSessionStateHandler {
         try {
           //@ts-ignore
           holdCallRequest(session)
+          //dispatch here because class is not connected to redux actions
           phoneStore.dispatch({
             type: SIPSESSION_HOLD_REQUEST,
             //@ts-ignore

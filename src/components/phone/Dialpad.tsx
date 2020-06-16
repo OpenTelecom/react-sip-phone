@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { connect } from 'react-redux'
+
 import styles from './Phone.scss'
 import DialButton from './DialButton'
 import { Session, SessionState } from 'sip.js'
@@ -7,6 +9,7 @@ import { playDTMF } from '../../util/TonePlayer'
 interface Props {
   open: boolean
   session: Session
+  deviceId: string
 }
 
 class Dialpad extends React.Component<Props> {
@@ -41,7 +44,7 @@ class Dialpad extends React.Component<Props> {
   handleClick(value: string) {
     if (this.props.session.state === SessionState.Established) {
       this.sendDTMF(value)
-      playDTMF(value)
+      playDTMF(value, this.props.deviceId)
     }
   }
 
@@ -73,4 +76,11 @@ class Dialpad extends React.Component<Props> {
     )
   }
 }
-export default Dialpad
+
+const mapStateToProps = (state: any) => ({
+  deviceId: state.device.primaryAudioOutput
+})
+const actions = {
+
+}
+export default connect(mapStateToProps, actions)(Dialpad)
