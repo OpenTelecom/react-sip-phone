@@ -17,8 +17,7 @@ import { IncomingSessionStateHandler } from '../util/incomingSession'
 
 import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
-import toneManager from '../util/ToneManager'
-
+// import toneManager from '../util/ToneManager'
 export default class SIPAccount {
   public _config: SipConfig
   public _credentials: SipCredentials
@@ -121,7 +120,6 @@ export default class SIPAccount {
   }
 
   makeCall(number: string) {
-    toneManager.playRing('ringback')
 
     // Make a call
     const target = UserAgent.makeURI(
@@ -155,5 +153,7 @@ export default class SIPAccount {
     } else {
       console.log(`Failed to establish session for outgoing call to ${number}`)
     }
+    // toneManager.playRing('ringback')
+
   }
 }

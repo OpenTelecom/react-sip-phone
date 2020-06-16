@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { phoneStore } from '../../index'
 
 import styles from './Phone.scss'
 import { Session, SessionState, UserAgent } from 'sip.js'
@@ -8,13 +7,12 @@ import { Session, SessionState, UserAgent } from 'sip.js'
 import micOffIcon from '../../assets/mic_off-24px.svg'
 
 import {
-
-  SIPSESSION_UNMUTE_REQUEST,
-  SIPSESSION_UNMUTE_SUCCESS,
-  SIPSESSION_UNMUTE_FAIL,
   muteRequest,
   muteSuccess,
-  muteFail
+  muteFail,
+  unMuteRequest,
+  unMuteSuccess,
+  unMuteFail
 } from '../../actions/sipSessions'
 
 interface Props {
@@ -23,6 +21,9 @@ interface Props {
   muteRequest: Function
   muteSuccess: Function
   muteFail: Function
+  unMuteRequest: Function
+  unMuteSuccess: Function
+  unMuteFail: Function
 }
 
 class Mute extends React.Component<Props> {
@@ -32,17 +33,13 @@ class Mute extends React.Component<Props> {
 
   mute() {
     if (this.state.onMute) {
-      phoneStore.dispatch({
-        type: SIPSESSION_UNMUTE_REQUEST
-      })
+      this.props.unMuteRequest()
       return new Promise((resolve, reject) => {
         if (
           !this.props.session.sessionDescriptionHandler ||
           this.props.session.state !== SessionState.Established
         ) {
-          phoneStore.dispatch({
-            type: SIPSESSION_UNMUTE_FAIL
-          })
+          this.props.unMuteFail()
           reject('No session to mute')
           return
         }
@@ -55,16 +52,12 @@ class Mute extends React.Component<Props> {
               track.enabled = true
             })
           })
-          phoneStore.dispatch({
-            type: SIPSESSION_UNMUTE_SUCCESS
-          })
+          this.props.unMuteSuccess()
           this.setState({ onMute: false })
           resolve()
           return
         } catch (err) {
-          phoneStore.dispatch({
-            type: SIPSESSION_UNMUTE_FAIL
-          })
+          this.props.unMuteFail()
           reject(err)
           return
         }
@@ -83,7 +76,6 @@ class Mute extends React.Component<Props> {
         }
         try {
           this.props.muteRequest()
-
           const pc =
             // @ts-ignore
             this.props.session.sessionDescriptionHandler!.peerConnection
@@ -99,14 +91,12 @@ class Mute extends React.Component<Props> {
           return
         } catch (err) {
           this.props.muteFail()
-
           reject(err)
           return
         }
       })
     }
     this.props.muteFail()
-
     return
   }
 
@@ -129,7 +119,10 @@ const mapStateToProps = (state: any) => ({
 const actions = {
   muteRequest,
   muteSuccess,
-  muteFail
+  muteFail,
+  unMuteRequest,
+  unMuteSuccess,
+  unMuteFail
 }
 
 export default connect(mapStateToProps, actions)(Mute)

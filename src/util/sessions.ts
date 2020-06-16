@@ -13,6 +13,8 @@ export class SessionStateHandler {
   public stateChange = (newState: SessionState) => {
     switch (newState) {
       case SessionState.Establishing:
+        toneManager.playRing('ringback')
+
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
@@ -79,7 +81,6 @@ export const statusMask = (status: string) => {
       return 'Unknown Status'
   }
 }
-
 
 export const getDurationDisplay = (duration: number) => {
   let minutes = Math.floor(duration / 60)

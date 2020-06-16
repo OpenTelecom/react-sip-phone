@@ -198,3 +198,21 @@ export const muteFail = () => (dispatch: Dispatch) => {
   })
 }
 
+export const unMuteRequest = () => (dispatch: Dispatch) => {
+  dispatch({
+    type: SIPSESSION_UNMUTE_REQUEST
+  })
+}
+
+export const unMuteSuccess = () => (dispatch: Dispatch) => {
+  dispatch({
+    type: SIPSESSION_UNMUTE_SUCCESS
+  })
+}
+
+export const unMuteFail = () => (dispatch: Dispatch) => {
+  dispatch({
+    type: SIPSESSION_UNMUTE_FAIL
+  })
+}
+
