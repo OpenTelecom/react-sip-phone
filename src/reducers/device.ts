@@ -6,7 +6,9 @@ import {
 const device = (
     state = {
         audioInput: [],
-        audioOutput: []
+        audioOutput: [],
+        primaryAudioOutput: 'default',
+        primaryAudioInput: 'default'
     },
     action: Action
 ) => {

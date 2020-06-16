@@ -23,7 +23,7 @@ const DTMF_MATRIX = {
 const Synth = Tone.PolySynth && new Tone.PolySynth(2, Tone.Synth)
 const FMSynth = Tone.PolySynth && new Tone.PolySynth(2, Tone.FMSynth)
 
-export const playDTMF = (key: any) => {
+export const playDTMF = (key: any, deviceId: string) => {
   let obj = DTMF_MATRIX[key]
   if (!obj) {
     console.log('invalid DTMF tone input')
@@ -41,24 +41,108 @@ export const playDTMF = (key: any) => {
     }
   })
 
-  Synth.toMaster()
+  if (deviceId !== 'default') {
+    const mediaElement = document.getElementById('tone')
+
+
+    if (mediaElement) {
+      let dest = Tone.context.createMediaStreamDestination()
+      Synth.connect(dest)
+      // @ts-ignore
+      mediaElement.setSinkId(
+        // audio output device_id
+        deviceId
+      ).then(() => {
+        // @ts-ignore
+        mediaElement.srcObject = dest.stream
+        //@ts-ignore
+
+        mediaElement.play()
+      })
+
+
+    }
+  } else {
+    Synth.toMaster()
+  }
 
   Synth.triggerAttackRelease(obj, 0.3)
 }
 
-export const callDisconnect = () => {
+export const callDisconnect = (deviceId: string) => {
   FMSynth.triggerAttack(['C4', 'E4'], '+0.1')
   FMSynth.triggerRelease(['C4', 'E4'], '+0.14')
   FMSynth.triggerAttack(['D4', 'G4'], '+0.14')
   FMSynth.triggerRelease(['D4', 'G4'], '+0.18')
+  if (deviceId !== 'default') {
+    const mediaElement = document.getElementById('tone')
 
-  FMSynth.toMaster()
+
+    if (mediaElement) {
+      let dest = Tone.context.createMediaStreamDestination()
+      Synth.connect(dest)
+      // @ts-ignore
+      mediaElement.setSinkId(
+        // audio output device_id
+        deviceId
+      ).then(() => {
+        // @ts-ignore
+        mediaElement.srcObject = dest.stream
+        //@ts-ignore
+
+        mediaElement.play()
+      })
+
+
+    }
+
+  }
+  else {
+    FMSynth.toMaster()
+  }
 }
 
 class TonePlayer {
   private loop: any
 
-  ringback = () => {
+
+  //get audio element, set srcObj to device, and play the track
+  ringtone = (deviceId: string) => {
+    // console.log(deviceId)
+    // const ring = require('./assets/ring.mp3')
+
+    // const ringtone = new Audio(ring);
+    // ringtone.addEventListener('loadeddata', () => {
+    //   ringtone.play()
+    //   // The duration variable now holds the duration (in seconds) of the audio clip 
+    // })
+
+    const mediaElement = document.getElementById('ringtone')
+    if (deviceId !== 'default') {
+      if (mediaElement) {
+
+        // @ts-ignore
+        mediaElement.setSinkId(
+          // audio output device_id
+          // 'default'
+          deviceId
+        ).then(() => {
+          // @ts-ignore
+          mediaElement.play()
+        })
+      } else {
+        console.log('no media Element')
+      }
+    } else {
+      // @ts-ignore
+      mediaElement.play()
+    }
+
+
+
+  }
+
+  ringback = (deviceId: string) => {
     let dest = Tone.context.createMediaStreamDestination()
     console.log(dest)
     Synth.set({
@@ -72,7 +156,29 @@ class TonePlayer {
         release: 0.02
       }
     }).connect(dest)
-    Synth.toMaster()
+    if (deviceId !== 'default') {
+      const mediaElement = document.getElementById('tone')
+
+
+      if (mediaElement) {
+        let dest = Tone.context.createMediaStreamDestination()
+        Synth.connect(dest)
+        // @ts-ignore
+        mediaElement.setSinkId(
+          // audio output device_id
+          deviceId
+        ).then(() => {
+          // @ts-ignore
+          mediaElement.srcObject = dest.stream
+          //@ts-ignore
+
+          mediaElement.play()
+        })
+      }
+
+    } else {
+      Synth.toMaster()
+    }
 
     this.loop = new Tone.Loop((time: any) => {
       Synth.triggerAttack([440, 480])
@@ -83,9 +189,16 @@ class TonePlayer {
   }
 
   stop = () => {
-    this.loop.stop(0)
-    Tone.Transport.stop()
-    Synth.triggerRelease([440, 480])
+    try {
+      this.loop.stop(0)
+      Tone.Transport.stop()
+      Synth.triggerRelease([440, 480])
+    } catch{
+      const mediaElement = document.getElementById('ringtone')
+      //@ts-ignore
+      mediaElement.pause()
+
+    }
   }
 }
 

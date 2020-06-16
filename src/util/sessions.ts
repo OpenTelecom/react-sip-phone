@@ -15,6 +15,11 @@ export class SessionStateHandler {
 
   //creates new audio track then replaces audio track in getSender stream w/ new track
   public setLocalAudioOutgoing() {
+    const state = phoneStore.getState()
+
+    //@ts-ignore
+    const deviceId = state.device.primaryAudioInput
+
     //@ts-ignore
     this.session.sessionDescriptionHandler.peerConnection
       .getSenders()
@@ -24,7 +29,8 @@ export class SessionStateHandler {
         if (sender.track && sender.track.kind === 'audio') {
           let audioDeviceId =
             // audio input device_id
-            'default'
+            // 'default'
+            deviceId
           navigator.mediaDevices
             // @ts-ignore
 
@@ -32,7 +38,6 @@ export class SessionStateHandler {
             .getUserMedia({ audio: { deviceId: audioDeviceId } })
             .then(function (stream) {
               let audioTrack = stream.getAudioTracks()
-              console.log(audioTrack)
               sender.replaceTrack(audioTrack[0])
             })
         }
@@ -42,9 +47,13 @@ export class SessionStateHandler {
     })
   }
 
-  //takes track from getReceiver stream and adds to new track
+  //adds track from getReceiver stream to <audio id={sessionId}> in Phone.tsx
   public setRemoteAudio() {
-    const mediaElement = document.getElementById('mediaElement')
+    const state = phoneStore.getState()
+    //@ts-ignore
+    const deviceId = state.device.primaryAudioOutput
+
+    const mediaElement = document.getElementById(this.session.id)
     const remoteStream = new MediaStream()
     //@ts-ignore
     this.session.sessionDescriptionHandler.peerConnection
@@ -55,17 +64,19 @@ export class SessionStateHandler {
         }
       })
     if (mediaElement) {
-      // @ts-ignore
 
+      // @ts-ignore
       mediaElement.setSinkId(
         // audio output device_id
-        'default'
-      )
-      // @ts-ignore
-      mediaElement.srcObject = remoteStream
-      //@ts-ignore
+        // 'default'
+        deviceId
+      ).then(() => {
+        // @ts-ignore
+        mediaElement.srcObject = remoteStream
+        //@ts-ignore
 
-      mediaElement.play()
+        mediaElement.play()
+      })
     } else {
       console.log('no media Element')
     }
@@ -75,13 +86,13 @@ export class SessionStateHandler {
   }
 
   public cleanupMedia() {
-    const mediaElement = document.getElementById('mediaElement')
-    // @ts-ignore
-
-    mediaElement.srcObject = null
-    // @ts-ignore
-
-    mediaElement.pause()
+    const mediaElement = document.getElementById(this.session.id)
+    if (mediaElement) {
+      // @ts-ignore
+      mediaElement.srcObject = null
+      // @ts-ignore
+      mediaElement.pause()
+    }
   }
 
   public stateChange = (newState: SessionState) => {
@@ -159,6 +170,7 @@ export const statusMask = (status: string) => {
       return 'Unknown Status'
   }
 }
+
 
 export const getDurationDisplay = (duration: number) => {
   let minutes = Math.floor(duration / 60)

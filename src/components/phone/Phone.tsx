@@ -20,6 +20,8 @@ interface Props {
   userAgent: UserAgent
   endCall: Function
   phoneConfig: PhoneConfig
+  deviceId: string
+
 }
 
 class Phone extends React.Component<Props> {
@@ -57,11 +59,12 @@ class Phone extends React.Component<Props> {
       this.props.session.state === SessionState.Initial ||
       this.props.session.state === SessionState.Establishing
     ) {
+      toneManager.stopAll()
+      callDisconnect(this.props.deviceId)
       // @ts-ignore
 
       this.props.session.cancel()
-      toneManager.stopAll()
-      callDisconnect()
+
     }
     this.setState({ ended: true })
     setTimeout(() => {
@@ -77,10 +80,10 @@ class Phone extends React.Component<Props> {
   handleCounter() {
     if (this.props.session.state !== SessionState.Terminated) {
       if (this.state.counterStarted === false) {
-        this.setState({counterStarted: true})
+        this.setState({ counterStarted: true })
       }
       setTimeout(() => {
-        this.setState({duration: this.state.duration + 1})
+        this.setState({ duration: this.state.duration + 1 })
         this.handleCounter()
       }, 1000)
     }
@@ -95,10 +98,10 @@ class Phone extends React.Component<Props> {
           `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
         </div>
         <div>{statusMask(props.session.state)}</div>
-        { (this.props.session.state === SessionState.Initial ||
-      this.props.session.state === SessionState.Establishing) ? 
-        null : <div>{getDurationDisplay(this.state.duration)}</div>
-    }
+        {(this.props.session.state === SessionState.Initial ||
+          this.props.session.state === SessionState.Establishing) ?
+          null : <div>{getDurationDisplay(this.state.duration)}</div>
+        }
         {
           state.ended ? null :
             <React.Fragment>
@@ -153,6 +156,8 @@ class Phone extends React.Component<Props> {
                   />
                 </div>
               </div>
+              <audio id={this.props.session.id} autoPlay />
+
             </React.Fragment>
         }
       </React.Fragment>
@@ -162,7 +167,9 @@ class Phone extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
-  userAgent: state.sipAccounts.userAgent
+  userAgent: state.sipAccounts.userAgent,
+  deviceId: state.device.primaryAudioOutput
+
 })
 const actions = {
   endCall

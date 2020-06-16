@@ -1,17 +1,26 @@
 import TonePlayer from './TonePlayer'
+import { phoneStore } from '../index'
 
 class ToneManager {
   currentTone: any
-  constructor() {}
+  constructor() { }
 
-  public ringback() {
+  public playRing(type: string) {
+    const state = phoneStore.getState()
+    //@ts-ignore
+    const deviceId = state.device.primaryAudioOutput
     if (this.currentTone) {
       this.currentTone.stop()
       this.currentTone = undefined
     }
+    if (type === 'ringback') {
+      this.currentTone = new TonePlayer()
+      this.currentTone.ringback(deviceId)
+    } else if (type == 'ringtone') {
+      this.currentTone = new TonePlayer()
+      this.currentTone.ringtone(deviceId)
+    }
 
-    this.currentTone = new TonePlayer()
-    this.currentTone.ringback()
   }
 
   public stopAll() {

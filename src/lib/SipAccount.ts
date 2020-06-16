@@ -121,7 +121,7 @@ export default class SIPAccount {
   }
 
   makeCall(number: string) {
-    toneManager.ringback()
+    toneManager.playRing('ringback')
 
     // Make a call
     const target = UserAgent.makeURI(
