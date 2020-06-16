@@ -13,7 +13,7 @@ import dialpadIcon from '../../assets/dialpad-24px.svg'
 import transferIcon from '../../assets/arrow_forward-24px.svg'
 import { callDisconnect } from '../../util/TonePlayer'
 import toneManager from '../../util/ToneManager'
-import { statusMask } from '../../util/sessions'
+import { statusMask, getDurationDisplay } from '../../util/sessions'
 import { PhoneConfig } from '../../models'
 interface Props {
   session: Session
@@ -28,7 +28,9 @@ class Phone extends React.Component<Props> {
     transferMenu: false,
     ended: false,
     transferDialString: '',
-    attendedTransferStarted: false
+    attendedTransferStarted: false,
+    duration: 0,
+    counterStarted: false
   }
 
   constructor(props: any) {
@@ -37,6 +39,9 @@ class Phone extends React.Component<Props> {
   }
 
   componentDidUpdate(newProps: Props) {
+    if (newProps.session.state === SessionState.Established && !this.state.counterStarted) {
+      this.handleCounter()
+    }
     if (
       newProps.session.state === SessionState.Terminated &&
       this.state.ended === false
@@ -50,7 +55,7 @@ class Phone extends React.Component<Props> {
       this.props.session.bye()
     } else if (
       this.props.session.state === SessionState.Initial ||
-      SessionState.Establishing
+      this.props.session.state === SessionState.Establishing
     ) {
       // @ts-ignore
 
@@ -69,6 +74,18 @@ class Phone extends React.Component<Props> {
     this.setState({ attendedTransferStarted: bool })
   }
 
+  handleCounter() {
+    if (this.props.session.state !== SessionState.Terminated) {
+      if (this.state.counterStarted === false) {
+        this.setState({counterStarted: true})
+      }
+      setTimeout(() => {
+        this.setState({duration: this.state.duration + 1})
+        this.handleCounter()
+      }, 1000)
+    }
+  }
+
   render() {
     const { state, props } = this
     return (
@@ -78,6 +95,10 @@ class Phone extends React.Component<Props> {
           `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
         </div>
         <div>{statusMask(props.session.state)}</div>
+        { (this.props.session.state === SessionState.Initial ||
+      this.props.session.state === SessionState.Establishing) ? 
+        null : <div>{getDurationDisplay(this.state.duration)}</div>
+    }
         {
           state.ended ? null :
             <React.Fragment>

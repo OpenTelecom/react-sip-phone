@@ -159,3 +159,33 @@ export const statusMask = (status: string) => {
       return 'Unknown Status'
   }
 }
+
+export const getDurationDisplay = (duration: number) => {
+  let minutes = Math.floor(duration / 60)
+  let hours = Math.floor(minutes / 60)
+  minutes = minutes % 60
+  let seconds = duration % 60
+  let dh, dm, ds
+  if (hours && hours < 10) {
+    dh = `0${hours}:`
+  } else if (hours) {
+    dh = `${hours}:`
+  } else {
+    dh = '00:'
+  }
+  if (minutes && minutes < 10) {
+    dm = `0${minutes}:`
+  } else if (minutes) {
+    dm = `${minutes}:`
+  } else {
+    dm = '00:'
+  }
+  if (seconds && seconds < 10) {
+    ds = `0${seconds}`
+  } else if (seconds) {
+    ds = `${seconds}`
+  } else {
+    ds = '00'
+  }
+  return `${hours ? dh : ''}${dm}${ds}`
+}
