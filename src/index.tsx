@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
 import styles from './styles.scss'
 import SipWrapper from './SipWrapper'
 import Status from './components/Status'
@@ -7,7 +8,7 @@ import PhoneSessions from './components/PhoneSessions'
 import Dialstring from './components/Dialstring'
 import { SipConfig, SipCredentials, PhoneConfig } from './models'
 
-import defaultStore from './store/configureStore'
+import { defaultStore, persistor } from './store/configureStore'
 
 interface Props {
   width: number
@@ -16,39 +17,38 @@ interface Props {
   phoneConfig: PhoneConfig
   sipCredentials: SipCredentials
   sipConfig: SipConfig
-  store: any
   containerStyle: any
 }
 
-export let phoneStore = defaultStore
+export const phoneStore = defaultStore
 
 export const ReactSipPhone = ({
   name,
   width = 300,
   height = 600,
-  store,
   phoneConfig = { disabledButtons: [] },
   sipConfig,
   sipCredentials,
   containerStyle = {}
 }: Props) => {
   //If no store is passed into component, default store is used
-  phoneStore = store ? store : defaultStore
   return (
     <Provider store={phoneStore}>
-      <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials}>
-        <div className={styles.container}
-          style={{
-            ...containerStyle,
-            width: `${width < 300 ? 300 : width}px`,
-            height: `${height < 600 ? 600 : height}px`
-          }}>
-          <Status name={name} />
-          <Dialstring />
-          <PhoneSessions phoneConfig={phoneConfig} />
-          <audio id='tone' autoPlay />
-        </div>
-      </SipWrapper>
+      <PersistGate loading={null} persistor={persistor}>
+        <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials} phoneConfig={phoneConfig}>
+          <div className={styles.container}
+            style={{
+              ...containerStyle,
+              width: `${width < 300 ? 300 : width}px`,
+              height: `${height < 600 ? 600 : height}px`
+            }}>
+            <Status name={name} />
+            <Dialstring />
+            <PhoneSessions phoneConfig={phoneConfig} />
+            <audio id='tone' autoPlay />
+          </div>
+        </SipWrapper>
+      </PersistGate>
     </Provider>
   )
 }
