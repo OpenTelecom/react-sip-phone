@@ -143,6 +143,7 @@ class Phone extends React.Component<Props> {
                     onChange={(e) =>
                       this.setState({ transferDialString: e.target.value })
                     }
+                    placeholder="Enter the transfer destination..."
                   />
                   {this.state.attendedTransferStarted ? null :
                     <BlindTranfer
