@@ -60,9 +60,7 @@ class AttendedTransfer extends React.Component<Props> {
           case SessionState.Initial:
           case SessionState.Establishing:
             this.props.stateChange(newState, outgoingSession.id)
-
             //add new session to local state
-
             this.props.attendedTransferPending()
 
             break
@@ -76,10 +74,10 @@ class AttendedTransfer extends React.Component<Props> {
             break
           case SessionState.Terminating:
             this.props.stateChange(newState, outgoingSession.id)
-
             break
           case SessionState.Terminated:
             this.props.stateChange(newState, outgoingSession.id)
+            this.attendedTransferClear()
 
             setTimeout(() => {
               this.props.closeSession(outgoingSession.id)
@@ -98,6 +96,12 @@ class AttendedTransfer extends React.Component<Props> {
       this.props.attendedTransferFail()
 
     }
+  }
+
+  attendedTransferClear() {
+    this.setState({ attendedTransferSessionPending: null })
+    this.setState({ attendedTransferSessionReady: null })
+    this.props.started(false)
   }
 
   //refers the session in local state
