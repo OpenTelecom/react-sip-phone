@@ -15,9 +15,9 @@ import { NEW_USERAGENT } from '../actions/sipAccounts'
 import { SessionStateHandler, getFullNumber } from '../util/sessions'
 import { IncomingSessionStateHandler } from '../util/incomingSession'
 
-import { NEW_SESSION, INCOMING_CALL, SIPSESSION_HOLD_REQUEST, holdCallRequest } from '../actions/sipSessions'
+import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
-
+// import toneManager from '../util/ToneManager'
 export default class SIPAccount {
   public _config: SipConfig
   public _credentials: SipCredentials
@@ -65,6 +65,7 @@ export default class SIPAccount {
     }
 
     //check here for register
+
     this._userAgent = new UserAgent(userAgentOptions)
     this._registerer = new Registerer(this._userAgent, registererOptions)
     this.setupDelegate() // Delegate is what handles incoming calls
@@ -119,6 +120,7 @@ export default class SIPAccount {
   }
 
   makeCall(number: string) {
+
     // Make a call
     const target = UserAgent.makeURI(
       `sip:${getFullNumber(number)}@sip.reper.io;user=phone`
@@ -137,32 +139,6 @@ export default class SIPAccount {
         }
       }
       phoneStore.dispatch({ type: NEW_SESSION, payload: outgoingSession })
-
-      //hold all 
-      const state = phoneStore.getState()
-      //@ts-ignore
-      const onHolds = state.sipSessions.onHold
-      //@ts-ignore
-      const sessions = state.sipSessions.sessions
-      for (let [sessionId, session] of Object.entries(sessions)) {
-        if (
-          sessionId in onHolds === false &&
-          sessionId !== outgoingSession.id
-        ) {
-          try {
-            //@ts-ignore
-            holdCallRequest(session)
-            //dispatch here because class is not connected to redux actions
-            phoneStore.dispatch({
-              type: SIPSESSION_HOLD_REQUEST,
-              //@ts-ignore
-              payload: session.id
-            })
-          } catch (err) {
-          }
-        }
-      }
-
       // Handle outgoing session state changes.
       const stateHandler = new SessionStateHandler(outgoingSession)
       outgoingSession.stateChange.addListener(stateHandler.stateChange)
@@ -177,5 +153,7 @@ export default class SIPAccount {
     } else {
       console.log(`Failed to establish session for outgoing call to ${number}`)
     }
+    // toneManager.playRing('ringback')
+
   }
 }
