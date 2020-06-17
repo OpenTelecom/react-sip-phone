@@ -10,7 +10,7 @@ const middleware = [thunk]
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['sipConfig']
+  whitelist: ['config']
 }
 
 const persistedReducer = persistReducer(persistConfig, reducers)
