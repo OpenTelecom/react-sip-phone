@@ -45,7 +45,6 @@ class AttendedTransfer extends React.Component<Props> {
 
   attendedTransferCall() {
     this.holdAll()
-
     this.props.attendedTransferRequest()
     const target = UserAgent.makeURI(
       `sip:${getFullNumber(this.props.destination)}@sip.reper.io;user=phone`
@@ -54,6 +53,8 @@ class AttendedTransfer extends React.Component<Props> {
       const inviter = new Inviter(this.props.userAgent, target)
       const outgoingSession: Session = inviter
       phoneStore.dispatch({ type: NEW_ATTENDED_TRANSFER, payload: outgoingSession })
+      this.setState({ attendedTransferSessionPending: outgoingSession })
+
       outgoingSession.stateChange.addListener((newState: SessionState) => {
         switch (newState) {
           case SessionState.Initial:
@@ -61,7 +62,7 @@ class AttendedTransfer extends React.Component<Props> {
             this.props.stateChange(newState, outgoingSession.id)
 
             //add new session to local state
-            this.setState({ attendedTransferSessionPending: outgoingSession })
+
             this.props.attendedTransferPending()
 
             break
@@ -91,7 +92,6 @@ class AttendedTransfer extends React.Component<Props> {
       })
       outgoingSession.invite().catch((error: Error) => {
         this.props.attendedTransferFail()
-
         console.log(error)
       })
     } else {
