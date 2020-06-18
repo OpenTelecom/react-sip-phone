@@ -26,9 +26,9 @@
 }
 
 #settingsMenu {
-  @include flex-container;
-  transition: all 0.3s ease;
-  height: 160px;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  height: 120px;
   width: 100%;
   justify-content: flex-start;
   &.closed {
@@ -40,4 +40,14 @@
 
 #dropdowns {
   width: 100%;
+}
+
+.dropdownRow {
+  display: flex;
+  flex-direction: row;
+  margin: 5px 0 5px 0;
+}
+
+.dropdownIcon {
+  padding: 0 5px 0 5px;
 }

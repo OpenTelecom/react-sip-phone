@@ -4,8 +4,8 @@ import { setPrimaryInput, setPrimaryOutput, getInputAudioDevices, getOutputAudio
 import styles from './Status.scss'
 import Select from 'react-select';
 import settingsIcon from '../assets/settings-24px.svg'
-//import micIcon from '../assets/mic-24px.svg'
-//import soundIcon from '../assets/volume_up-24px.svg'
+import micIcon from '../assets/mic-24px.svg'
+import soundIcon from '../assets/volume_up-24px.svg'
 
 interface Props {
   name: string
@@ -61,21 +61,26 @@ class Status extends React.Component<Props> {
           className={state.settingsMenu ? '' : styles.closed}
         >
           <hr style={{ width: '100%' }} />
-          Devices:
-          <Select
-            placeholder="Select Output..."
-            value={outputs.find((output: any) => output.value === props.primaryOutput) || null}
-            onChange={option => this.handleChangeDevice('out', option.value)}
-            options={outputs}
-            id={styles.dropdowns}
-          />
-          <Select
-            placeholder="Select Input..."
-            value={inputs.find((input: any) => input.value === props.primaryInput)}
-            onChange={option => this.handleChangeDevice('in', option.value)}
-            options={inputs}
-            id={styles.dropdowns}
-          />
+          <div className={styles.dropdownRow}>
+            <img className={styles.dropdownIcon} src={soundIcon} />
+            <Select
+              placeholder="Select Output..."
+              value={outputs.find((output: any) => output.value === props.primaryOutput) || null}
+              onChange={option => this.handleChangeDevice('out', option.value)}
+              options={outputs}
+              id={styles.dropdowns}
+            />
+          </div>
+          <div className={styles.dropdownRow}>
+            <img className={styles.dropdownIcon} src={micIcon} />
+            <Select
+              placeholder="Select Input..."
+              value={inputs.find((input: any) => input.value === props.primaryInput)}
+              onChange={option => this.handleChangeDevice('in', option.value)}
+              options={inputs}
+              id={styles.dropdowns}
+            />
+          </div>
           <hr style={{ width: '100%' }} />
         </div>
       </React.Fragment>
