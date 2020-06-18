@@ -17,7 +17,7 @@ import { IncomingSessionStateHandler } from '../util/incomingSession'
 
 import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
-// import toneManager from '../util/ToneManager'
+
 export default class SIPAccount {
   public _config: SipConfig
   public _credentials: SipCredentials
@@ -50,7 +50,6 @@ export default class SIPAccount {
         constraints: {
           audio: {
             deviceId:
-              // '5f0dfd826388eaf731ff99ebb0a1717570611901459d8baef942908b7cf5fe12'
               'default'
           },
           video: false
@@ -65,7 +64,6 @@ export default class SIPAccount {
     }
 
     //check here for register
-
     this._userAgent = new UserAgent(userAgentOptions)
     this._registerer = new Registerer(this._userAgent, registererOptions)
     this.setupDelegate() // Delegate is what handles incoming calls
