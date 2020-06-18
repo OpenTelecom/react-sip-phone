@@ -41,19 +41,19 @@ export const getOutputAudioDevices = () => {
   }
 }
 
-export const setPrimaryOutput = (name: string) => {
+export const setPrimaryOutput = (id: string) => {
   // TODO other stuff for changing the device
   return {
     type: SET_PRIMARY_OUTPUT,
-    payload: name
+    payload: id
   }
 }
 
-export const setPrimaryInput = (name: string) => {
+export const setPrimaryInput = (id: string) => {
   // TODO other stuff for changing the device
   return {
     type: SET_PRIMARY_INPUT,
-    payload: name
+    payload: id
   }
 }
 

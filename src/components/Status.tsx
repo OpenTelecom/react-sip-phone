@@ -29,7 +29,7 @@ class Status extends React.Component<Props> {
   mapOptions(options: any) {
     const list: any = []
     options.map((option: any) => {
-      list.push({ value: option.id, label: option.label })
+      list.push({ value: option.deviceId, label: option.label })
     })
     return list
   }
@@ -64,7 +64,7 @@ class Status extends React.Component<Props> {
           Devices:
           <Select
             placeholder="Select Output..."
-            value={outputs.find((output: any) => output.value === props.primaryOutput)}
+            value={outputs.find((output: any) => output.value === props.primaryOutput) || null}
             onChange={option => this.handleChangeDevice('out', option.value)}
             options={outputs}
             id={styles.dropdowns}
