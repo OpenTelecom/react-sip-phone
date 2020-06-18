@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { setPrimaryInput, setPrimaryOutput } from '../actions/device'
+import { setPrimaryInput, setPrimaryOutput, getInputAudioDevices, getOutputAudioDevices } from '../actions/device'
 import styles from './Status.scss'
 import Select from 'react-select';
 import settingsIcon from '../assets/settings-24px.svg'
@@ -15,10 +15,17 @@ interface Props {
   primaryOutput: string
   setPrimaryInput: Function
   setPrimaryOutput: Function
+  getInputAudioDevices: Function
+  getOutputAudioDevices: Function
 }
 
 class Status extends React.Component<Props> {
   state = { settingsMenu: false }
+
+  componentDidMount() {
+    this.props.getInputAudioDevices()
+    this.props.getOutputAudioDevices()
+  }
   mapOptions(options: any) {
     const list: any = []
     options.map((option: any) => {
@@ -53,7 +60,7 @@ class Status extends React.Component<Props> {
           id={styles.settingsMenu}
           className={state.settingsMenu ? '' : styles.closed}
         >
-          <hr style={{width: '100%'}} />
+          <hr style={{ width: '100%' }} />
           Devices:
           <Select
             placeholder="Select Output..."
@@ -69,7 +76,7 @@ class Status extends React.Component<Props> {
             options={inputs}
             id={styles.dropdowns}
           />
-          <hr style={{width: '100%'}} />
+          <hr style={{ width: '100%' }} />
         </div>
       </React.Fragment>
     )
@@ -83,6 +90,9 @@ const mapStateToProps = (state: any) => ({
 })
 
 const actions = {
-  setPrimaryInput, setPrimaryOutput
+  setPrimaryInput,
+  setPrimaryOutput,
+  getInputAudioDevices,
+  getOutputAudioDevices
 }
 export default connect(mapStateToProps, actions)(Status)
