@@ -25,8 +25,6 @@ class Status extends React.Component<Props> {
   componentDidMount() {
     this.props.getInputAudioDevices()
     this.props.getOutputAudioDevices()
-    this.props.setPrimaryOutput('default')
-    this.props.setPrimaryInput('default')
   }
   mapOptions(options: any) {
     const list: any = []
