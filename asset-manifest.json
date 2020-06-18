@@ -1,0 +1,33 @@
+{
+  "files": {
+    "main.css": "/react-sip-phone/static/css/main.b2aaa5f2.chunk.css",
+    "main.js": "/react-sip-phone/static/js/main.c3bfa7cc.chunk.js",
+    "main.js.map": "/react-sip-phone/static/js/main.c3bfa7cc.chunk.js.map",
+    "runtime-main.js": "/react-sip-phone/static/js/runtime-main.cebfdbae.js",
+    "runtime-main.js.map": "/react-sip-phone/static/js/runtime-main.cebfdbae.js.map",
+    "static/js/2.5d8e9ab8.chunk.js": "/react-sip-phone/static/js/2.5d8e9ab8.chunk.js",
+    "static/js/2.5d8e9ab8.chunk.js.map": "/react-sip-phone/static/js/2.5d8e9ab8.chunk.js.map",
+    "index.html": "/react-sip-phone/index.html",
+    "precache-manifest.c3f81fb57312886a18f3b4a08abf97d0.js": "/react-sip-phone/precache-manifest.c3f81fb57312886a18f3b4a08abf97d0.js",
+    "service-worker.js": "/react-sip-phone/service-worker.js",
+    "static/css/main.b2aaa5f2.chunk.css.map": "/react-sip-phone/static/css/main.b2aaa5f2.chunk.css.map",
+    "static/js/2.5d8e9ab8.chunk.js.LICENSE.txt": "/react-sip-phone/static/js/2.5d8e9ab8.chunk.js.LICENSE.txt",
+    "static/media/arrow_forward-24px~UJhdZXVe.svg": "/react-sip-phone/static/media/arrow_forward-24px~UJhdZXVe.66bdaa19.svg",
+    "static/media/call-24px~AGZUevvA.svg": "/react-sip-phone/static/media/call-24px~AGZUevvA.f3b7d629.svg",
+    "static/media/call_end-24px~HrwYCAOf.svg": "/react-sip-phone/static/media/call_end-24px~HrwYCAOf.39365fed.svg",
+    "static/media/dialpad-24px~cidqBzRK.svg": "/react-sip-phone/static/media/dialpad-24px~cidqBzRK.348fe506.svg",
+    "static/media/mic-24px~xExSpqQP.svg": "/react-sip-phone/static/media/mic-24px~xExSpqQP.58e127e9.svg",
+    "static/media/mic_off-24px~bjejwOqd.svg": "/react-sip-phone/static/media/mic_off-24px~bjejwOqd.ba53335f.svg",
+    "static/media/phone_in_talk-24px~DQfZjkDQ.svg": "/react-sip-phone/static/media/phone_in_talk-24px~DQfZjkDQ.77e3ccda.svg",
+    "static/media/phone_paused-24px~TWxpQtZf.svg": "/react-sip-phone/static/media/phone_paused-24px~TWxpQtZf.84161f8e.svg",
+    "static/media/ring.mp3": "/react-sip-phone/static/media/ring.69b29a4c.mp3",
+    "static/media/settings-24px~HQuidduc.svg": "/react-sip-phone/static/media/settings-24px~HQuidduc.83d38c97.svg",
+    "static/media/volume_up-24px~qJQJhpOr.svg": "/react-sip-phone/static/media/volume_up-24px~qJQJhpOr.aed75bc0.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.cebfdbae.js",
+    "static/js/2.5d8e9ab8.chunk.js",
+    "static/css/main.b2aaa5f2.chunk.css",
+    "static/js/main.c3bfa7cc.chunk.js"
+  ]
+}
