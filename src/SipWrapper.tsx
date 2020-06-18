@@ -22,8 +22,6 @@ class SipWrapper extends React.Component<Props> {
   componentDidMount() {
     console.log('mounted')
     if (this.props.sipCredentials.password) {
-      this.props.setPhoneConfig(this.props.phoneConfig)
-      this.props.setCredentials(this.props.sipCredentials.sipuri, this.props.sipCredentials.password)
       this.initializeSip()
     }
   }

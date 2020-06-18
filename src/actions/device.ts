@@ -3,6 +3,8 @@ export const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED'
 export const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED'
 export const REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED'
 export const LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED'
+export const SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT'
+export const SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT'
 
 
 export const getInputAudioDevices = () => {
@@ -39,6 +41,21 @@ export const getOutputAudioDevices = () => {
   }
 }
 
+export const setPrimaryOutput = (name: string) => {
+  // TODO other stuff for changing the device
+  return {
+    type: SET_PRIMARY_OUTPUT,
+    payload: name
+  }
+}
+
+export const setPrimaryInput = (name: string) => {
+  // TODO other stuff for changing the device
+  return {
+    type: SET_PRIMARY_INPUT,
+    payload: name
+  }
+}
 
 
 
