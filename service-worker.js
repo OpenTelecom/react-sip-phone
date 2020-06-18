@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/react-sip-phone/precache-manifest.c3f81fb57312886a18f3b4a08abf97d0.js"
+  "/react-sip-phone/precache-manifest.fb07b7d26e02812bc848839c7b8b89b6.js"
 );
 
 self.addEventListener('message', (event) => {

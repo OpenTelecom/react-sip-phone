@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "99ea6169e72f0a4de3916bb3a56cc067",
+    "revision": "b296788bda3ea43018c7ffbda22161c6",
     "url": "/react-sip-phone/index.html"
   },
   {
-    "revision": "f2d4100b17fae3f844f2",
-    "url": "/react-sip-phone/static/css/main.b2aaa5f2.chunk.css"
+    "revision": "6ffba86cdb599f1e486d",
+    "url": "/react-sip-phone/static/css/main.60b6c878.chunk.css"
   },
   {
-    "revision": "6e84179b3f6758efec25",
-    "url": "/react-sip-phone/static/js/2.5d8e9ab8.chunk.js"
+    "revision": "d0408795c011503e68b9",
+    "url": "/react-sip-phone/static/js/2.a71363d4.chunk.js"
   },
   {
     "revision": "0d5e184495f6abf55a2cc09297f94947",
-    "url": "/react-sip-phone/static/js/2.5d8e9ab8.chunk.js.LICENSE.txt"
+    "url": "/react-sip-phone/static/js/2.a71363d4.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "f2d4100b17fae3f844f2",
-    "url": "/react-sip-phone/static/js/main.c3bfa7cc.chunk.js"
+    "revision": "6ffba86cdb599f1e486d",
+    "url": "/react-sip-phone/static/js/main.45b15f55.chunk.js"
   },
   {
     "revision": "0d451b33b170193d0bc0",
