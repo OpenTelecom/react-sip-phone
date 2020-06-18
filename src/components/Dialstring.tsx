@@ -3,12 +3,9 @@ import { connect } from 'react-redux'
 import SIPAccount from '../lib/SipAccount'
 import styles from './Dialstring.scss'
 import callIcon from '../assets/call-24px.svg'
-import { getInputAudioDevices, getOutputAudioDevices } from '../actions/device'
 
 interface Props {
   sipAccount: SIPAccount
-  getInputAudioDevices: Function
-  getOutputAudioDevices: Function
 }
 
 class Dialstring extends React.Component<Props> {
@@ -22,11 +19,6 @@ class Dialstring extends React.Component<Props> {
   }
   checkDialstring() {
     return this.state.currentDialString.length === 0
-  }
-
-  componentDidMount() {
-    this.props.getInputAudioDevices()
-    this.props.getOutputAudioDevices()
   }
 
   render() {
@@ -60,8 +52,6 @@ const mapStateToProps = (state: any) => ({
 })
 
 const actions = {
-  getInputAudioDevices,
-  getOutputAudioDevices
 }
 
 const D = connect(mapStateToProps, actions)(Dialstring)
