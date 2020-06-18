@@ -23,15 +23,11 @@ export class IncomingSessionStateHandler {
         break
       case SessionState.Established:
         phoneStore.dispatch({
-          type: SIPSESSION_STATECHANGE,
-          payload: { state: newState, id: this.incomingSession.id }
+          type: SIPSESSION_STATECHANGE
         })
         this.holdAll()
         setLocalAudio(this.incomingSession)
         setRemoteAudio(this.incomingSession)
-        phoneStore.dispatch({
-          type: SIPSESSION_STATECHANGE
-        })
         break
       case SessionState.Terminating:
         phoneStore.dispatch({

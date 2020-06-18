@@ -14,7 +14,6 @@ export class SessionStateHandler {
     switch (newState) {
       case SessionState.Establishing:
         toneManager.playRing('ringback')
-
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
@@ -26,9 +25,6 @@ export class SessionStateHandler {
         toneManager.stopAll()
         setLocalAudio(this.session)
         setRemoteAudio(this.session)
-        phoneStore.dispatch({
-          type: SIPSESSION_STATECHANGE
-        })
         break
       case SessionState.Terminating:
         phoneStore.dispatch({

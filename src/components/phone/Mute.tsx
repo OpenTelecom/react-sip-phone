@@ -47,10 +47,10 @@ class Mute extends React.Component<Props> {
           const pc =
             // @ts-ignore
             this.props.session.sessionDescriptionHandler!.peerConnection
-          pc.getLocalStreams().forEach(function (stream: any) {
-            stream.getAudioTracks().forEach(function (track: any) {
-              track.enabled = true
-            })
+          pc.getSenders().forEach(function (stream: any) {
+            if (stream.track && stream.track.kind === 'audio') {
+              stream.track.enabled = true
+            }
           })
           this.props.unMuteSuccess()
           this.setState({ onMute: false })
@@ -79,13 +79,13 @@ class Mute extends React.Component<Props> {
           const pc =
             // @ts-ignore
             this.props.session.sessionDescriptionHandler!.peerConnection
-          pc.getLocalStreams().forEach(function (stream: any) {
-            stream.getAudioTracks().forEach(function (track: any) {
-              track.enabled = false
-            })
+          console.log(pc.getSenders())
+          pc.getSenders().forEach(function (stream: any) {
+            if (stream.track && stream.track.kind === 'audio') {
+              stream.track.enabled = false
+            }
           })
           this.props.muteSuccess()
-
           this.setState({ onMute: true })
           resolve()
           return
