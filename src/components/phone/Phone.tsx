@@ -77,7 +77,7 @@ class Phone extends React.Component<Props> {
   }
 
   handleCounter() {
-    if (this.props.session.state !== SessionState.Terminated) {
+    if (this.props.session && this.props.session.state !== SessionState.Terminated) {
       if (this.state.counterStarted === false) {
         this.setState({ counterStarted: true })
       }
@@ -97,7 +97,9 @@ class Phone extends React.Component<Props> {
           // @ts-ignore
           `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
         </div>
+        <br/>
         <div>{statusMask(props.session.state)}</div>
+        <br/>
         {(this.props.session.state === SessionState.Initial ||
           this.props.session.state === SessionState.Establishing) ?
           null : <div>{getDurationDisplay(this.state.duration)}</div>

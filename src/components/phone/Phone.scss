@@ -79,7 +79,6 @@
 #transferMenu {
   @include flex-container;
   transition: all 0.3s ease;
-  height: 160px;
   &.closed {
     visibility: hidden;
     opacity: 0;
