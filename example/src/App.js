@@ -12,13 +12,13 @@ const name = urlParams.get('name')
 const App = () => {
   return (
     <ReactSipPhone
-      name={name || 'Jason Lu'}
+      name={name || ''}
       sipCredentials={{
-        sipuri: sipuri || 'user_EYrB693q6Z@sip.reper.io',
-        password: password || 'J8wKwN5YUYtv'
+        sipuri: sipuri || '',
+        password: password || ''
       }}
       sipConfig={{
-        websocket: websocket || 'wss://kazoo-sbc-01-us-west-1.reper.io:5065',
+        websocket: websocket || '',
         defaultCountryCode: '1'
       }}
       width={0}
