@@ -45,14 +45,10 @@ export declare const endCall: (sessionId: string) => {
     type: string;
     payload: string;
 };
-export declare const holdCallRequest: (session: Session) => {
+export declare const holdCallRequest: (session: Session) => (dispatch: Dispatch) => {
     type: string;
-    payload?: undefined;
-} | {
-    type: string;
-    payload: string;
-};
-export declare const unHoldCallRequest: (_session: Session, onHolds: Array<any>, sessions: Array<any>) => (dispatch: Dispatch) => void;
+} | undefined;
+export declare const unHoldCallRequest: (session: Session, onHolds: Array<any>, sessions: Array<any>) => (dispatch: Dispatch) => void;
 export declare const blindTransferRequest: () => (dispatch: Dispatch) => void;
 export declare const blindTransferSuccess: () => (dispatch: Dispatch) => void;
 export declare const blindTransferFail: () => (dispatch: Dispatch) => void;

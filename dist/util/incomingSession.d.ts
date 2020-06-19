@@ -3,5 +3,4 @@ export declare class IncomingSessionStateHandler {
     private incomingSession;
     constructor(incomingSession: Session);
     stateChange: (newState: SessionState) => void;
-    holdAll(id: string): void;
 }

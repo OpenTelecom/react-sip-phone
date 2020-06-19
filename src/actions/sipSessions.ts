@@ -74,7 +74,7 @@ export const endCall = (sessionId: string) => {
   return { type: CLOSE_SESSION, payload: sessionId }
 }
 
-export const holdCallRequest = (session: Session) => {
+export const holdCallRequest = (session: Session) => (dispatch: Dispatch) => {
   if (
     !session.sessionDescriptionHandler ||
     session.state !== SessionState.Established
@@ -87,38 +87,38 @@ export const holdCallRequest = (session: Session) => {
         session.sessionDescriptionHandler!.holdModifier
       ]
     })
-    return { type: SIPSESSION_HOLD_REQUEST, payload: session.id }
+    dispatch({ type: SIPSESSION_HOLD_REQUEST, payload: session.id })
   } catch (err) {
-    return { type: SIPSESSION_HOLD_FAIL }
+    dispatch({ type: SIPSESSION_HOLD_FAIL })
   }
+  return
 }
 
 //maps thru onHold and sessions arrays looking for a call to put on hold before unHolding a call 
-export const unHoldCallRequest = (_session: Session, onHolds: Array<any>, sessions: Array<any>) => (dispatch: Dispatch) => {
+export const unHoldCallRequest = (session: Session, onHolds: Array<any>, sessions: Array<any>) => (dispatch: Dispatch) => {
   //checks for  established sessions that are not on hold
-  for (let [sessionId, session] of Object.entries(sessions)) {
+  for (let [sessionId, _session] of Object.entries(sessions)) {
     if (
       onHolds.indexOf(sessionId) < 0 &&
-      sessionId !== _session.id && session.state === 'Established'
+      sessionId !== session.id && _session.state === 'Established'
     ) {
       // hold session if not on hold
       try {
-        session.invite({
+        _session.invite({
           sessionDescriptionHandlerModifiers: [
-            session.sessionDescriptionHandler!.holdModifier
+            _session.sessionDescriptionHandler!.holdModifier
           ]
         })
-        dispatch({ type: SIPSESSION_HOLD_REQUEST, payload: session.id })
+        dispatch({ type: SIPSESSION_HOLD_REQUEST, payload: _session.id })
       } catch (err) {
         dispatch({ type: SIPSESSION_HOLD_FAIL })
       }
-
     }
   }
   // unhold original session
   try {
-    _session.invite()
-    dispatch({ type: SIPSESSION_UNHOLD_REQUEST, payload: _session.id })
+    session.invite()
+    dispatch({ type: SIPSESSION_UNHOLD_REQUEST, payload: session.id })
   } catch (err) {
     dispatch({ type: SIPSESSION_UNHOLD_FAIL })
   }
