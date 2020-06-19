@@ -119,41 +119,46 @@ var endCall = function endCall(sessionId) {
   };
 };
 var holdCallRequest = function holdCallRequest(session) {
-  if (!session.sessionDescriptionHandler || session.state !== sip_js.SessionState.Established) {
-    return {
-      type: SIPSESSION_HOLD_FAIL
-    };
-  }
+  return function (dispatch) {
+    if (!session.sessionDescriptionHandler || session.state !== sip_js.SessionState.Established) {
+      return {
+        type: SIPSESSION_HOLD_FAIL
+      };
+    }
 
-  try {
-    session.invite({
-      sessionDescriptionHandlerModifiers: [session.sessionDescriptionHandler.holdModifier]
-    });
-    return {
-      type: SIPSESSION_HOLD_REQUEST,
-      payload: session.id
-    };
-  } catch (err) {
-    return {
-      type: SIPSESSION_HOLD_FAIL
-    };
-  }
+    try {
+      session.invite({
+        sessionDescriptionHandlerModifiers: [session.sessionDescriptionHandler.holdModifier]
+      });
+      dispatch({
+        type: SIPSESSION_HOLD_REQUEST,
+        payload: session.id
+      });
+    } catch (err) {
+      dispatch({
+        type: SIPSESSION_HOLD_FAIL
+      });
+    }
+
+    return;
+  };
 };
-var unHoldCallRequest = function unHoldCallRequest(_session, onHolds, sessions) {
+var unHoldCallRequest = function unHoldCallRequest(session, onHolds, sessions) {
   return function (dispatch) {
     for (var _i = 0, _Object$entries = Object.entries(sessions); _i < _Object$entries.length; _i++) {
       var _Object$entries$_i = _Object$entries[_i],
           sessionId = _Object$entries$_i[0],
-          session = _Object$entries$_i[1];
+          _session = _Object$entries$_i[1];
 
-      if (onHolds.indexOf(sessionId) < 0 && sessionId !== _session.id && session.state === 'Established') {
+      if (onHolds.indexOf(sessionId) < 0 && sessionId !== session.id && _session.state === 'Established') {
         try {
-          session.invite({
-            sessionDescriptionHandlerModifiers: [session.sessionDescriptionHandler.holdModifier]
+          _session.invite({
+            sessionDescriptionHandlerModifiers: [_session.sessionDescriptionHandler.holdModifier]
           });
+
           dispatch({
             type: SIPSESSION_HOLD_REQUEST,
-            payload: session.id
+            payload: _session.id
           });
         } catch (err) {
           dispatch({
@@ -164,11 +169,10 @@ var unHoldCallRequest = function unHoldCallRequest(_session, onHolds, sessions) 
     }
 
     try {
-      _session.invite();
-
+      session.invite();
       dispatch({
         type: SIPSESSION_UNHOLD_REQUEST,
-        payload: _session.id
+        payload: session.id
       });
     } catch (err) {
       dispatch({
@@ -283,6 +287,31 @@ var unMuteFail = function unMuteFail() {
       type: SIPSESSION_UNMUTE_FAIL
     });
   };
+};
+
+var holdAll = function holdAll(id) {
+  var state = phoneStore.getState();
+  var onHolds = state.sipSessions.onHold;
+  var sessions = state.sipSessions.sessions;
+
+  for (var _i = 0, _Object$entries = Object.entries(sessions); _i < _Object$entries.length; _i++) {
+    var _Object$entries$_i = _Object$entries[_i],
+        sessionId = _Object$entries$_i[0],
+        session = _Object$entries$_i[1];
+
+    if (onHolds.indexOf(sessionId) < 0 && sessionId !== id) {
+      try {
+        holdCallRequest(session);
+        phoneStore.dispatch({
+          type: SIPSESSION_HOLD_REQUEST,
+          payload: session.id
+        });
+        return;
+      } catch (err) {
+        return;
+      }
+    }
+  }
 };
 
 var AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
@@ -574,88 +603,57 @@ var ToneManager = /*#__PURE__*/function () {
 
 var toneManager = new ToneManager();
 
-var SessionStateHandler = /*#__PURE__*/function () {
-  function SessionStateHandler(session) {
-    var _this = this;
+var SessionStateHandler = function SessionStateHandler(session) {
+  var _this = this;
 
-    this.stateChange = function (newState) {
-      switch (newState) {
-        case sip_js.SessionState.Establishing:
-          _this.holdAll(_this.session.id);
+  this.stateChange = function (newState) {
+    switch (newState) {
+      case sip_js.SessionState.Establishing:
+        holdAll(_this.session.id);
+        toneManager.playRing('ringback');
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        });
+        break;
 
-          toneManager.playRing('ringback');
+      case sip_js.SessionState.Established:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        });
+        toneManager.stopAll();
+        setLocalAudio(_this.session);
+        setRemoteAudio(_this.session);
+        break;
+
+      case sip_js.SessionState.Terminating:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        });
+        toneManager.stopAll();
+        cleanupMedia(_this.session.id);
+        break;
+
+      case sip_js.SessionState.Terminated:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        });
+        toneManager.stopAll();
+        setTimeout(function () {
           phoneStore.dispatch({
-            type: SIPSESSION_STATECHANGE
+            type: CLOSE_SESSION,
+            payload: _this.session.id
           });
-          break;
+        }, 5000);
+        break;
 
-        case sip_js.SessionState.Established:
-          phoneStore.dispatch({
-            type: SIPSESSION_STATECHANGE
-          });
-          toneManager.stopAll();
-          setLocalAudio(_this.session);
-          setRemoteAudio(_this.session);
-          break;
-
-        case sip_js.SessionState.Terminating:
-          phoneStore.dispatch({
-            type: SIPSESSION_STATECHANGE
-          });
-          toneManager.stopAll();
-          cleanupMedia(_this.session.id);
-          break;
-
-        case sip_js.SessionState.Terminated:
-          phoneStore.dispatch({
-            type: SIPSESSION_STATECHANGE
-          });
-          toneManager.stopAll();
-          setTimeout(function () {
-            phoneStore.dispatch({
-              type: CLOSE_SESSION,
-              payload: _this.session.id
-            });
-          }, 5000);
-          break;
-
-        default:
-          console.log("Unknown session state change: " + newState);
-          break;
-      }
-    };
-
-    this.session = session;
-  }
-
-  var _proto = SessionStateHandler.prototype;
-
-  _proto.holdAll = function holdAll(id) {
-    var state = phoneStore.getState();
-    var onHolds = state.sipSessions.onHold;
-    var sessions = state.sipSessions.sessions;
-
-    for (var _i = 0, _Object$entries = Object.entries(sessions); _i < _Object$entries.length; _i++) {
-      var _Object$entries$_i = _Object$entries[_i],
-          sessionId = _Object$entries$_i[0],
-          session = _Object$entries$_i[1];
-
-      if (onHolds.indexOf(sessionId) < 0 && sessionId !== id) {
-        try {
-          holdCallRequest(session);
-          phoneStore.dispatch({
-            type: SIPSESSION_HOLD_REQUEST,
-            payload: session.id
-          });
-        } catch (err) {
-          console.log(err);
-        }
-      }
+      default:
+        console.log("Unknown session state change: " + newState);
+        break;
     }
   };
 
-  return SessionStateHandler;
-}();
+  this.session = session;
+};
 var getFullNumber = function getFullNumber(number) {
   if (number.length < 10) {
     return number;
@@ -723,86 +721,53 @@ var getDurationDisplay = function getDurationDisplay(duration) {
   return "" + (hours ? dh : '') + dm + ds;
 };
 
-var IncomingSessionStateHandler = /*#__PURE__*/function () {
-  function IncomingSessionStateHandler(incomingSession) {
-    var _this = this;
+var IncomingSessionStateHandler = function IncomingSessionStateHandler(incomingSession) {
+  var _this = this;
 
-    this.stateChange = function (newState) {
-      switch (newState) {
-        case sip_js.SessionState.Establishing:
+  this.stateChange = function (newState) {
+    switch (newState) {
+      case sip_js.SessionState.Establishing:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        });
+        break;
+
+      case sip_js.SessionState.Established:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        });
+        holdAll(_this.incomingSession.id);
+        setLocalAudio(_this.incomingSession);
+        setRemoteAudio(_this.incomingSession);
+        break;
+
+      case sip_js.SessionState.Terminating:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        });
+        cleanupMedia(_this.incomingSession.id);
+        break;
+
+      case sip_js.SessionState.Terminated:
+        phoneStore.dispatch({
+          type: SIPSESSION_STATECHANGE
+        });
+        setTimeout(function () {
           phoneStore.dispatch({
-            type: SIPSESSION_STATECHANGE
+            type: CLOSE_SESSION,
+            payload: _this.incomingSession.id
           });
-          break;
+        }, 5000);
+        break;
 
-        case sip_js.SessionState.Established:
-          phoneStore.dispatch({
-            type: SIPSESSION_STATECHANGE
-          });
-
-          _this.holdAll(_this.incomingSession.id);
-
-          setLocalAudio(_this.incomingSession);
-          setRemoteAudio(_this.incomingSession);
-          break;
-
-        case sip_js.SessionState.Terminating:
-          phoneStore.dispatch({
-            type: SIPSESSION_STATECHANGE
-          });
-          cleanupMedia(_this.incomingSession.id);
-          break;
-
-        case sip_js.SessionState.Terminated:
-          phoneStore.dispatch({
-            type: SIPSESSION_STATECHANGE
-          });
-          setTimeout(function () {
-            phoneStore.dispatch({
-              type: CLOSE_SESSION,
-              payload: _this.incomingSession.id
-            });
-          }, 5000);
-          break;
-
-        default:
-          console.log("Unknown session state change: " + newState);
-          break;
-      }
-    };
-
-    this.incomingSession = incomingSession;
-  }
-
-  var _proto = IncomingSessionStateHandler.prototype;
-
-  _proto.holdAll = function holdAll(id) {
-    var state = phoneStore.getState();
-    var onHolds = state.sipSessions.onHold;
-    var sessions = state.sipSessions.sessions;
-
-    for (var _i = 0, _Object$entries = Object.entries(sessions); _i < _Object$entries.length; _i++) {
-      var _Object$entries$_i = _Object$entries[_i],
-          sessionId = _Object$entries$_i[0],
-          session = _Object$entries$_i[1];
-
-      if (onHolds.indexOf(sessionId) < 0 && sessionId !== id) {
-        try {
-          holdCallRequest(session);
-          phoneStore.dispatch({
-            type: SIPSESSION_HOLD_REQUEST,
-            payload: session.id
-          });
-          return;
-        } catch (err) {
-          return;
-        }
-      }
+      default:
+        console.log("Unknown session state change: " + newState);
+        break;
     }
   };
 
-  return IncomingSessionStateHandler;
-}();
+  this.incomingSession = incomingSession;
+};
 
 var SIPAccount = /*#__PURE__*/function () {
   function SIPAccount(sipConfig, sipCredentials) {

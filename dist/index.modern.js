@@ -80,7 +80,7 @@ const endCall = sessionId => {
     payload: sessionId
   };
 };
-const holdCallRequest = session => {
+const holdCallRequest = session => dispatch => {
   if (!session.sessionDescriptionHandler || session.state !== SessionState.Established) {
     return {
       type: SIPSESSION_HOLD_FAIL
@@ -91,26 +91,29 @@ const holdCallRequest = session => {
     session.invite({
       sessionDescriptionHandlerModifiers: [session.sessionDescriptionHandler.holdModifier]
     });
-    return {
+    dispatch({
       type: SIPSESSION_HOLD_REQUEST,
       payload: session.id
-    };
+    });
   } catch (err) {
-    return {
+    dispatch({
       type: SIPSESSION_HOLD_FAIL
-    };
+    });
   }
+
+  return;
 };
-const unHoldCallRequest = (_session, onHolds, sessions) => dispatch => {
-  for (let [sessionId, session] of Object.entries(sessions)) {
-    if (onHolds.indexOf(sessionId) < 0 && sessionId !== _session.id && session.state === 'Established') {
+const unHoldCallRequest = (session, onHolds, sessions) => dispatch => {
+  for (let [sessionId, _session] of Object.entries(sessions)) {
+    if (onHolds.indexOf(sessionId) < 0 && sessionId !== session.id && _session.state === 'Established') {
       try {
-        session.invite({
-          sessionDescriptionHandlerModifiers: [session.sessionDescriptionHandler.holdModifier]
+        _session.invite({
+          sessionDescriptionHandlerModifiers: [_session.sessionDescriptionHandler.holdModifier]
         });
+
         dispatch({
           type: SIPSESSION_HOLD_REQUEST,
-          payload: session.id
+          payload: _session.id
         });
       } catch (err) {
         dispatch({
@@ -121,11 +124,10 @@ const unHoldCallRequest = (_session, onHolds, sessions) => dispatch => {
   }
 
   try {
-    _session.invite();
-
+    session.invite();
     dispatch({
       type: SIPSESSION_UNHOLD_REQUEST,
-      payload: _session.id
+      payload: session.id
     });
   } catch (err) {
     dispatch({
@@ -209,6 +211,27 @@ const unMuteFail = () => dispatch => {
   dispatch({
     type: SIPSESSION_UNMUTE_FAIL
   });
+};
+
+const holdAll = id => {
+  const state = phoneStore.getState();
+  const onHolds = state.sipSessions.onHold;
+  const sessions = state.sipSessions.sessions;
+
+  for (let [sessionId, session] of Object.entries(sessions)) {
+    if (onHolds.indexOf(sessionId) < 0 && sessionId !== id) {
+      try {
+        holdCallRequest(session);
+        phoneStore.dispatch({
+          type: SIPSESSION_HOLD_REQUEST,
+          payload: session.id
+        });
+        return;
+      } catch (err) {
+        return;
+      }
+    }
+  }
 };
 
 const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
@@ -500,7 +523,7 @@ class SessionStateHandler {
     this.stateChange = newState => {
       switch (newState) {
         case SessionState.Establishing:
-          this.holdAll(this.session.id);
+          holdAll(this.session.id);
           toneManager.playRing('ringback');
           phoneStore.dispatch({
             type: SIPSESSION_STATECHANGE
@@ -544,26 +567,6 @@ class SessionStateHandler {
     };
 
     this.session = session;
-  }
-
-  holdAll(id) {
-    const state = phoneStore.getState();
-    const onHolds = state.sipSessions.onHold;
-    const sessions = state.sipSessions.sessions;
-
-    for (let [sessionId, session] of Object.entries(sessions)) {
-      if (onHolds.indexOf(sessionId) < 0 && sessionId !== id) {
-        try {
-          holdCallRequest(session);
-          phoneStore.dispatch({
-            type: SIPSESSION_HOLD_REQUEST,
-            payload: session.id
-          });
-        } catch (err) {
-          console.log(err);
-        }
-      }
-    }
   }
 
 }
@@ -648,7 +651,7 @@ class IncomingSessionStateHandler {
           phoneStore.dispatch({
             type: SIPSESSION_STATECHANGE
           });
-          this.holdAll(this.incomingSession.id);
+          holdAll(this.incomingSession.id);
           setLocalAudio(this.incomingSession);
           setRemoteAudio(this.incomingSession);
           break;
@@ -679,27 +682,6 @@ class IncomingSessionStateHandler {
     };
 
     this.incomingSession = incomingSession;
-  }
-
-  holdAll(id) {
-    const state = phoneStore.getState();
-    const onHolds = state.sipSessions.onHold;
-    const sessions = state.sipSessions.sessions;
-
-    for (let [sessionId, session] of Object.entries(sessions)) {
-      if (onHolds.indexOf(sessionId) < 0 && sessionId !== id) {
-        try {
-          holdCallRequest(session);
-          phoneStore.dispatch({
-            type: SIPSESSION_HOLD_REQUEST,
-            payload: session.id
-          });
-          return;
-        } catch (err) {
-          return;
-        }
-      }
-    }
   }
 
 }
