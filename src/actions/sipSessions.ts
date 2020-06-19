@@ -95,14 +95,12 @@ export const holdCallRequest = (session: Session) => {
 
 //maps thru onHold and sessions arrays looking for a call to put on hold before unHolding a call 
 export const unHoldCallRequest = (_session: Session, onHolds: Array<any>, sessions: Array<any>) => (dispatch: Dispatch) => {
-
-  //checks for sessions that exist but are not on hold
+  //checks for  established sessions that are not on hold
   for (let [sessionId, session] of Object.entries(sessions)) {
     if (
-      sessionId in onHolds === false &&
-      sessionId !== _session.id
+      onHolds.indexOf(sessionId) < 0 &&
+      sessionId !== _session.id && session.state === 'Established'
     ) {
-
       // hold session if not on hold
       try {
         session.invite({
@@ -117,7 +115,7 @@ export const unHoldCallRequest = (_session: Session, onHolds: Array<any>, sessio
 
     }
   }
-  // unhold original call 
+  // unhold original session
   try {
     _session.invite()
     dispatch({ type: SIPSESSION_UNHOLD_REQUEST, payload: _session.id })
