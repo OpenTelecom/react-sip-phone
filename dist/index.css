@@ -1,17 +1,3 @@
-@use './variables.scss';
-._styles-module__container__3IMWP {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  height: 100%; }
-
-._Status__container__tNVQG {
-  width: 100%;
-  height: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 ._styles__container__1H7C6 {
   display: flex;
   flex-direction: column;

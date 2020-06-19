@@ -1,6 +1,9 @@
 import { phoneStore } from '../index'
 import { SessionState, Session } from 'sip.js'
-import { SIPSESSION_STATECHANGE, CLOSE_SESSION } from '../actions/sipSessions'
+import {
+  SIPSESSION_STATECHANGE, CLOSE_SESSION, SIPSESSION_HOLD_REQUEST,
+  holdCallRequest
+} from '../actions/sipSessions'
 
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from './audio'
 import toneManager from './ToneManager'
@@ -13,6 +16,7 @@ export class SessionStateHandler {
   public stateChange = (newState: SessionState) => {
     switch (newState) {
       case SessionState.Establishing:
+        this.holdAll(this.session.id)
         toneManager.playRing('ringback')
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
@@ -49,8 +53,38 @@ export class SessionStateHandler {
         console.log(`Unknown session state change: ${newState}`)
         break
     }
+
+  }
+
+  public holdAll(id: string) {
+    const state = phoneStore.getState()
+    //@ts-ignore
+    const onHolds = state.sipSessions.onHold
+    //@ts-ignore
+    const sessions = state.sipSessions.sessions
+    for (let [sessionId, session] of Object.entries(sessions)) {
+      if (
+        onHolds.indexOf(sessionId) < 0 &&
+        sessionId !== id
+      ) {
+        try {
+          //@ts-ignore
+          holdCallRequest(session)
+          //dispatch here because class is not connected to redux actions
+          phoneStore.dispatch({
+            type: SIPSESSION_HOLD_REQUEST,
+            //@ts-ignore
+            payload: session.id
+          })
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    }
   }
 }
+
+
 
 export const getFullNumber = (number: string) => {
   if (number.length < 10) {
