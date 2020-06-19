@@ -3,9 +3,8 @@ import { SessionState, Session } from 'sip.js'
 import {
   SIPSESSION_STATECHANGE,
   CLOSE_SESSION,
-  SIPSESSION_HOLD_REQUEST,
-  holdCallRequest
 } from '../actions/sipSessions'
+import { holdAll } from '../util/hold'
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from './audio'
 
 export class IncomingSessionStateHandler {
@@ -25,7 +24,7 @@ export class IncomingSessionStateHandler {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
-        this.holdAll(this.incomingSession.id)
+        holdAll(this.incomingSession.id)
         setLocalAudio(this.incomingSession)
         setRemoteAudio(this.incomingSession)
         break
@@ -49,34 +48,6 @@ export class IncomingSessionStateHandler {
       default:
         console.log(`Unknown session state change: ${newState}`)
         break
-    }
-  }
-
-  public holdAll(id: string) {
-    const state = phoneStore.getState()
-    //@ts-ignore
-    const onHolds = state.sipSessions.onHold
-    //@ts-ignore
-    const sessions = state.sipSessions.sessions
-    for (let [sessionId, session] of Object.entries(sessions)) {
-      if (
-        onHolds.indexOf(sessionId) < 0 &&
-        sessionId !== id
-      ) {
-        try {
-          //@ts-ignore
-          holdCallRequest(session)
-          //dispatch here because class is not connected to redux actions
-          phoneStore.dispatch({
-            type: SIPSESSION_HOLD_REQUEST,
-            //@ts-ignore
-            payload: session.id
-          })
-          return
-        } catch (err) {
-          return
-        }
-      }
     }
   }
 }
