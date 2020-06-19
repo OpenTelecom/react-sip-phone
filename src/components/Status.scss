@@ -1,0 +1,53 @@
+@import './phone/Phone.scss';
+
+.container {
+  width: 100%;
+  margin-top: 10px;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.userString {
+  padding: 2px;
+}
+
+#settingsButton {
+  @include common-button;
+  background: none;
+  height: 24px;
+  width: 24px;
+  padding: 2px;
+  &.on {
+    background-color: gray;
+  }
+}
+
+#settingsMenu {
+  flex-direction: column;
+  transition: all 0.2s ease;
+  height: 120px;
+  width: 100%;
+  justify-content: flex-start;
+  &.closed {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+  }
+}
+
+#dropdowns {
+  width: 100%;
+}
+
+.dropdownRow {
+  display: flex;
+  flex-direction: row;
+  margin: 5px 0 5px 0;
+}
+
+.dropdownIcon {
+  padding: 0 5px 0 5px;
+}

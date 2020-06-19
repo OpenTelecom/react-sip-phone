@@ -1,0 +1,23 @@
+@import '../styles.scss';
+
+.dialButton {
+  @include common-button;
+  height: 40px;
+  width: 40px;
+  background: none;
+}
+
+.dialInput {
+  @include common-input;
+}
+
+.dialstringContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border: 2px solid $almost-black;
+  border-radius: 100px;
+  padding: 0 0 0 20px;
+}

@@ -1,15 +1,100 @@
-.dialpadOpen {
-  display: flex;
+@import '../../variables';
+@import '../../styles.scss';
+
+@mixin phone-buttons {
+  margin: 10px;
 }
 
-.dialpadClosed {
-  display: none;
+@mixin action-buttons {
+  background-color: lightgray;
+  margin: 10px;
+}
+
+@mixin flex-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+#incoming {
+  @include flex-container;
+}
+
+#dialpad {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  transition: all 0.3s ease, opacity 0.2s ease;
+  height: 320px;
+  &.closed {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+  }
 }
 
 .dialpadButton {
-
+  @include common-button;
+  @include phone-buttons;
+  font-size: 1.5em;
 }
 
-.dialpadButton:hover {
-  
+.dialpadButtonLetters {
+  font-size: 0.5em;
+  color: $almost-black;
+}
+
+.dialpadRow {
+  display: flex;
+  flex-direction: row;
+}
+
+#actionButton {
+  @include common-button;
+  @include action-buttons;
+  &.on {
+    background-color: gray;
+  }
+}
+
+.endCallButton {
+  @include common-button;
+  @include action-buttons;
+  background-color: #ff6961;
+}
+
+.startCallButton {
+  @include common-button;
+  @include action-buttons;
+  background-color: #15c73b;
+}
+
+.actionsContainer {
+  @include flex-container;
+}
+
+#transferMenu {
+  @include flex-container;
+  transition: all 0.3s ease;
+  &.closed {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+  }
+}
+
+#transferInput {
+  @include common-input;
+  border: 2px solid $almost-black;
+  border-radius: 100px;
+  width: 80%;
+  padding: 5px 10px 5px 10px;
+}
+
+.transferButtons {
+  @include common-button;
+  @include phone-buttons;
 }

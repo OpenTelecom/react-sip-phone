@@ -1,7 +1,7 @@
-import { ExampleComponent } from '.'
+import { ReactSipPhone } from '.'
 
 describe('ExampleComponent', () => {
   it('is truthy', () => {
-    expect(ExampleComponent).toBeTruthy()
+    expect(ReactSipPhone).toBeTruthy()
   })
 })
