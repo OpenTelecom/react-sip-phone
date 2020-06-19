@@ -1,0 +1,509 @@
+@use './variables.scss';
+._styles-module__container__3IMWP {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%; }
+
+._Status__container__tNVQG {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+._styles__container__1H7C6 {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif; }
+
+._Status__container__Adysl {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif; }
+
+#_Status__incoming__14y58 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center; }
+
+#_Status__dialpad__24i7u {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  transition: all 0.3s ease, opacity 0.2s ease;
+  height: 320px; }
+  #_Status__dialpad__24i7u._Status__closed__3nIZK {
+    visibility: hidden;
+    opacity: 0;
+    height: 0; }
+
+._Status__dialpadButton__38DZj {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  margin: 10px;
+  font-size: 1.5em; }
+  ._Status__dialpadButton__38DZj:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Status__dialpadButton__38DZj:hover {
+    opacity: 0.5; }
+
+._Status__dialpadButtonLetters__N-jqm {
+  font-size: 0.5em;
+  color: #333132; }
+
+._Status__dialpadRow__19SxG {
+  display: flex;
+  flex-direction: row; }
+
+#_Status__actionButton__1hhhF {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  background-color: lightgray;
+  margin: 10px; }
+  #_Status__actionButton__1hhhF:focus {
+    outline: none;
+    box-shadow: none; }
+  #_Status__actionButton__1hhhF:hover {
+    opacity: 0.5; }
+  #_Status__actionButton__1hhhF._Status__on__3ZwLv {
+    background-color: gray; }
+
+._Status__endCallButton__3z8u3 {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  background-color: lightgray;
+  margin: 10px;
+  background-color: #ff6961; }
+  ._Status__endCallButton__3z8u3:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Status__endCallButton__3z8u3:hover {
+    opacity: 0.5; }
+
+._Status__startCallButton__3UW76 {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  background-color: lightgray;
+  margin: 10px;
+  background-color: #15c73b; }
+  ._Status__startCallButton__3UW76:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Status__startCallButton__3UW76:hover {
+    opacity: 0.5; }
+
+._Status__actionsContainer__2kDeL {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center; }
+
+#_Status__transferMenu__1yjIy {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease; }
+  #_Status__transferMenu__1yjIy._Status__closed__3nIZK {
+    visibility: hidden;
+    opacity: 0;
+    height: 0; }
+
+#_Status__transferInput__2tho8 {
+  border: none;
+  padding: none;
+  font-size: 1em;
+  border: 2px solid #333132;
+  border-radius: 100px;
+  width: 80%;
+  padding: 5px 10px 5px 10px; }
+  #_Status__transferInput__2tho8:focus {
+    outline: none; }
+
+._Status__transferButtons__Rc_m0 {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  margin: 10px; }
+  ._Status__transferButtons__Rc_m0:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Status__transferButtons__Rc_m0:hover {
+    opacity: 0.5; }
+
+._Status__container__Adysl {
+  width: 100%;
+  margin-top: 10px;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center; }
+
+._Status__userString__gelBY {
+  padding: 2px; }
+
+#_Status__settingsButton__3TfJl {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  background: none;
+  height: 24px;
+  width: 24px;
+  padding: 2px; }
+  #_Status__settingsButton__3TfJl:focus {
+    outline: none;
+    box-shadow: none; }
+  #_Status__settingsButton__3TfJl:hover {
+    opacity: 0.5; }
+  #_Status__settingsButton__3TfJl._Status__on__3ZwLv {
+    background-color: gray; }
+
+#_Status__settingsMenu__6JtnT {
+  flex-direction: column;
+  transition: all 0.2s ease;
+  height: 120px;
+  width: 100%;
+  justify-content: flex-start; }
+  #_Status__settingsMenu__6JtnT._Status__closed__3nIZK {
+    visibility: hidden;
+    opacity: 0;
+    height: 0; }
+
+#_Status__dropdowns__2FMhO {
+  width: 100%; }
+
+._Status__dropdownRow__2NuIJ {
+  display: flex;
+  flex-direction: row;
+  margin: 5px 0 5px 0; }
+
+._Status__dropdownIcon__1K5Gw {
+  padding: 0 5px 0 5px; }
+
+._Phone__container__33s4p {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif; }
+
+#_Phone__incoming__3dASG {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center; }
+
+#_Phone__dialpad__-iUpI {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  transition: all 0.3s ease, opacity 0.2s ease;
+  height: 320px; }
+  #_Phone__dialpad__-iUpI._Phone__closed__1Yn0M {
+    visibility: hidden;
+    opacity: 0;
+    height: 0; }
+
+._Phone__dialpadButton__2Mev0 {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  margin: 10px;
+  font-size: 1.5em; }
+  ._Phone__dialpadButton__2Mev0:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Phone__dialpadButton__2Mev0:hover {
+    opacity: 0.5; }
+
+._Phone__dialpadButtonLetters__30C7x {
+  font-size: 0.5em;
+  color: #333132; }
+
+._Phone__dialpadRow__ftZ8R {
+  display: flex;
+  flex-direction: row; }
+
+#_Phone__actionButton__1gnBl {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  background-color: lightgray;
+  margin: 10px; }
+  #_Phone__actionButton__1gnBl:focus {
+    outline: none;
+    box-shadow: none; }
+  #_Phone__actionButton__1gnBl:hover {
+    opacity: 0.5; }
+  #_Phone__actionButton__1gnBl._Phone__on__11LDZ {
+    background-color: gray; }
+
+._Phone__endCallButton__EoCL2 {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  background-color: lightgray;
+  margin: 10px;
+  background-color: #ff6961; }
+  ._Phone__endCallButton__EoCL2:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Phone__endCallButton__EoCL2:hover {
+    opacity: 0.5; }
+
+._Phone__startCallButton__PaJuy {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  background-color: lightgray;
+  margin: 10px;
+  background-color: #15c73b; }
+  ._Phone__startCallButton__PaJuy:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Phone__startCallButton__PaJuy:hover {
+    opacity: 0.5; }
+
+._Phone__actionsContainer__25gV2 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center; }
+
+#_Phone__transferMenu__1yYD- {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease; }
+  #_Phone__transferMenu__1yYD-._Phone__closed__1Yn0M {
+    visibility: hidden;
+    opacity: 0;
+    height: 0; }
+
+#_Phone__transferInput__ovMXl {
+  border: none;
+  padding: none;
+  font-size: 1em;
+  border: 2px solid #333132;
+  border-radius: 100px;
+  width: 80%;
+  padding: 5px 10px 5px 10px; }
+  #_Phone__transferInput__ovMXl:focus {
+    outline: none; }
+
+._Phone__transferButtons__1-bn8 {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  margin: 10px; }
+  ._Phone__transferButtons__1-bn8:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Phone__transferButtons__1-bn8:hover {
+    opacity: 0.5; }
+
+._Dialstring__container__2iAE_ {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif; }
+
+._Dialstring__dialButton__3GsXr {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  height: 40px;
+  width: 40px;
+  background: none; }
+  ._Dialstring__dialButton__3GsXr:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Dialstring__dialButton__3GsXr:hover {
+    opacity: 0.5; }
+
+._Dialstring__dialInput__32AFz {
+  border: none;
+  padding: none;
+  font-size: 1em; }
+  ._Dialstring__dialInput__32AFz:focus {
+    outline: none; }
+
+._Dialstring__dialstringContainer__2sye_ {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border: 2px solid #333132;
+  border-radius: 100px;
+  padding: 0 0 0 20px; }
