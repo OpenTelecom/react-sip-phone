@@ -25,7 +25,7 @@ export class IncomingSessionStateHandler {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
-        this.holdAll()
+        this.holdAll(this.incomingSession.id)
         setLocalAudio(this.incomingSession)
         setRemoteAudio(this.incomingSession)
         break
@@ -52,7 +52,7 @@ export class IncomingSessionStateHandler {
     }
   }
 
-  public holdAll() {
+  public holdAll(id: string) {
     const state = phoneStore.getState()
     //@ts-ignore
     const onHolds = state.sipSessions.onHold
@@ -60,8 +60,8 @@ export class IncomingSessionStateHandler {
     const sessions = state.sipSessions.sessions
     for (let [sessionId, session] of Object.entries(sessions)) {
       if (
-        sessionId in onHolds === false &&
-        sessionId !== this.incomingSession.id
+        onHolds.indexOf(sessionId) < 0 &&
+        sessionId !== id
       ) {
         try {
           //@ts-ignore
