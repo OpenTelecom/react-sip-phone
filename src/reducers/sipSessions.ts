@@ -13,7 +13,7 @@ import {
 const sipSessions = (
   state = {
     sessions: {},
-    incomingCalls: {},
+    incomingCalls: [],
     stateChanged: 0,
     onHold: [],
     attendedTransfers: []
@@ -26,7 +26,8 @@ const sipSessions = (
       console.log('Incoming call')
       return {
         ...state,
-        incomingCalls: { ...state.incomingCalls, [payload.id]: payload }
+        sessions: { ...state.sessions, [payload.id]: payload },
+        incomingCalls: [ ...state.incomingCalls, payload.id]
       }
     case NEW_SESSION:
       console.log('New session added')
@@ -41,19 +42,19 @@ const sipSessions = (
         attendedTransfers: [...state.attendedTransfers, payload.id]
       }
     case ACCEPT_CALL:
-      const acceptedIncoming: any = { ...state.incomingCalls }
-      delete acceptedIncoming[payload.id]
+      const acceptedIncoming = [...state.incomingCalls].filter((id) => id !== payload.id)
       return {
         ...state,
-        incomingCalls: acceptedIncoming,
-        sessions: { ...state.sessions, [payload.id]: payload }
+        incomingCalls: acceptedIncoming
       }
     case DECLINE_CALL:
-      const declinedIncoming: any = { ...state.incomingCalls }
-      delete declinedIncoming[payload.id]
+      const declinedIncoming = [...state.incomingCalls].filter((id) => id !== payload.id)
+      const declinedSessions: any = { ...state.sessions }
+      delete declinedSessions[payload.id]
       return {
         ...state,
-        incomingCalls: declinedIncoming
+        incomingCalls: declinedIncoming,
+        sessions: declinedSessions
       }
     case SIPSESSION_STATECHANGE:
       return {
@@ -61,16 +62,15 @@ const sipSessions = (
         stateChanged: state.stateChanged + 1
       }
     case CLOSE_SESSION:
-      const newIncoming: any = { ...state.incomingCalls }
+      const closedIncoming = [...state.incomingCalls].filter((id) => id !== payload)
       const newSessions: any = { ...state.sessions }
       delete newSessions[payload]
-      delete newIncoming[payload]
-      const endHold = [...state.onHold].filter((session) => session !== payload)
+      const endHold = [...state.onHold].filter((id) => id !== payload)
 
       return {
         ...state,
         sessions: newSessions,
-        incomingCalls: newIncoming,
+        incomingCalls: closedIncoming,
         onHold: endHold
       }
     case SIPSESSION_HOLD_REQUEST:
@@ -79,7 +79,7 @@ const sipSessions = (
         onHold: [...state.onHold, payload]
       }
     case SIPSESSION_UNHOLD_REQUEST:
-      const newHold = [...state.onHold].filter((session) => session !== payload)
+      const newHold = [...state.onHold].filter((id) => id !== payload)
 
       return {
         ...state,

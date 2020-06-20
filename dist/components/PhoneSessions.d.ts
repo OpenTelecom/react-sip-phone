@@ -2,7 +2,7 @@ import * as React from 'react';
 import { PhoneConfig } from '../models';
 interface Props {
     sessions: any;
-    incomingCalls: any;
+    incomingCalls: Array<string>;
     phoneConfig: PhoneConfig;
     attendedTransfers: Array<string>;
 }
