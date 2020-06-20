@@ -1946,29 +1946,24 @@ var actions$8 = {
 };
 var Incoming$1 = reactRedux.connect(mapStateToProps$8, actions$8)(Incoming);
 
-var getSessions = function getSessions(sessions, phoneConfig, attendedTransfers) {
+var getSessions = function getSessions(sessions, phoneConfig, attendedTransfers, incomingCalls) {
   var elements = [];
 
   for (var session in sessions) {
     if (attendedTransfers.includes(session)) continue;
-    elements.push(React.createElement(Phone$1, {
-      session: sessions[session],
-      key: session,
-      phoneConfig: phoneConfig
-    }));
-  }
 
-  return elements;
-};
-
-var getIncomingCallReferrals = function getIncomingCallReferrals(sessions) {
-  var elements = [];
-
-  for (var session in sessions) {
-    elements.push(React.createElement(Incoming$1, {
-      session: sessions[session],
-      key: session
-    }));
+    if (incomingCalls.includes(session)) {
+      elements.push(React.createElement(Incoming$1, {
+        session: sessions[session],
+        key: session
+      }));
+    } else {
+      elements.push(React.createElement(Phone$1, {
+        session: sessions[session],
+        key: session,
+        phoneConfig: phoneConfig
+      }));
+    }
   }
 
   return elements;
@@ -1984,7 +1979,7 @@ var PhoneSessions = /*#__PURE__*/function (_React$Component) {
   var _proto = PhoneSessions.prototype;
 
   _proto.render = function render() {
-    return React.createElement(React.Fragment, null, getIncomingCallReferrals(this.props.incomingCalls), getSessions(this.props.sessions, this.props.phoneConfig, this.props.attendedTransfers));
+    return React.createElement(React.Fragment, null, getSessions(this.props.sessions, this.props.phoneConfig, this.props.attendedTransfers, this.props.incomingCalls));
   };
 
   return PhoneSessions;
@@ -2071,12 +2066,12 @@ var actions$9 = {};
 var D = reactRedux.connect(mapStateToProps$a, actions$9)(Dialstring);
 
 var sipSessions = function sipSessions(state, action) {
-  var _extends2, _extends3, _extends4, _extends5;
+  var _extends2, _extends3, _extends4;
 
   if (state === void 0) {
     state = {
       sessions: {},
-      incomingCalls: {},
+      incomingCalls: [],
       stateChanged: 0,
       onHold: [],
       attendedTransfers: []
@@ -2090,7 +2085,8 @@ var sipSessions = function sipSessions(state, action) {
     case INCOMING_CALL:
       console.log('Incoming call');
       return _extends(_extends({}, state), {}, {
-        incomingCalls: _extends(_extends({}, state.incomingCalls), {}, (_extends2 = {}, _extends2[payload.id] = payload, _extends2))
+        sessions: _extends(_extends({}, state.sessions), {}, (_extends2 = {}, _extends2[payload.id] = payload, _extends2)),
+        incomingCalls: [].concat(state.incomingCalls, [payload.id])
       });
 
     case NEW_SESSION:
@@ -2106,20 +2102,24 @@ var sipSessions = function sipSessions(state, action) {
       });
 
     case ACCEPT_CALL:
-      var acceptedIncoming = _extends({}, state.incomingCalls);
-
-      delete acceptedIncoming[payload.id];
+      var acceptedIncoming = [].concat(state.incomingCalls).filter(function (id) {
+        return id !== payload.id;
+      });
       return _extends(_extends({}, state), {}, {
-        incomingCalls: acceptedIncoming,
-        sessions: _extends(_extends({}, state.sessions), {}, (_extends5 = {}, _extends5[payload.id] = payload, _extends5))
+        incomingCalls: acceptedIncoming
       });
 
     case DECLINE_CALL:
-      var declinedIncoming = _extends({}, state.incomingCalls);
+      var declinedIncoming = [].concat(state.incomingCalls).filter(function (id) {
+        return id !== payload.id;
+      });
 
-      delete declinedIncoming[payload.id];
+      var declinedSessions = _extends({}, state.sessions);
+
+      delete declinedSessions[payload.id];
       return _extends(_extends({}, state), {}, {
-        incomingCalls: declinedIncoming
+        incomingCalls: declinedIncoming,
+        sessions: declinedSessions
       });
 
     case SIPSESSION_STATECHANGE:
@@ -2128,18 +2128,19 @@ var sipSessions = function sipSessions(state, action) {
       });
 
     case CLOSE_SESSION:
-      var newIncoming = _extends({}, state.incomingCalls);
+      var closedIncoming = [].concat(state.incomingCalls).filter(function (id) {
+        return id !== payload;
+      });
 
       var newSessions = _extends({}, state.sessions);
 
       delete newSessions[payload];
-      delete newIncoming[payload];
-      var endHold = [].concat(state.onHold).filter(function (session) {
-        return session !== payload;
+      var endHold = [].concat(state.onHold).filter(function (id) {
+        return id !== payload;
       });
       return _extends(_extends({}, state), {}, {
         sessions: newSessions,
-        incomingCalls: newIncoming,
+        incomingCalls: closedIncoming,
         onHold: endHold
       });
 
@@ -2149,8 +2150,8 @@ var sipSessions = function sipSessions(state, action) {
       });
 
     case SIPSESSION_UNHOLD_REQUEST:
-      var newHold = [].concat(state.onHold).filter(function (session) {
-        return session !== payload;
+      var newHold = [].concat(state.onHold).filter(function (id) {
+        return id !== payload;
       });
       return _extends(_extends({}, state), {}, {
         onHold: newHold

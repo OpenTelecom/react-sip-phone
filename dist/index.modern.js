@@ -1680,29 +1680,24 @@ const actions$8 = {
 };
 var Incoming$1 = connect(mapStateToProps$8, actions$8)(Incoming);
 
-const getSessions = (sessions, phoneConfig, attendedTransfers) => {
+const getSessions = (sessions, phoneConfig, attendedTransfers, incomingCalls) => {
   const elements = [];
 
   for (const session in sessions) {
     if (attendedTransfers.includes(session)) continue;
-    elements.push(createElement(Phone$1, {
-      session: sessions[session],
-      key: session,
-      phoneConfig: phoneConfig
-    }));
-  }
 
-  return elements;
-};
-
-const getIncomingCallReferrals = sessions => {
-  const elements = [];
-
-  for (const session in sessions) {
-    elements.push(createElement(Incoming$1, {
-      session: sessions[session],
-      key: session
-    }));
+    if (incomingCalls.includes(session)) {
+      elements.push(createElement(Incoming$1, {
+        session: sessions[session],
+        key: session
+      }));
+    } else {
+      elements.push(createElement(Phone$1, {
+        session: sessions[session],
+        key: session,
+        phoneConfig: phoneConfig
+      }));
+    }
   }
 
   return elements;
@@ -1710,7 +1705,7 @@ const getIncomingCallReferrals = sessions => {
 
 class PhoneSessions extends Component {
   render() {
-    return createElement(Fragment, null, getIncomingCallReferrals(this.props.incomingCalls), getSessions(this.props.sessions, this.props.phoneConfig, this.props.attendedTransfers));
+    return createElement(Fragment, null, getSessions(this.props.sessions, this.props.phoneConfig, this.props.attendedTransfers, this.props.incomingCalls));
   }
 
 }
@@ -1778,7 +1773,7 @@ const D = connect(mapStateToProps$a, actions$9)(Dialstring);
 
 const sipSessions = (state = {
   sessions: {},
-  incomingCalls: {},
+  incomingCalls: [],
   stateChanged: 0,
   onHold: [],
   attendedTransfers: []
@@ -1792,9 +1787,10 @@ const sipSessions = (state = {
     case INCOMING_CALL:
       console.log('Incoming call');
       return { ...state,
-        incomingCalls: { ...state.incomingCalls,
+        sessions: { ...state.sessions,
           [payload.id]: payload
-        }
+        },
+        incomingCalls: [...state.incomingCalls, payload.id]
       };
 
     case NEW_SESSION:
@@ -1814,22 +1810,19 @@ const sipSessions = (state = {
       };
 
     case ACCEPT_CALL:
-      const acceptedIncoming = { ...state.incomingCalls
-      };
-      delete acceptedIncoming[payload.id];
+      const acceptedIncoming = [...state.incomingCalls].filter(id => id !== payload.id);
       return { ...state,
-        incomingCalls: acceptedIncoming,
-        sessions: { ...state.sessions,
-          [payload.id]: payload
-        }
+        incomingCalls: acceptedIncoming
       };
 
     case DECLINE_CALL:
-      const declinedIncoming = { ...state.incomingCalls
+      const declinedIncoming = [...state.incomingCalls].filter(id => id !== payload.id);
+      const declinedSessions = { ...state.sessions
       };
-      delete declinedIncoming[payload.id];
+      delete declinedSessions[payload.id];
       return { ...state,
-        incomingCalls: declinedIncoming
+        incomingCalls: declinedIncoming,
+        sessions: declinedSessions
       };
 
     case SIPSESSION_STATECHANGE:
@@ -1838,16 +1831,14 @@ const sipSessions = (state = {
       };
 
     case CLOSE_SESSION:
-      const newIncoming = { ...state.incomingCalls
-      };
+      const closedIncoming = [...state.incomingCalls].filter(id => id !== payload);
       const newSessions = { ...state.sessions
       };
       delete newSessions[payload];
-      delete newIncoming[payload];
-      const endHold = [...state.onHold].filter(session => session !== payload);
+      const endHold = [...state.onHold].filter(id => id !== payload);
       return { ...state,
         sessions: newSessions,
-        incomingCalls: newIncoming,
+        incomingCalls: closedIncoming,
         onHold: endHold
       };
 
@@ -1857,7 +1848,7 @@ const sipSessions = (state = {
       };
 
     case SIPSESSION_UNHOLD_REQUEST:
-      const newHold = [...state.onHold].filter(session => session !== payload);
+      const newHold = [...state.onHold].filter(id => id !== payload);
       return { ...state,
         onHold: newHold
       };
