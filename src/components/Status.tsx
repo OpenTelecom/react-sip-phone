@@ -17,6 +17,7 @@ interface Props {
   setPrimaryOutput: Function
   getInputAudioDevices: Function
   getOutputAudioDevices: Function
+  sessions: any
 }
 
 class Status extends React.Component<Props> {
@@ -35,9 +36,9 @@ class Status extends React.Component<Props> {
   }
   handleChangeDevice(type: string, id: string) {
     if (type === 'out') {
-      this.props.setPrimaryOutput(id)
+      this.props.setPrimaryOutput(id, this.props.sessions)
     } else {
-      this.props.setPrimaryInput(id)
+      this.props.setPrimaryInput(id, this.props.sessions)
     }
   }
   render() {
@@ -91,7 +92,8 @@ const mapStateToProps = (state: any) => ({
   inputs: state.device.audioInput,
   outputs: state.device.audioOutput,
   primaryInput: state.device.primaryAudioInput,
-  primaryOutput: state.device.primaryAudioOutput
+  primaryOutput: state.device.primaryAudioOutput,
+  sessions: state.sipSessions.sessions
 })
 
 const actions = {
