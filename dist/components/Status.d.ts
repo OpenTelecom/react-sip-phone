@@ -9,6 +9,7 @@ interface Props {
     setPrimaryOutput: Function;
     getInputAudioDevices: Function;
     getOutputAudioDevices: Function;
+    sessions: any;
 }
 declare class Status extends React.Component<Props> {
     state: {
