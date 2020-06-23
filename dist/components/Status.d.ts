@@ -11,6 +11,7 @@ interface Props {
     getOutputAudioDevices: Function;
     getNewInputAudioDevices: Function;
     getNewOutputAudioDevices: Function;
+    audioSwap: Function;
     newInputs: any;
     newOutputs: any;
     sessions: any;
@@ -23,10 +24,8 @@ declare class Status extends React.Component<Props> {
     mapOptions(options: any): any;
     handleChangeDevice(type: string, id: string): void;
     getAllAudioDevices: () => void;
-    add: (arr: any, _deviceId: any) => boolean;
     newPrimaryInput: () => void;
-    newPrimaryOutput: () => void;
-    deviceLength: () => void;
+    deviceAddedOrRemoved: () => void;
     mediaDevicesChange: () => void;
     render(): JSX.Element;
 }

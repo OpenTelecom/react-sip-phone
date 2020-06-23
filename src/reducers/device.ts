@@ -5,7 +5,7 @@ import {
     SET_PRIMARY_INPUT,
     SET_PRIMARY_OUTPUT,
     AUDIO_NEW_INPUT_DEVICES_DETECTED,
-    AUDIO_NEW_OUTPUT_DEVICES_DETECTED
+    AUDIO_DEVICES_SWAP
 
 } from '../actions/device'
 const device = (
@@ -46,10 +46,12 @@ const device = (
                 ...state,
                 newAudioInput: payload
             }
-        case AUDIO_NEW_OUTPUT_DEVICES_DETECTED:
+        case AUDIO_DEVICES_SWAP:
             return {
                 ...state,
-                newAudioOutput: payload
+                audioInput: payload,
+                newAudioOutput: [],
+                newAudioInput: []
             }
         default:
             return state

@@ -41,12 +41,5 @@ declare const device: (state: {
     audioInput: never[];
     audioOutput: never[];
     newAudioOutput: never[];
-} | {
-    newAudioOutput: any;
-    primaryAudioOutput: string;
-    primaryAudioInput: string;
-    audioInput: never[];
-    audioOutput: never[];
-    newAudioInput: never[];
 };
 export default device;

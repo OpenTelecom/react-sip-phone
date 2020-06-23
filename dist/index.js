@@ -318,6 +318,7 @@ var AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
 var AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED';
 var AUDIO_NEW_INPUT_DEVICES_DETECTED = 'AUDIO__NEW_INPUT_DEVICES_DETECTED';
 var AUDIO_NEW_OUTPUT_DEVICES_DETECTED = 'AUDIO__NEW_OUTPUT_DEVICES_DETECTED';
+var AUDIO_DEVICES_SWAP = 'AUDIO_DEVICES_SWAP';
 var REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
 var LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 var SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
@@ -328,6 +329,12 @@ var SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
 var SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
 var SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
 var SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
+var audioSwap = function audioSwap(newArray) {
+  return {
+    type: AUDIO_DEVICES_SWAP,
+    payload: newArray
+  };
+};
 var getInputAudioDevices = function getInputAudioDevices() {
   var inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -1133,18 +1140,6 @@ var Status = /*#__PURE__*/function (_React$Component) {
       _this.props.getOutputAudioDevices();
     };
 
-    _this.add = function (arr, _deviceId) {
-      var found = arr.some(function (device) {
-        return device.deviceId === _deviceId;
-      });
-
-      if (!found) {
-        return false;
-      } else {
-        return true;
-      }
-    };
-
     _this.newPrimaryInput = function () {
       setTimeout(function () {
         console.log(JSON.parse(JSON.stringify(_this.props.newInputs)));
@@ -1155,25 +1150,22 @@ var Status = /*#__PURE__*/function (_React$Component) {
         console.log(_this.props.newInputs[1].deviceId);
 
         _this.props.setPrimaryInput(_this.props.newInputs[1].deviceId, _this.props.sessions);
-      }, 2000);
+
+        setTimeout(function () {
+          _this.props.audioSwap(_this.props.newInputs);
+
+          _this.props.getInputAudioDevices();
+        }, 2000);
+      }, 3000);
     };
 
-    _this.newPrimaryOutput = function () {
-      setTimeout(function () {
-        console.log(JSON.parse(JSON.stringify(_this.props.newOutputs)));
-        console.log(JSON.parse(JSON.stringify(_this.props.outputs)));
-        console.log(JSON.stringify(_this.props.newOutputs));
-        console.log(JSON.stringify(_this.props.outputs));
-        console.log(_this.props.newOutputs);
-        console.log(_this.props.newOutputs[1].deviceId);
-
-        _this.props.setPrimaryOutput(_this.props.newOutputs[1].deviceId, _this.props.sessions);
-      }, 2000);
-    };
-
-    _this.deviceLength = function () {
+    _this.deviceAddedOrRemoved = function () {
       if (_this.props.inputs.length > _this.props.newInputs.length) {
         console.log('device removed');
+
+        _this.newPrimaryInput();
+      } else if (_this.props.inputs.length < _this.props.newInputs.length) {
+        console.log('device added');
 
         _this.newPrimaryInput();
       }
@@ -1185,7 +1177,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
 
         console.log(e);
 
-        _this.deviceLength();
+        _this.deviceAddedOrRemoved();
       };
     };
 
@@ -1304,7 +1296,8 @@ var actions$1 = {
   getInputAudioDevices: getInputAudioDevices,
   getOutputAudioDevices: getOutputAudioDevices,
   getNewInputAudioDevices: getNewInputAudioDevices,
-  getNewOutputAudioDevices: getNewOutputAudioDevices
+  getNewOutputAudioDevices: getNewOutputAudioDevices,
+  audioSwap: audioSwap
 };
 var Status$1 = reactRedux.connect(mapStateToProps$1, actions$1)(Status);
 
@@ -2442,9 +2435,11 @@ var device = function device(state, action) {
         newAudioInput: payload
       });
 
-    case AUDIO_NEW_OUTPUT_DEVICES_DETECTED:
+    case AUDIO_DEVICES_SWAP:
       return _extends(_extends({}, state), {}, {
-        newAudioOutput: payload
+        audioInput: payload,
+        newAudioOutput: [],
+        newAudioInput: []
       });
 
     default:

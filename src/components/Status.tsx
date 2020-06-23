@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import {
-  setPrimaryInput, setPrimaryOutput, getInputAudioDevices, getOutputAudioDevices, getNewInputAudioDevices, getNewOutputAudioDevices
+  setPrimaryInput, setPrimaryOutput, getInputAudioDevices, getOutputAudioDevices, getNewInputAudioDevices, getNewOutputAudioDevices, audioSwap
 
 } from '../actions/device'
 import styles from './Status.scss'
@@ -22,6 +22,7 @@ interface Props {
   getOutputAudioDevices: Function
   getNewInputAudioDevices: Function
   getNewOutputAudioDevices: Function
+  audioSwap: Function
   newInputs: any
   newOutputs: any
   sessions: any
@@ -40,11 +41,8 @@ class Status extends React.Component<Props> {
   componentDidMount() {
     this.props.getInputAudioDevices()
     this.props.getOutputAudioDevices()
-    // setTimeout(() => {
-    //   this.props.setNumberInputDevices(this.props.inputs.length)
-    // }, 2000)
-
   }
+
   mapOptions(options: any) {
     const list: any = []
     options.map((option: any) => {
@@ -65,15 +63,6 @@ class Status extends React.Component<Props> {
     this.props.getOutputAudioDevices()
   }
 
-  add = (arr: any, _deviceId: any) => {
-    const found: any = arr.some((device: any) => device.deviceId === _deviceId)
-    if (!found) {
-      return false
-    } else {
-      return true
-    }
-  }
-
   newPrimaryInput = () => {
     setTimeout(() => {
       console.log(JSON.parse(JSON.stringify(this.props.newInputs)))
@@ -84,31 +73,36 @@ class Status extends React.Component<Props> {
       console.log(this.props.newInputs[1].deviceId)
       this.props.setPrimaryInput(this.props.newInputs[1].deviceId, this.props.sessions)
       // this.props.setPrimaryOutput(this.props.newInputs[1].deviceId, this.props.sessions)
+      setTimeout(() => {
+        this.props.audioSwap(this.props.newInputs)
+        this.props.getInputAudioDevices()
+      }, 2000)
+    }, 3000)
+    //set new device lists 
 
-    }, 2000)
   }
 
-  newPrimaryOutput = () => {
-    setTimeout(() => {
-      console.log(JSON.parse(JSON.stringify(this.props.newOutputs)))
-      console.log(JSON.parse(JSON.stringify(this.props.outputs)))
-      console.log(JSON.stringify(this.props.newOutputs))
-      console.log(JSON.stringify(this.props.outputs))
-      console.log(this.props.newOutputs)
-      console.log(this.props.newOutputs[1].deviceId)
-      this.props.setPrimaryOutput(this.props.newOutputs[1].deviceId, this.props.sessions)
-    }, 2000)
-  }
+  // newPrimaryOutput = () => {
+  //   setTimeout(() => {
+  //     console.log(JSON.parse(JSON.stringify(this.props.newOutputs)))
+  //     console.log(JSON.parse(JSON.stringify(this.props.outputs)))
+  //     console.log(JSON.stringify(this.props.newOutputs))
+  //     console.log(JSON.stringify(this.props.outputs))
+  //     console.log(this.props.newOutputs)
+  //     console.log(this.props.newOutputs[1].deviceId)
+  //     this.props.setPrimaryOutput(this.props.newOutputs[1].deviceId, this.props.sessions)
+  //   }, 2000)
+  // }
 
-  deviceLength = () => {
+  deviceAddedOrRemoved = () => {
     if (this.props.inputs.length > this.props.newInputs.length) {
       // set new device id
       console.log('device removed')
       this.newPrimaryInput()
-      // this.newPrimaryOutput()
 
     } else if (this.props.inputs.length < this.props.newInputs.length) {
-
+      console.log('device added')
+      this.newPrimaryInput()
     }
   }
 
@@ -118,7 +112,7 @@ class Status extends React.Component<Props> {
       // this.props.getNewOutputAudioDevices()
 
       console.log(e)
-      this.deviceLength()
+      this.deviceAddedOrRemoved()
     }
   }
 
@@ -188,6 +182,7 @@ const actions = {
   getInputAudioDevices,
   getOutputAudioDevices,
   getNewInputAudioDevices,
-  getNewOutputAudioDevices
+  getNewOutputAudioDevices,
+  audioSwap
 }
 export default connect(mapStateToProps, actions)(Status)

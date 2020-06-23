@@ -238,6 +238,7 @@ const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
 const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED';
 const AUDIO_NEW_INPUT_DEVICES_DETECTED = 'AUDIO__NEW_INPUT_DEVICES_DETECTED';
 const AUDIO_NEW_OUTPUT_DEVICES_DETECTED = 'AUDIO__NEW_OUTPUT_DEVICES_DETECTED';
+const AUDIO_DEVICES_SWAP = 'AUDIO_DEVICES_SWAP';
 const REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
 const LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 const SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
@@ -248,6 +249,12 @@ const SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
 const SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
 const SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
 const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
+const audioSwap = newArray => {
+  return {
+    type: AUDIO_DEVICES_SWAP,
+    payload: newArray
+  };
+};
 const getInputAudioDevices = () => {
   let inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -1001,16 +1008,6 @@ class Status extends Component {
       this.props.getOutputAudioDevices();
     };
 
-    this.add = (arr, _deviceId) => {
-      const found = arr.some(device => device.deviceId === _deviceId);
-
-      if (!found) {
-        return false;
-      } else {
-        return true;
-      }
-    };
-
     this.newPrimaryInput = () => {
       setTimeout(() => {
         console.log(JSON.parse(JSON.stringify(this.props.newInputs)));
@@ -1020,24 +1017,19 @@ class Status extends Component {
         console.log(this.props.newInputs);
         console.log(this.props.newInputs[1].deviceId);
         this.props.setPrimaryInput(this.props.newInputs[1].deviceId, this.props.sessions);
-      }, 2000);
+        setTimeout(() => {
+          this.props.audioSwap(this.props.newInputs);
+          this.props.getInputAudioDevices();
+        }, 2000);
+      }, 3000);
     };
 
-    this.newPrimaryOutput = () => {
-      setTimeout(() => {
-        console.log(JSON.parse(JSON.stringify(this.props.newOutputs)));
-        console.log(JSON.parse(JSON.stringify(this.props.outputs)));
-        console.log(JSON.stringify(this.props.newOutputs));
-        console.log(JSON.stringify(this.props.outputs));
-        console.log(this.props.newOutputs);
-        console.log(this.props.newOutputs[1].deviceId);
-        this.props.setPrimaryOutput(this.props.newOutputs[1].deviceId, this.props.sessions);
-      }, 2000);
-    };
-
-    this.deviceLength = () => {
+    this.deviceAddedOrRemoved = () => {
       if (this.props.inputs.length > this.props.newInputs.length) {
         console.log('device removed');
+        this.newPrimaryInput();
+      } else if (this.props.inputs.length < this.props.newInputs.length) {
+        console.log('device added');
         this.newPrimaryInput();
       }
     };
@@ -1046,7 +1038,7 @@ class Status extends Component {
       navigator.mediaDevices.ondevicechange = e => {
         this.props.getNewInputAudioDevices();
         console.log(e);
-        this.deviceLength();
+        this.deviceAddedOrRemoved();
       };
     };
   }
@@ -1148,7 +1140,8 @@ const actions$1 = {
   getInputAudioDevices,
   getOutputAudioDevices,
   getNewInputAudioDevices,
-  getNewOutputAudioDevices
+  getNewOutputAudioDevices,
+  audioSwap
 };
 var Status$1 = connect(mapStateToProps$1, actions$1)(Status);
 
@@ -2113,9 +2106,11 @@ const device = (state = {
         newAudioInput: payload
       };
 
-    case AUDIO_NEW_OUTPUT_DEVICES_DETECTED:
+    case AUDIO_DEVICES_SWAP:
       return { ...state,
-        newAudioOutput: payload
+        audioInput: payload,
+        newAudioOutput: [],
+        newAudioInput: []
       };
 
     default:
