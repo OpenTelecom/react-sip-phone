@@ -24,9 +24,8 @@ declare class Status extends React.Component<Props> {
     mapOptions(options: any): any;
     handleChangeDevice(type: string, id: string): void;
     getAllAudioDevices: () => void;
-    newPrimaryInput: () => void;
-    deviceAddedOrRemoved: () => void;
-    mediaDevicesChange: () => void;
+    newDevice: () => void;
+    mediaDevicesListener: () => void;
     render(): JSX.Element;
 }
 declare const _default: import("react-redux").ConnectedComponent<typeof Status, Pick<React.ClassAttributes<Status> & Props, "name" | "ref" | "key">>;

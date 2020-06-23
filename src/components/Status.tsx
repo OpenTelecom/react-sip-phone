@@ -63,24 +63,6 @@ class Status extends React.Component<Props> {
     this.props.getOutputAudioDevices()
   }
 
-  newPrimaryInput = () => {
-    setTimeout(() => {
-      console.log(JSON.parse(JSON.stringify(this.props.newInputs)))
-      console.log(JSON.parse(JSON.stringify(this.props.inputs)))
-      console.log(JSON.stringify(this.props.newInputs))
-      console.log(JSON.stringify(this.props.inputs))
-      console.log(this.props.newInputs)
-      console.log(this.props.newInputs[1].deviceId)
-      this.props.setPrimaryInput(this.props.newInputs[1].deviceId, this.props.sessions)
-      // this.props.setPrimaryOutput(this.props.newInputs[1].deviceId, this.props.sessions)
-      setTimeout(() => {
-        this.props.audioSwap(this.props.newInputs)
-        this.props.getInputAudioDevices()
-      }, 2000)
-    }, 3000)
-    //set new device lists 
-
-  }
 
   // newPrimaryOutput = () => {
   //   setTimeout(() => {
@@ -94,25 +76,30 @@ class Status extends React.Component<Props> {
   //   }, 2000)
   // }
 
-  deviceAddedOrRemoved = () => {
-    if (this.props.inputs.length > this.props.newInputs.length) {
-      // set new device id
-      console.log('device removed')
-      this.newPrimaryInput()
-
-    } else if (this.props.inputs.length < this.props.newInputs.length) {
-      console.log('device added')
-      this.newPrimaryInput()
-    }
+  newDevice = () => {
+    console.log('device changed')
+    setTimeout(() => {
+      console.log(JSON.parse(JSON.stringify(this.props.newInputs)))
+      console.log(JSON.parse(JSON.stringify(this.props.inputs)))
+      console.log(JSON.stringify(this.props.newInputs))
+      console.log(JSON.stringify(this.props.inputs))
+      console.log(this.props.newInputs)
+      console.log(this.props.newInputs[1].deviceId)
+      this.props.setPrimaryInput(this.props.newInputs[1].deviceId, this.props.sessions)
+      // this.props.setPrimaryOutput(this.props.newInputs[1].deviceId, this.props.sessions)
+      setTimeout(() => {
+        this.props.audioSwap()
+        this.props.getInputAudioDevices()
+      }, 2000)
+    }, 4000)
   }
 
-  mediaDevicesChange = () => {
+  mediaDevicesListener = () => {
     navigator.mediaDevices.ondevicechange = (e) => {
       this.props.getNewInputAudioDevices()
       // this.props.getNewOutputAudioDevices()
-
       console.log(e)
-      this.deviceAddedOrRemoved()
+      this.newDevice()
     }
   }
 
@@ -133,7 +120,7 @@ class Status extends React.Component<Props> {
             <img src={settingsIcon} />
           </div>
         </div>
-        {this.mediaDevicesChange()}
+        {this.mediaDevicesListener()}
         <div
           id={styles.settingsMenu}
           className={state.settingsMenu ? '' : styles.closed}

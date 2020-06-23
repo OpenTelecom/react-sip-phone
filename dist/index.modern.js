@@ -249,10 +249,9 @@ const SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
 const SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
 const SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
 const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
-const audioSwap = newArray => {
+const audioSwap = () => {
   return {
-    type: AUDIO_DEVICES_SWAP,
-    payload: newArray
+    type: AUDIO_DEVICES_SWAP
   };
 };
 const getInputAudioDevices = () => {
@@ -1008,7 +1007,8 @@ class Status extends Component {
       this.props.getOutputAudioDevices();
     };
 
-    this.newPrimaryInput = () => {
+    this.newDevice = () => {
+      console.log('device changed');
       setTimeout(() => {
         console.log(JSON.parse(JSON.stringify(this.props.newInputs)));
         console.log(JSON.parse(JSON.stringify(this.props.inputs)));
@@ -1018,27 +1018,17 @@ class Status extends Component {
         console.log(this.props.newInputs[1].deviceId);
         this.props.setPrimaryInput(this.props.newInputs[1].deviceId, this.props.sessions);
         setTimeout(() => {
-          this.props.audioSwap(this.props.newInputs);
+          this.props.audioSwap();
           this.props.getInputAudioDevices();
         }, 2000);
-      }, 3000);
+      }, 4000);
     };
 
-    this.deviceAddedOrRemoved = () => {
-      if (this.props.inputs.length > this.props.newInputs.length) {
-        console.log('device removed');
-        this.newPrimaryInput();
-      } else if (this.props.inputs.length < this.props.newInputs.length) {
-        console.log('device added');
-        this.newPrimaryInput();
-      }
-    };
-
-    this.mediaDevicesChange = () => {
+    this.mediaDevicesListener = () => {
       navigator.mediaDevices.ondevicechange = e => {
         this.props.getNewInputAudioDevices();
         console.log(e);
-        this.deviceAddedOrRemoved();
+        this.newDevice();
       };
     };
   }
@@ -1086,7 +1076,7 @@ class Status extends Component {
       })
     }, createElement("img", {
       src: settingsIcon
-    }))), this.mediaDevicesChange(), createElement("div", {
+    }))), this.mediaDevicesListener(), createElement("div", {
       id: styles$1.settingsMenu,
       className: state.settingsMenu ? '' : styles$1.closed
     }, createElement("hr", {
@@ -2108,8 +2098,6 @@ const device = (state = {
 
     case AUDIO_DEVICES_SWAP:
       return { ...state,
-        audioInput: payload,
-        newAudioOutput: [],
         newAudioInput: []
       };
 

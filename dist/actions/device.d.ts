@@ -14,9 +14,8 @@ export declare const SET_LOCAL_AUDIO_SESSION_FAIL = "SET_LOCAL_AUDIO_SESSION_FAI
 export declare const SET_REMOTE_AUDIO_SESSIONS_PENDING = "SET_REMOTE_AUDIO_SESSIONS_PENDING";
 export declare const SET_REMOTE_AUDIO_SESSION_SUCCESS = "SET_REMOTE_AUDIO_SESSION_SUCCESS";
 export declare const SET_REMOTE_AUDIO_SESSION_FAIL = "SET_REMOTE_AUDIO_SESSION_FAIL";
-export declare const audioSwap: (newArray: any) => {
+export declare const audioSwap: () => {
     type: string;
-    payload: any;
 };
 export declare const getInputAudioDevices: () => {
     type: string;

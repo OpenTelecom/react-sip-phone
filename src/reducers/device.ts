@@ -49,8 +49,6 @@ const device = (
         case AUDIO_DEVICES_SWAP:
             return {
                 ...state,
-                audioInput: payload,
-                newAudioOutput: [],
                 newAudioInput: []
             }
         default:

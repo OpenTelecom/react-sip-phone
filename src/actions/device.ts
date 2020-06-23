@@ -23,11 +23,9 @@ export const SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCES
 export const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL'
 
 
-export const audioSwap = (newArray: any) => {
-
+export const audioSwap = () => {
   return {
     type: AUDIO_DEVICES_SWAP,
-    payload: newArray
   }
 }
 

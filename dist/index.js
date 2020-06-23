@@ -329,10 +329,9 @@ var SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
 var SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
 var SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
 var SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
-var audioSwap = function audioSwap(newArray) {
+var audioSwap = function audioSwap() {
   return {
-    type: AUDIO_DEVICES_SWAP,
-    payload: newArray
+    type: AUDIO_DEVICES_SWAP
   };
 };
 var getInputAudioDevices = function getInputAudioDevices() {
@@ -1140,7 +1139,8 @@ var Status = /*#__PURE__*/function (_React$Component) {
       _this.props.getOutputAudioDevices();
     };
 
-    _this.newPrimaryInput = function () {
+    _this.newDevice = function () {
+      console.log('device changed');
       setTimeout(function () {
         console.log(JSON.parse(JSON.stringify(_this.props.newInputs)));
         console.log(JSON.parse(JSON.stringify(_this.props.inputs)));
@@ -1152,32 +1152,20 @@ var Status = /*#__PURE__*/function (_React$Component) {
         _this.props.setPrimaryInput(_this.props.newInputs[1].deviceId, _this.props.sessions);
 
         setTimeout(function () {
-          _this.props.audioSwap(_this.props.newInputs);
+          _this.props.audioSwap();
 
           _this.props.getInputAudioDevices();
         }, 2000);
-      }, 3000);
+      }, 4000);
     };
 
-    _this.deviceAddedOrRemoved = function () {
-      if (_this.props.inputs.length > _this.props.newInputs.length) {
-        console.log('device removed');
-
-        _this.newPrimaryInput();
-      } else if (_this.props.inputs.length < _this.props.newInputs.length) {
-        console.log('device added');
-
-        _this.newPrimaryInput();
-      }
-    };
-
-    _this.mediaDevicesChange = function () {
+    _this.mediaDevicesListener = function () {
       navigator.mediaDevices.ondevicechange = function (e) {
         _this.props.getNewInputAudioDevices();
 
         console.log(e);
 
-        _this.deviceAddedOrRemoved();
+        _this.newDevice();
       };
     };
 
@@ -1231,7 +1219,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
       }
     }, React.createElement("img", {
       src: settingsIcon
-    }))), this.mediaDevicesChange(), React.createElement("div", {
+    }))), this.mediaDevicesListener(), React.createElement("div", {
       id: styles$1.settingsMenu,
       className: state.settingsMenu ? '' : styles$1.closed
     }, React.createElement("hr", {
@@ -2437,8 +2425,6 @@ var device = function device(state, action) {
 
     case AUDIO_DEVICES_SWAP:
       return _extends(_extends({}, state), {}, {
-        audioInput: payload,
-        newAudioOutput: [],
         newAudioInput: []
       });
 
