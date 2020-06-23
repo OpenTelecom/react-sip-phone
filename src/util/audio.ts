@@ -54,8 +54,6 @@ export const setLocalAudio = (session: Session) => {
 
       if (sender.track && sender.track.kind === 'audio') {
         let audioDeviceId =
-          // audio input device_id
-          // 'default'
           deviceId
         navigator.mediaDevices
           // @ts-ignore

@@ -316,10 +316,18 @@ var holdAll = function holdAll(id) {
 
 var AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
 var AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED';
+var AUDIO_NEW_INPUT_DEVICES_DETECTED = 'AUDIO__NEW_INPUT_DEVICES_DETECTED';
+var AUDIO_NEW_OUTPUT_DEVICES_DETECTED = 'AUDIO__NEW_OUTPUT_DEVICES_DETECTED';
 var REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
 var LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 var SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
 var SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT';
+var SET_LOCAL_AUDIO_SESSIONS_PENDING = 'SET_LOCAL_AUDIO_SESSIONS_PENDING';
+var SET_LOCAL_AUDIO_SESSION_SUCCESS = 'SET_LOCAL_AUDIO_SESSION_SUCCESS';
+var SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
+var SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
+var SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
+var SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
 var getInputAudioDevices = function getInputAudioDevices() {
   var inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -331,6 +339,20 @@ var getInputAudioDevices = function getInputAudioDevices() {
   });
   return {
     type: AUDIO_INPUT_DEVICES_DETECTED,
+    payload: inputArray
+  };
+};
+var getNewInputAudioDevices = function getNewInputAudioDevices() {
+  var inputArray = [];
+  navigator.mediaDevices.enumerateDevices().then(function (devices) {
+    devices.forEach(function (device) {
+      if (device.kind === 'audioinput') {
+        inputArray.push(device);
+      }
+    });
+  });
+  return {
+    type: AUDIO_NEW_INPUT_DEVICES_DETECTED,
     payload: inputArray
   };
 };
@@ -348,16 +370,135 @@ var getOutputAudioDevices = function getOutputAudioDevices() {
     payload: outputArray
   };
 };
-var setPrimaryOutput = function setPrimaryOutput(id) {
+var getNewOutputAudioDevices = function getNewOutputAudioDevices() {
+  var outputArray = [];
+  navigator.mediaDevices.enumerateDevices().then(function (devices) {
+    devices.forEach(function (device) {
+      if (device.kind === 'audiooutput') {
+        outputArray.push(device);
+      }
+    });
+  });
   return {
-    type: SET_PRIMARY_OUTPUT,
-    payload: id
+    type: AUDIO_NEW_OUTPUT_DEVICES_DETECTED,
+    payload: outputArray
   };
 };
-var setPrimaryInput = function setPrimaryInput(id) {
-  return {
-    type: SET_PRIMARY_INPUT,
-    payload: id
+var setPrimaryOutput = function setPrimaryOutput(deviceId, sessions) {
+  return function (dispatch) {
+    if (sessions) {
+      if (Object.keys(sessions).length > 0) {
+        dispatch({
+          type: SET_REMOTE_AUDIO_SESSIONS_PENDING
+        });
+
+        for (var _i = 0, _Object$entries = Object.entries(sessions); _i < _Object$entries.length; _i++) {
+          var _Object$entries$_i = _Object$entries[_i],
+              sessionId = _Object$entries$_i[0],
+              _session = _Object$entries$_i[1];
+
+          if (_session.state === 'Established') {
+            try {
+              (function () {
+                var mediaElement = document.getElementById(sessionId);
+                var remoteStream = new MediaStream();
+
+                _session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(function (receiver) {
+                  if (receiver.track) {
+                    remoteStream.addTrack(receiver.track);
+                  }
+                });
+
+                if (mediaElement) {
+                  mediaElement.setSinkId(deviceId).then(function () {
+                    mediaElement.srcObject = remoteStream;
+                    mediaElement.play();
+                  });
+                } else {
+                  console.log('no media Element');
+                }
+              })();
+            } catch (err) {
+              console.log(err);
+              dispatch({
+                type: SET_REMOTE_AUDIO_SESSION_FAIL
+              });
+              return;
+            }
+          }
+
+          dispatch({
+            type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+          });
+        }
+      }
+    }
+
+    dispatch({
+      type: SET_PRIMARY_OUTPUT,
+      payload: deviceId
+    });
+  };
+};
+var setPrimaryInput = function setPrimaryInput(deviceId, sessions) {
+  return function (dispatch) {
+    if (sessions) {
+      if (Object.keys(sessions).length > 0) {
+        dispatch({
+          type: SET_LOCAL_AUDIO_SESSIONS_PENDING
+        });
+
+        var _loop = function _loop() {
+          var _Object$entries2$_i = _Object$entries2[_i2],
+              sessionId = _Object$entries2$_i[0],
+              _session = _Object$entries2$_i[1];
+
+          if (_session.state === 'Established') {
+            try {
+              _session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
+                console.log(sender);
+                console.log(sessionId);
+
+                if (sender.track && sender.track.kind === 'audio') {
+                  var audioDeviceId = deviceId;
+                  navigator.mediaDevices.getUserMedia({
+                    audio: {
+                      deviceId: audioDeviceId
+                    }
+                  }).then(function (stream) {
+                    var audioTrack = stream.getAudioTracks();
+                    sender.replaceTrack(audioTrack[0]);
+                  });
+                }
+              });
+            } catch (err) {
+              console.log(err);
+              dispatch({
+                type: SET_LOCAL_AUDIO_SESSION_FAIL
+              });
+              return {
+                v: void 0
+              };
+            }
+          }
+
+          dispatch({
+            type: SET_LOCAL_AUDIO_SESSION_SUCCESS
+          });
+        };
+
+        for (var _i2 = 0, _Object$entries2 = Object.entries(sessions); _i2 < _Object$entries2.length; _i2++) {
+          var _ret = _loop();
+
+          if (typeof _ret === "object") return _ret.v;
+        }
+      }
+
+      dispatch({
+        type: SET_PRIMARY_INPUT,
+        payload: deviceId
+      });
+    }
   };
 };
 
@@ -985,6 +1126,69 @@ var Status = /*#__PURE__*/function (_React$Component) {
     _this.state = {
       settingsMenu: false
     };
+
+    _this.getAllAudioDevices = function () {
+      _this.props.getInputAudioDevices();
+
+      _this.props.getOutputAudioDevices();
+    };
+
+    _this.add = function (arr, _deviceId) {
+      var found = arr.some(function (device) {
+        return device.deviceId === _deviceId;
+      });
+
+      if (!found) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    _this.newPrimaryInput = function () {
+      setTimeout(function () {
+        console.log(JSON.parse(JSON.stringify(_this.props.newInputs)));
+        console.log(JSON.parse(JSON.stringify(_this.props.inputs)));
+        console.log(JSON.stringify(_this.props.newInputs));
+        console.log(JSON.stringify(_this.props.inputs));
+        console.log(_this.props.newInputs);
+        console.log(_this.props.newInputs[1].deviceId);
+
+        _this.props.setPrimaryInput(_this.props.newInputs[1].deviceId, _this.props.sessions);
+      }, 2000);
+    };
+
+    _this.newPrimaryOutput = function () {
+      setTimeout(function () {
+        console.log(JSON.parse(JSON.stringify(_this.props.newOutputs)));
+        console.log(JSON.parse(JSON.stringify(_this.props.outputs)));
+        console.log(JSON.stringify(_this.props.newOutputs));
+        console.log(JSON.stringify(_this.props.outputs));
+        console.log(_this.props.newOutputs);
+        console.log(_this.props.newOutputs[1].deviceId);
+
+        _this.props.setPrimaryOutput(_this.props.newOutputs[1].deviceId, _this.props.sessions);
+      }, 2000);
+    };
+
+    _this.deviceLength = function () {
+      if (_this.props.inputs.length > _this.props.newInputs.length) {
+        console.log('device removed');
+
+        _this.newPrimaryInput();
+      }
+    };
+
+    _this.mediaDevicesChange = function () {
+      navigator.mediaDevices.ondevicechange = function (e) {
+        _this.props.getNewInputAudioDevices();
+
+        console.log(e);
+
+        _this.deviceLength();
+      };
+    };
+
     return _this;
   }
 
@@ -1008,9 +1212,9 @@ var Status = /*#__PURE__*/function (_React$Component) {
 
   _proto.handleChangeDevice = function handleChangeDevice(type, id) {
     if (type === 'out') {
-      this.props.setPrimaryOutput(id);
+      this.props.setPrimaryOutput(id, this.props.sessions);
     } else {
-      this.props.setPrimaryInput(id);
+      this.props.setPrimaryInput(id, this.props.sessions);
     }
   };
 
@@ -1035,7 +1239,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
       }
     }, React.createElement("img", {
       src: settingsIcon
-    }))), React.createElement("div", {
+    }))), this.mediaDevicesChange(), React.createElement("div", {
       id: styles$1.settingsMenu,
       className: state.settingsMenu ? '' : styles$1.closed
     }, React.createElement("hr", {
@@ -1087,7 +1291,10 @@ var mapStateToProps$1 = function mapStateToProps(state) {
     inputs: state.device.audioInput,
     outputs: state.device.audioOutput,
     primaryInput: state.device.primaryAudioInput,
-    primaryOutput: state.device.primaryAudioOutput
+    primaryOutput: state.device.primaryAudioOutput,
+    sessions: state.sipSessions.sessions,
+    newInputs: state.device.newAudioInput,
+    newOutputs: state.device.newAudioOutput
   };
 };
 
@@ -1095,7 +1302,9 @@ var actions$1 = {
   setPrimaryInput: setPrimaryInput,
   setPrimaryOutput: setPrimaryOutput,
   getInputAudioDevices: getInputAudioDevices,
-  getOutputAudioDevices: getOutputAudioDevices
+  getOutputAudioDevices: getOutputAudioDevices,
+  getNewInputAudioDevices: getNewInputAudioDevices,
+  getNewOutputAudioDevices: getNewOutputAudioDevices
 };
 var Status$1 = reactRedux.connect(mapStateToProps$1, actions$1)(Status);
 
@@ -1550,11 +1759,14 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
 
             _this2.props.stateChange(newState, outgoingSession.id);
 
+            setLocalAudio(outgoingSession);
+            setRemoteAudio(outgoingSession);
             break;
 
           case sip_js.SessionState.Terminating:
             _this2.props.stateChange(newState, outgoingSession.id);
 
+            cleanupMedia(outgoingSession.id);
             break;
 
           case sip_js.SessionState.Terminated:
@@ -2192,10 +2404,12 @@ var sipAccounts = function sipAccounts(state, action) {
 var device = function device(state, action) {
   if (state === void 0) {
     state = {
+      primaryAudioOutput: 'default',
+      primaryAudioInput: 'default',
       audioInput: [],
       audioOutput: [],
-      primaryAudioOutput: 'default',
-      primaryAudioInput: 'default'
+      newAudioInput: [],
+      newAudioOutput: []
     };
   }
 
@@ -2221,6 +2435,16 @@ var device = function device(state, action) {
     case SET_PRIMARY_INPUT:
       return _extends(_extends({}, state), {}, {
         primaryAudioInput: payload
+      });
+
+    case AUDIO_NEW_INPUT_DEVICES_DETECTED:
+      return _extends(_extends({}, state), {}, {
+        newAudioInput: payload
+      });
+
+    case AUDIO_NEW_OUTPUT_DEVICES_DETECTED:
+      return _extends(_extends({}, state), {}, {
+        newAudioOutput: payload
       });
 
     default:

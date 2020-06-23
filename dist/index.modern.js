@@ -236,10 +236,18 @@ const holdAll = id => {
 
 const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
 const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED';
+const AUDIO_NEW_INPUT_DEVICES_DETECTED = 'AUDIO__NEW_INPUT_DEVICES_DETECTED';
+const AUDIO_NEW_OUTPUT_DEVICES_DETECTED = 'AUDIO__NEW_OUTPUT_DEVICES_DETECTED';
 const REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
 const LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 const SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
 const SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT';
+const SET_LOCAL_AUDIO_SESSIONS_PENDING = 'SET_LOCAL_AUDIO_SESSIONS_PENDING';
+const SET_LOCAL_AUDIO_SESSION_SUCCESS = 'SET_LOCAL_AUDIO_SESSION_SUCCESS';
+const SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
+const SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
+const SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
+const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
 const getInputAudioDevices = () => {
   let inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -251,6 +259,20 @@ const getInputAudioDevices = () => {
   });
   return {
     type: AUDIO_INPUT_DEVICES_DETECTED,
+    payload: inputArray
+  };
+};
+const getNewInputAudioDevices = () => {
+  let inputArray = [];
+  navigator.mediaDevices.enumerateDevices().then(function (devices) {
+    devices.forEach(function (device) {
+      if (device.kind === 'audioinput') {
+        inputArray.push(device);
+      }
+    });
+  });
+  return {
+    type: AUDIO_NEW_INPUT_DEVICES_DETECTED,
     payload: inputArray
   };
 };
@@ -268,17 +290,114 @@ const getOutputAudioDevices = () => {
     payload: outputArray
   };
 };
-const setPrimaryOutput = id => {
+const getNewOutputAudioDevices = () => {
+  let outputArray = [];
+  navigator.mediaDevices.enumerateDevices().then(function (devices) {
+    devices.forEach(function (device) {
+      if (device.kind === 'audiooutput') {
+        outputArray.push(device);
+      }
+    });
+  });
   return {
-    type: SET_PRIMARY_OUTPUT,
-    payload: id
+    type: AUDIO_NEW_OUTPUT_DEVICES_DETECTED,
+    payload: outputArray
   };
 };
-const setPrimaryInput = id => {
-  return {
-    type: SET_PRIMARY_INPUT,
-    payload: id
-  };
+const setPrimaryOutput = (deviceId, sessions) => dispatch => {
+  if (sessions) {
+    if (Object.keys(sessions).length > 0) {
+      dispatch({
+        type: SET_REMOTE_AUDIO_SESSIONS_PENDING
+      });
+
+      for (let [sessionId, _session] of Object.entries(sessions)) {
+        if (_session.state === 'Established') {
+          try {
+            const mediaElement = document.getElementById(sessionId);
+            const remoteStream = new MediaStream();
+
+            _session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(receiver => {
+              if (receiver.track) {
+                remoteStream.addTrack(receiver.track);
+              }
+            });
+
+            if (mediaElement) {
+              mediaElement.setSinkId(deviceId).then(() => {
+                mediaElement.srcObject = remoteStream;
+                mediaElement.play();
+              });
+            } else {
+              console.log('no media Element');
+            }
+          } catch (err) {
+            console.log(err);
+            dispatch({
+              type: SET_REMOTE_AUDIO_SESSION_FAIL
+            });
+            return;
+          }
+        }
+
+        dispatch({
+          type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+        });
+      }
+    }
+  }
+
+  dispatch({
+    type: SET_PRIMARY_OUTPUT,
+    payload: deviceId
+  });
+};
+const setPrimaryInput = (deviceId, sessions) => dispatch => {
+  if (sessions) {
+    if (Object.keys(sessions).length > 0) {
+      dispatch({
+        type: SET_LOCAL_AUDIO_SESSIONS_PENDING
+      });
+
+      for (let [sessionId, _session] of Object.entries(sessions)) {
+        if (_session.state === 'Established') {
+          try {
+            _session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
+              console.log(sender);
+              console.log(sessionId);
+
+              if (sender.track && sender.track.kind === 'audio') {
+                let audioDeviceId = deviceId;
+                navigator.mediaDevices.getUserMedia({
+                  audio: {
+                    deviceId: audioDeviceId
+                  }
+                }).then(function (stream) {
+                  let audioTrack = stream.getAudioTracks();
+                  sender.replaceTrack(audioTrack[0]);
+                });
+              }
+            });
+          } catch (err) {
+            console.log(err);
+            dispatch({
+              type: SET_LOCAL_AUDIO_SESSION_FAIL
+            });
+            return;
+          }
+        }
+
+        dispatch({
+          type: SET_LOCAL_AUDIO_SESSION_SUCCESS
+        });
+      }
+    }
+
+    dispatch({
+      type: SET_PRIMARY_INPUT,
+      payload: deviceId
+    });
+  }
 };
 
 const setRemoteAudio = session => {
@@ -876,6 +995,60 @@ class Status extends Component {
     this.state = {
       settingsMenu: false
     };
+
+    this.getAllAudioDevices = () => {
+      this.props.getInputAudioDevices();
+      this.props.getOutputAudioDevices();
+    };
+
+    this.add = (arr, _deviceId) => {
+      const found = arr.some(device => device.deviceId === _deviceId);
+
+      if (!found) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    this.newPrimaryInput = () => {
+      setTimeout(() => {
+        console.log(JSON.parse(JSON.stringify(this.props.newInputs)));
+        console.log(JSON.parse(JSON.stringify(this.props.inputs)));
+        console.log(JSON.stringify(this.props.newInputs));
+        console.log(JSON.stringify(this.props.inputs));
+        console.log(this.props.newInputs);
+        console.log(this.props.newInputs[1].deviceId);
+        this.props.setPrimaryInput(this.props.newInputs[1].deviceId, this.props.sessions);
+      }, 2000);
+    };
+
+    this.newPrimaryOutput = () => {
+      setTimeout(() => {
+        console.log(JSON.parse(JSON.stringify(this.props.newOutputs)));
+        console.log(JSON.parse(JSON.stringify(this.props.outputs)));
+        console.log(JSON.stringify(this.props.newOutputs));
+        console.log(JSON.stringify(this.props.outputs));
+        console.log(this.props.newOutputs);
+        console.log(this.props.newOutputs[1].deviceId);
+        this.props.setPrimaryOutput(this.props.newOutputs[1].deviceId, this.props.sessions);
+      }, 2000);
+    };
+
+    this.deviceLength = () => {
+      if (this.props.inputs.length > this.props.newInputs.length) {
+        console.log('device removed');
+        this.newPrimaryInput();
+      }
+    };
+
+    this.mediaDevicesChange = () => {
+      navigator.mediaDevices.ondevicechange = e => {
+        this.props.getNewInputAudioDevices();
+        console.log(e);
+        this.deviceLength();
+      };
+    };
   }
 
   componentDidMount() {
@@ -896,9 +1069,9 @@ class Status extends Component {
 
   handleChangeDevice(type, id) {
     if (type === 'out') {
-      this.props.setPrimaryOutput(id);
+      this.props.setPrimaryOutput(id, this.props.sessions);
     } else {
-      this.props.setPrimaryInput(id);
+      this.props.setPrimaryInput(id, this.props.sessions);
     }
   }
 
@@ -921,7 +1094,7 @@ class Status extends Component {
       })
     }, createElement("img", {
       src: settingsIcon
-    }))), createElement("div", {
+    }))), this.mediaDevicesChange(), createElement("div", {
       id: styles$1.settingsMenu,
       className: state.settingsMenu ? '' : styles$1.closed
     }, createElement("hr", {
@@ -963,14 +1136,19 @@ const mapStateToProps$1 = state => ({
   inputs: state.device.audioInput,
   outputs: state.device.audioOutput,
   primaryInput: state.device.primaryAudioInput,
-  primaryOutput: state.device.primaryAudioOutput
+  primaryOutput: state.device.primaryAudioOutput,
+  sessions: state.sipSessions.sessions,
+  newInputs: state.device.newAudioInput,
+  newOutputs: state.device.newAudioOutput
 });
 
 const actions$1 = {
   setPrimaryInput,
   setPrimaryOutput,
   getInputAudioDevices,
-  getOutputAudioDevices
+  getOutputAudioDevices,
+  getNewInputAudioDevices,
+  getNewOutputAudioDevices
 };
 var Status$1 = connect(mapStateToProps$1, actions$1)(Status);
 
@@ -1337,10 +1515,13 @@ class AttendedTransfer extends Component {
               attendedTransferSessionPending: false
             });
             this.props.stateChange(newState, outgoingSession.id);
+            setLocalAudio(outgoingSession);
+            setRemoteAudio(outgoingSession);
             break;
 
           case SessionState.Terminating:
             this.props.stateChange(newState, outgoingSession.id);
+            cleanupMedia(outgoingSession.id);
             break;
 
           case SessionState.Terminated:
@@ -1894,10 +2075,12 @@ const sipAccounts = (state = {
 };
 
 const device = (state = {
+  primaryAudioOutput: 'default',
+  primaryAudioInput: 'default',
   audioInput: [],
   audioOutput: [],
-  primaryAudioOutput: 'default',
-  primaryAudioInput: 'default'
+  newAudioInput: [],
+  newAudioOutput: []
 }, action) => {
   const {
     type,
@@ -1923,6 +2106,16 @@ const device = (state = {
     case SET_PRIMARY_INPUT:
       return { ...state,
         primaryAudioInput: payload
+      };
+
+    case AUDIO_NEW_INPUT_DEVICES_DETECTED:
+      return { ...state,
+        newAudioInput: payload
+      };
+
+    case AUDIO_NEW_OUTPUT_DEVICES_DETECTED:
+      return { ...state,
+        newAudioOutput: payload
       };
 
     default:

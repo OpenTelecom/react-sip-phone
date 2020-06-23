@@ -20,6 +20,8 @@ import { getFullNumber } from '../../util/sessions'
 import attendedIcon from '../../assets/phone_in_talk-24px.svg'
 import cancelIcon from '../../assets/call_end-24px.svg'
 import connectIcon from '../../assets/arrow_forward-24px.svg'
+import { setLocalAudio, setRemoteAudio, cleanupMedia } from '../../util/audio'
+
 
 interface Props {
   session: Session
@@ -71,9 +73,13 @@ class AttendedTransfer extends React.Component<Props> {
             this.setState({ attendedTransferSessionPending: false })
             this.props.stateChange(newState, outgoingSession.id)
 
+            setLocalAudio(outgoingSession)
+            setRemoteAudio(outgoingSession)
+
             break
           case SessionState.Terminating:
             this.props.stateChange(newState, outgoingSession.id)
+            cleanupMedia(outgoingSession.id)
             break
           case SessionState.Terminated:
             this.props.stateChange(newState, outgoingSession.id)

@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { setPrimaryInput, setPrimaryOutput, getInputAudioDevices, getOutputAudioDevices } from '../actions/device'
+import {
+  setPrimaryInput, setPrimaryOutput, getInputAudioDevices, getOutputAudioDevices, getNewInputAudioDevices, getNewOutputAudioDevices
+
+} from '../actions/device'
 import styles from './Status.scss'
 import Select from 'react-select';
 import settingsIcon from '../assets/settings-24px.svg'
@@ -9,7 +12,7 @@ import soundIcon from '../assets/volume_up-24px.svg'
 
 interface Props {
   name: string
-  inputs: any
+  inputs: Array<Object>
   outputs: any
   primaryInput: string
   primaryOutput: string
@@ -17,14 +20,30 @@ interface Props {
   setPrimaryOutput: Function
   getInputAudioDevices: Function
   getOutputAudioDevices: Function
+  getNewInputAudioDevices: Function
+  getNewOutputAudioDevices: Function
+  newInputs: any
+  newOutputs: any
+  sessions: any
 }
 
+
+
 class Status extends React.Component<Props> {
-  state = { settingsMenu: false }
+  state = {
+    settingsMenu: false,
+    // audioInputs: Array<{ deviceId: string, groupId: string, kind: string, label: string }>()
+    // audioInputs: new Array() as Array<any>,
+
+  }
 
   componentDidMount() {
     this.props.getInputAudioDevices()
     this.props.getOutputAudioDevices()
+    // setTimeout(() => {
+    //   this.props.setNumberInputDevices(this.props.inputs.length)
+    // }, 2000)
+
   }
   mapOptions(options: any) {
     const list: any = []
@@ -35,11 +54,75 @@ class Status extends React.Component<Props> {
   }
   handleChangeDevice(type: string, id: string) {
     if (type === 'out') {
-      this.props.setPrimaryOutput(id)
+      this.props.setPrimaryOutput(id, this.props.sessions)
     } else {
-      this.props.setPrimaryInput(id)
+      this.props.setPrimaryInput(id, this.props.sessions)
     }
   }
+
+  getAllAudioDevices = () => {
+    this.props.getInputAudioDevices()
+    this.props.getOutputAudioDevices()
+  }
+
+  add = (arr: any, _deviceId: any) => {
+    const found: any = arr.some((device: any) => device.deviceId === _deviceId)
+    if (!found) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  newPrimaryInput = () => {
+    setTimeout(() => {
+      console.log(JSON.parse(JSON.stringify(this.props.newInputs)))
+      console.log(JSON.parse(JSON.stringify(this.props.inputs)))
+      console.log(JSON.stringify(this.props.newInputs))
+      console.log(JSON.stringify(this.props.inputs))
+      console.log(this.props.newInputs)
+      console.log(this.props.newInputs[1].deviceId)
+      this.props.setPrimaryInput(this.props.newInputs[1].deviceId, this.props.sessions)
+      // this.props.setPrimaryOutput(this.props.newInputs[1].deviceId, this.props.sessions)
+
+    }, 2000)
+  }
+
+  newPrimaryOutput = () => {
+    setTimeout(() => {
+      console.log(JSON.parse(JSON.stringify(this.props.newOutputs)))
+      console.log(JSON.parse(JSON.stringify(this.props.outputs)))
+      console.log(JSON.stringify(this.props.newOutputs))
+      console.log(JSON.stringify(this.props.outputs))
+      console.log(this.props.newOutputs)
+      console.log(this.props.newOutputs[1].deviceId)
+      this.props.setPrimaryOutput(this.props.newOutputs[1].deviceId, this.props.sessions)
+    }, 2000)
+  }
+
+  deviceLength = () => {
+    if (this.props.inputs.length > this.props.newInputs.length) {
+      // set new device id
+      console.log('device removed')
+      this.newPrimaryInput()
+      // this.newPrimaryOutput()
+
+    } else if (this.props.inputs.length < this.props.newInputs.length) {
+
+    }
+  }
+
+  mediaDevicesChange = () => {
+    navigator.mediaDevices.ondevicechange = (e) => {
+      this.props.getNewInputAudioDevices()
+      // this.props.getNewOutputAudioDevices()
+
+      console.log(e)
+      this.deviceLength()
+    }
+  }
+
+
   render() {
     const { props, state } = this
     const inputs = this.mapOptions(props.inputs)
@@ -56,6 +139,7 @@ class Status extends React.Component<Props> {
             <img src={settingsIcon} />
           </div>
         </div>
+        {this.mediaDevicesChange()}
         <div
           id={styles.settingsMenu}
           className={state.settingsMenu ? '' : styles.closed}
@@ -91,13 +175,19 @@ const mapStateToProps = (state: any) => ({
   inputs: state.device.audioInput,
   outputs: state.device.audioOutput,
   primaryInput: state.device.primaryAudioInput,
-  primaryOutput: state.device.primaryAudioOutput
+  primaryOutput: state.device.primaryAudioOutput,
+  sessions: state.sipSessions.sessions,
+  newInputs: state.device.newAudioInput,
+  newOutputs: state.device.newAudioOutput
+
 })
 
 const actions = {
   setPrimaryInput,
   setPrimaryOutput,
   getInputAudioDevices,
-  getOutputAudioDevices
+  getOutputAudioDevices,
+  getNewInputAudioDevices,
+  getNewOutputAudioDevices
 }
 export default connect(mapStateToProps, actions)(Status)
