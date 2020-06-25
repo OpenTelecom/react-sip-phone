@@ -320,6 +320,12 @@ var REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
 var LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 var SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
 var SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT';
+var SET_LOCAL_AUDIO_SESSIONS_PENDING = 'SET_LOCAL_AUDIO_SESSIONS_PENDING';
+var SET_LOCAL_AUDIO_SESSION_SUCCESS = 'SET_LOCAL_AUDIO_SESSION_SUCCESS';
+var SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
+var SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
+var SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
+var SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
 var getInputAudioDevices = function getInputAudioDevices() {
   var inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -348,16 +354,121 @@ var getOutputAudioDevices = function getOutputAudioDevices() {
     payload: outputArray
   };
 };
-var setPrimaryOutput = function setPrimaryOutput(id) {
-  return {
-    type: SET_PRIMARY_OUTPUT,
-    payload: id
+var setPrimaryOutput = function setPrimaryOutput(deviceId, sessions) {
+  return function (dispatch) {
+    if (sessions) {
+      if (Object.keys(sessions).length > 0) {
+        dispatch({
+          type: SET_REMOTE_AUDIO_SESSIONS_PENDING
+        });
+
+        for (var _i = 0, _Object$entries = Object.entries(sessions); _i < _Object$entries.length; _i++) {
+          var _Object$entries$_i = _Object$entries[_i],
+              sessionId = _Object$entries$_i[0],
+              _session = _Object$entries$_i[1];
+
+          if (_session.state === 'Established') {
+            try {
+              (function () {
+                var mediaElement = document.getElementById(sessionId);
+                var remoteStream = new MediaStream();
+
+                _session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(function (receiver) {
+                  if (receiver.track) {
+                    remoteStream.addTrack(receiver.track);
+                  }
+                });
+
+                if (mediaElement) {
+                  mediaElement.setSinkId(deviceId).then(function () {
+                    mediaElement.srcObject = remoteStream;
+                    mediaElement.play();
+                  });
+                } else {
+                  console.log('no media Element');
+                }
+              })();
+            } catch (err) {
+              console.log(err);
+              dispatch({
+                type: SET_REMOTE_AUDIO_SESSION_FAIL
+              });
+              return;
+            }
+          }
+
+          dispatch({
+            type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+          });
+        }
+      }
+    }
+
+    dispatch({
+      type: SET_PRIMARY_OUTPUT,
+      payload: deviceId
+    });
   };
 };
-var setPrimaryInput = function setPrimaryInput(id) {
-  return {
-    type: SET_PRIMARY_INPUT,
-    payload: id
+var setPrimaryInput = function setPrimaryInput(deviceId, sessions) {
+  return function (dispatch) {
+    if (sessions) {
+      if (Object.keys(sessions).length > 0) {
+        dispatch({
+          type: SET_LOCAL_AUDIO_SESSIONS_PENDING
+        });
+
+        var _loop = function _loop() {
+          var _Object$entries2$_i = _Object$entries2[_i2],
+              sessionId = _Object$entries2$_i[0],
+              _session = _Object$entries2$_i[1];
+
+          if (_session.state === 'Established') {
+            try {
+              _session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
+                console.log(sender);
+                console.log(sessionId);
+
+                if (sender.track && sender.track.kind === 'audio') {
+                  var audioDeviceId = deviceId;
+                  navigator.mediaDevices.getUserMedia({
+                    audio: {
+                      deviceId: audioDeviceId
+                    }
+                  }).then(function (stream) {
+                    var audioTrack = stream.getAudioTracks();
+                    sender.replaceTrack(audioTrack[0]);
+                  });
+                }
+              });
+            } catch (err) {
+              console.log(err);
+              dispatch({
+                type: SET_LOCAL_AUDIO_SESSION_FAIL
+              });
+              return {
+                v: void 0
+              };
+            }
+          }
+
+          dispatch({
+            type: SET_LOCAL_AUDIO_SESSION_SUCCESS
+          });
+        };
+
+        for (var _i2 = 0, _Object$entries2 = Object.entries(sessions); _i2 < _Object$entries2.length; _i2++) {
+          var _ret = _loop();
+
+          if (typeof _ret === "object") return _ret.v;
+        }
+      }
+
+      dispatch({
+        type: SET_PRIMARY_INPUT,
+        payload: deviceId
+      });
+    }
   };
 };
 
@@ -1008,9 +1119,9 @@ var Status = /*#__PURE__*/function (_React$Component) {
 
   _proto.handleChangeDevice = function handleChangeDevice(type, id) {
     if (type === 'out') {
-      this.props.setPrimaryOutput(id);
+      this.props.setPrimaryOutput(id, this.props.sessions);
     } else {
-      this.props.setPrimaryInput(id);
+      this.props.setPrimaryInput(id, this.props.sessions);
     }
   };
 
@@ -1087,7 +1198,8 @@ var mapStateToProps$1 = function mapStateToProps(state) {
     inputs: state.device.audioInput,
     outputs: state.device.audioOutput,
     primaryInput: state.device.primaryAudioInput,
-    primaryOutput: state.device.primaryAudioOutput
+    primaryOutput: state.device.primaryAudioOutput,
+    sessions: state.sipSessions.sessions
   };
 };
 

@@ -240,6 +240,12 @@ const REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
 const LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 const SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
 const SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT';
+const SET_LOCAL_AUDIO_SESSIONS_PENDING = 'SET_LOCAL_AUDIO_SESSIONS_PENDING';
+const SET_LOCAL_AUDIO_SESSION_SUCCESS = 'SET_LOCAL_AUDIO_SESSION_SUCCESS';
+const SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
+const SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
+const SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
+const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
 const getInputAudioDevices = () => {
   let inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -268,17 +274,100 @@ const getOutputAudioDevices = () => {
     payload: outputArray
   };
 };
-const setPrimaryOutput = id => {
-  return {
+const setPrimaryOutput = (deviceId, sessions) => dispatch => {
+  if (sessions) {
+    if (Object.keys(sessions).length > 0) {
+      dispatch({
+        type: SET_REMOTE_AUDIO_SESSIONS_PENDING
+      });
+
+      for (let [sessionId, _session] of Object.entries(sessions)) {
+        if (_session.state === 'Established') {
+          try {
+            const mediaElement = document.getElementById(sessionId);
+            const remoteStream = new MediaStream();
+
+            _session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(receiver => {
+              if (receiver.track) {
+                remoteStream.addTrack(receiver.track);
+              }
+            });
+
+            if (mediaElement) {
+              mediaElement.setSinkId(deviceId).then(() => {
+                mediaElement.srcObject = remoteStream;
+                mediaElement.play();
+              });
+            } else {
+              console.log('no media Element');
+            }
+          } catch (err) {
+            console.log(err);
+            dispatch({
+              type: SET_REMOTE_AUDIO_SESSION_FAIL
+            });
+            return;
+          }
+        }
+
+        dispatch({
+          type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+        });
+      }
+    }
+  }
+
+  dispatch({
     type: SET_PRIMARY_OUTPUT,
-    payload: id
-  };
+    payload: deviceId
+  });
 };
-const setPrimaryInput = id => {
-  return {
-    type: SET_PRIMARY_INPUT,
-    payload: id
-  };
+const setPrimaryInput = (deviceId, sessions) => dispatch => {
+  if (sessions) {
+    if (Object.keys(sessions).length > 0) {
+      dispatch({
+        type: SET_LOCAL_AUDIO_SESSIONS_PENDING
+      });
+
+      for (let [sessionId, _session] of Object.entries(sessions)) {
+        if (_session.state === 'Established') {
+          try {
+            _session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
+              console.log(sender);
+              console.log(sessionId);
+
+              if (sender.track && sender.track.kind === 'audio') {
+                let audioDeviceId = deviceId;
+                navigator.mediaDevices.getUserMedia({
+                  audio: {
+                    deviceId: audioDeviceId
+                  }
+                }).then(function (stream) {
+                  let audioTrack = stream.getAudioTracks();
+                  sender.replaceTrack(audioTrack[0]);
+                });
+              }
+            });
+          } catch (err) {
+            console.log(err);
+            dispatch({
+              type: SET_LOCAL_AUDIO_SESSION_FAIL
+            });
+            return;
+          }
+        }
+
+        dispatch({
+          type: SET_LOCAL_AUDIO_SESSION_SUCCESS
+        });
+      }
+    }
+
+    dispatch({
+      type: SET_PRIMARY_INPUT,
+      payload: deviceId
+    });
+  }
 };
 
 const setRemoteAudio = session => {
@@ -896,9 +985,9 @@ class Status extends Component {
 
   handleChangeDevice(type, id) {
     if (type === 'out') {
-      this.props.setPrimaryOutput(id);
+      this.props.setPrimaryOutput(id, this.props.sessions);
     } else {
-      this.props.setPrimaryInput(id);
+      this.props.setPrimaryInput(id, this.props.sessions);
     }
   }
 
@@ -963,7 +1052,8 @@ const mapStateToProps$1 = state => ({
   inputs: state.device.audioInput,
   outputs: state.device.audioOutput,
   primaryInput: state.device.primaryAudioInput,
-  primaryOutput: state.device.primaryAudioOutput
+  primaryOutput: state.device.primaryAudioOutput,
+  sessions: state.sipSessions.sessions
 });
 
 const actions$1 = {
