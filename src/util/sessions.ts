@@ -34,14 +34,12 @@ export class SessionStateHandler {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
-        toneManager.stopAll()
         cleanupMedia(this.session.id)
         break
       case SessionState.Terminated:
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
-        toneManager.stopAll()
         setTimeout(() => {
           phoneStore.dispatch({
             type: CLOSE_SESSION,
@@ -55,8 +53,6 @@ export class SessionStateHandler {
     }
   }
 }
-
-
 
 export const getFullNumber = (number: string) => {
   if (number.length < 10) {
