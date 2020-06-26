@@ -317,6 +317,7 @@ var holdAll = function holdAll(id) {
 var AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
 var AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED';
 var REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
+var REMOTE_AUDIO_FAIL = 'REMOTE_AUDIO_FAIL';
 var LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 var SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
 var SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT';
@@ -478,18 +479,24 @@ var setRemoteAudio = function setRemoteAudio(session) {
   var mediaElement = document.getElementById(session.id);
   var remoteStream = new MediaStream();
   session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(function (receiver) {
-    if (receiver.track) {
+    if (receiver.track.kind === 'audio') {
       remoteStream.addTrack(receiver.track);
     }
   });
 
-  if (mediaElement) {
+  if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
+    console.log('safari');
+    mediaElement.srcObject = remoteStream;
+    mediaElement.play();
+  } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
     mediaElement.setSinkId(deviceId).then(function () {
       mediaElement.srcObject = remoteStream;
       mediaElement.play();
     });
   } else {
-    console.log('no media Element');
+    phoneStore.dispatch({
+      type: REMOTE_AUDIO_FAIL
+    });
   }
 
   phoneStore.dispatch({
@@ -500,8 +507,6 @@ var setLocalAudio = function setLocalAudio(session) {
   var state = phoneStore.getState();
   var deviceId = state.device.primaryAudioInput;
   session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
-    console.log(sender);
-
     if (sender.track && sender.track.kind === 'audio') {
       var audioDeviceId = deviceId;
       navigator.mediaDevices.getUserMedia({
@@ -606,78 +611,105 @@ var callDisconnect = function callDisconnect(deviceId) {
   }
 };
 
-var TonePlayer = function TonePlayer() {
-  var _this = this;
+var TonePlayer = /*#__PURE__*/function () {
+  function TonePlayer() {
+    var _this = this;
 
-  this.ringtone = function (deviceId) {
+    this.ringtone = function (deviceId) {
+      var mediaElement = document.getElementById('ringtone');
+
+      if (deviceId !== 'default') {
+        if (mediaElement) {
+          mediaElement.setSinkId(deviceId).then(function () {
+            mediaElement.play();
+          });
+        } else {
+          console.log('no media Element');
+        }
+      } else {
+        mediaElement.play();
+      }
+    };
+
+    this.ringback = function (deviceId) {
+      var dest = Tone.context.createMediaStreamDestination();
+      console.log(dest);
+      Synth.set({
+        oscillator: {
+          type: 'sine'
+        },
+        envelope: {
+          attack: 0.02,
+          decay: 0.1,
+          sustain: 0.2,
+          release: 0.02
+        }
+      }).connect(dest);
+
+      if (deviceId !== 'default') {
+        var mediaElement = document.getElementById('tone');
+
+        if (mediaElement) {
+          var _dest = Tone.context.createMediaStreamDestination();
+
+          Synth.connect(_dest);
+          mediaElement.setSinkId(deviceId).then(function () {
+            mediaElement.srcObject = _dest.stream;
+            mediaElement.play();
+          });
+        }
+      } else {
+        Synth.toMaster();
+      }
+
+      _this.loop = new Tone.Loop(function (time) {
+        Synth.triggerAttack([440, 480]);
+        Synth.triggerRelease([440, 480], time + 2);
+      }, 6);
+
+      _this.loop.start(0);
+
+      Tone.Transport.start();
+    };
+  }
+
+  var _proto = TonePlayer.prototype;
+
+  _proto.stop = function stop() {
+    if (this.loop) {
+      try {
+        this.loop.stop(0);
+      } catch (_unused) {
+        console.log('no loop to stop');
+      }
+    }
+
+    if (Tone.Transport) {
+      try {
+        Tone.Transport.stop();
+        Synth.triggerRelease([440, 480]);
+      } catch (_unused2) {
+        console.log('no tone to stop');
+      }
+    }
+
     var mediaElement = document.getElementById('ringtone');
 
-    if (deviceId !== 'default') {
-      if (mediaElement) {
-        mediaElement.setSinkId(deviceId).then(function () {
-          mediaElement.play();
-        });
-      } else {
-        console.log('no media Element');
-      }
-    } else {
-      mediaElement.play();
-    }
-  };
+    if (mediaElement) {
+      var promise = mediaElement.pause();
 
-  this.ringback = function (deviceId) {
-    var dest = Tone.context.createMediaStreamDestination();
-    console.log(dest);
-    Synth.set({
-      oscillator: {
-        type: 'sine'
-      },
-      envelope: {
-        attack: 0.02,
-        decay: 0.1,
-        sustain: 0.2,
-        release: 0.02
-      }
-    }).connect(dest);
-
-    if (deviceId !== 'default') {
-      var mediaElement = document.getElementById('tone');
-
-      if (mediaElement) {
-        var _dest = Tone.context.createMediaStreamDestination();
-
-        Synth.connect(_dest);
-        mediaElement.setSinkId(deviceId).then(function () {
-          mediaElement.srcObject = _dest.stream;
-          mediaElement.play();
+      if (promise !== undefined) {
+        promise["catch"](function (error) {
+          console.log(error);
+        }).then(function () {
+          console.log('ringtone stopped');
         });
       }
-    } else {
-      Synth.toMaster();
-    }
-
-    _this.loop = new Tone.Loop(function (time) {
-      Synth.triggerAttack([440, 480]);
-      Synth.triggerRelease([440, 480], time + 2);
-    }, 6);
-
-    _this.loop.start(0);
-
-    Tone.Transport.start();
-  };
-
-  this.stop = function () {
-    try {
-      _this.loop.stop(0);
-
-      Tone.Transport.stop();
-      Synth.triggerRelease([440, 480]);
-    } catch (_unused) {
-      var mediaElement = document.getElementById('ringtone');
-      mediaElement.pause();
     }
   };
-};
+
+  return TonePlayer;
+}();
 
 var ToneManager = /*#__PURE__*/function () {
   function ToneManager() {}
@@ -740,7 +772,6 @@ var SessionStateHandler = function SessionStateHandler(session) {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         });
-        toneManager.stopAll();
         cleanupMedia(_this.session.id);
         break;
 
@@ -748,7 +779,6 @@ var SessionStateHandler = function SessionStateHandler(session) {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         });
-        toneManager.stopAll();
         setTimeout(function () {
           phoneStore.dispatch({
             type: CLOSE_SESSION,
@@ -1662,11 +1692,14 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
 
             _this2.props.stateChange(newState, outgoingSession.id);
 
+            setLocalAudio(outgoingSession);
+            setRemoteAudio(outgoingSession);
             break;
 
           case sip_js.SessionState.Terminating:
             _this2.props.stateChange(newState, outgoingSession.id);
 
+            cleanupMedia(outgoingSession.id);
             break;
 
           case sip_js.SessionState.Terminated:
@@ -1993,15 +2026,20 @@ var Incoming = /*#__PURE__*/function (_React$Component) {
   var _proto = Incoming.prototype;
 
   _proto.componentDidMount = function componentDidMount() {
-    console.log('this is the session');
-    console.log(this.props.session);
     toneManager.stopAll();
     toneManager.playRing('ringtone');
   };
 
   _proto.handleAccept = function handleAccept() {
     toneManager.stopAll();
-    this.props.session.accept();
+    this.props.session.accept({
+      sessionDescriptionHandlerOptions: {
+        constraints: {
+          audio: true,
+          video: false
+        }
+      }
+    });
     this.props.acceptCall(this.props.session);
   };
 
@@ -2038,8 +2076,7 @@ var Incoming = /*#__PURE__*/function (_React$Component) {
       src: ring,
       type: "audio/mpeg"
     })), React.createElement("audio", {
-      id: this.props.session.id,
-      autoPlay: true
+      id: this.props.session.id
     }));
   };
 

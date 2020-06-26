@@ -237,6 +237,7 @@ const holdAll = id => {
 const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
 const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED';
 const REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
+const REMOTE_AUDIO_FAIL = 'REMOTE_AUDIO_FAIL';
 const LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 const SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
 const SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT';
@@ -376,18 +377,24 @@ const setRemoteAudio = session => {
   const mediaElement = document.getElementById(session.id);
   const remoteStream = new MediaStream();
   session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(receiver => {
-    if (receiver.track) {
+    if (receiver.track.kind === 'audio') {
       remoteStream.addTrack(receiver.track);
     }
   });
 
-  if (mediaElement) {
+  if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
+    console.log('safari');
+    mediaElement.srcObject = remoteStream;
+    mediaElement.play();
+  } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
     mediaElement.setSinkId(deviceId).then(() => {
       mediaElement.srcObject = remoteStream;
       mediaElement.play();
     });
   } else {
-    console.log('no media Element');
+    phoneStore.dispatch({
+      type: REMOTE_AUDIO_FAIL
+    });
   }
 
   phoneStore.dispatch({
@@ -398,8 +405,6 @@ const setLocalAudio = session => {
   const state = phoneStore.getState();
   const deviceId = state.device.primaryAudioInput;
   session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
-    console.log(sender);
-
     if (sender.track && sender.track.kind === 'audio') {
       let audioDeviceId = deviceId;
       navigator.mediaDevices.getUserMedia({
@@ -560,17 +565,39 @@ class TonePlayer {
       this.loop.start(0);
       Tone.Transport.start();
     };
+  }
 
-    this.stop = () => {
+  stop() {
+    if (this.loop) {
       try {
         this.loop.stop(0);
+      } catch {
+        console.log('no loop to stop');
+      }
+    }
+
+    if (Tone.Transport) {
+      try {
         Tone.Transport.stop();
         Synth.triggerRelease([440, 480]);
       } catch {
-        const mediaElement = document.getElementById('ringtone');
-        mediaElement.pause();
+        console.log('no tone to stop');
       }
-    };
+    }
+
+    const mediaElement = document.getElementById('ringtone');
+
+    if (mediaElement) {
+      const promise = mediaElement.pause();
+
+      if (promise !== undefined) {
+        promise.catch(error => {
+          console.log(error);
+        }).then(() => {
+          console.log('ringtone stopped');
+        });
+      }
+    }
   }
 
 }
@@ -632,7 +659,6 @@ class SessionStateHandler {
           phoneStore.dispatch({
             type: SIPSESSION_STATECHANGE
           });
-          toneManager.stopAll();
           cleanupMedia(this.session.id);
           break;
 
@@ -640,7 +666,6 @@ class SessionStateHandler {
           phoneStore.dispatch({
             type: SIPSESSION_STATECHANGE
           });
-          toneManager.stopAll();
           setTimeout(() => {
             phoneStore.dispatch({
               type: CLOSE_SESSION,
@@ -1427,10 +1452,13 @@ class AttendedTransfer extends Component {
               attendedTransferSessionPending: false
             });
             this.props.stateChange(newState, outgoingSession.id);
+            setLocalAudio(outgoingSession);
+            setRemoteAudio(outgoingSession);
             break;
 
           case SessionState.Terminating:
             this.props.stateChange(newState, outgoingSession.id);
+            cleanupMedia(outgoingSession.id);
             break;
 
           case SessionState.Terminated:
@@ -1714,15 +1742,20 @@ const ring = require('./assets/ring.mp3');
 
 class Incoming extends Component {
   componentDidMount() {
-    console.log('this is the session');
-    console.log(this.props.session);
     toneManager.stopAll();
     toneManager.playRing('ringtone');
   }
 
   handleAccept() {
     toneManager.stopAll();
-    this.props.session.accept();
+    this.props.session.accept({
+      sessionDescriptionHandlerOptions: {
+        constraints: {
+          audio: true,
+          video: false
+        }
+      }
+    });
     this.props.acceptCall(this.props.session);
   }
 
@@ -1753,8 +1786,7 @@ class Incoming extends Component {
       src: ring,
       type: "audio/mpeg"
     })), createElement("audio", {
-      id: this.props.session.id,
-      autoPlay: true
+      id: this.props.session.id
     }));
   }
 
