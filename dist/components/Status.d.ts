@@ -10,6 +10,7 @@ interface Props {
     getInputAudioDevices: Function;
     getOutputAudioDevices: Function;
     sessions: any;
+    sinkIdAllowed: boolean;
 }
 declare class Status extends React.Component<Props> {
     state: {
