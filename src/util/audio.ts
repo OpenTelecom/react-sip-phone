@@ -5,6 +5,7 @@ import {
   REMOTE_AUDIO_CONNECTED,
   REMOTE_AUDIO_FAIL,
   LOCAL_AUDIO_CONNECTED,
+  AUDIO_SINKID_NOT_ALLOWED
 } from '../actions/device'
 
 //adds track from getReceiver stream to <audio id={sessionId}> in Phone.tsx
@@ -27,6 +28,9 @@ export const setRemoteAudio = (session: Session) => {
   //@ts-ignore
   if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
     console.log('safari')
+    phoneStore.dispatch({
+      type: AUDIO_SINKID_NOT_ALLOWED
+    })
     //@ts-ignore
     mediaElement.srcObject = remoteStream
     //@ts-ignore

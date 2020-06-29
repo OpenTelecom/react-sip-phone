@@ -247,6 +247,7 @@ const SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
 const SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
 const SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
 const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
+const AUDIO_SINKID_NOT_ALLOWED = 'AUDIO_SINKID_NOT_ALLOWED';
 const getInputAudioDevices = () => {
   let inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -323,7 +324,7 @@ const setPrimaryOutput = (deviceId, sessions) => dispatch => {
     payload: deviceId
   });
 };
-const setPrimaryInput = (deviceId, sessions) => dispatch => {
+const setPrimaryInput = (deviceId, sessions, sinkIdAllowed) => dispatch => {
   if (sessions) {
     if (Object.keys(sessions).length > 0) {
       dispatch({
@@ -334,7 +335,6 @@ const setPrimaryInput = (deviceId, sessions) => dispatch => {
         if (_session.state === 'Established') {
           try {
             _session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
-              console.log(sender);
               console.log(sessionId);
 
               if (sender.track && sender.track.kind === 'audio') {
@@ -363,11 +363,49 @@ const setPrimaryInput = (deviceId, sessions) => dispatch => {
         });
       }
     }
+  }
 
-    dispatch({
-      type: SET_PRIMARY_INPUT,
-      payload: deviceId
-    });
+  dispatch({
+    type: SET_PRIMARY_INPUT,
+    payload: deviceId
+  });
+
+  if (sinkIdAllowed === false) {
+    if (sessions) {
+      if (Object.keys(sessions).length > 0) {
+        for (let [sessionId, _session] of Object.entries(sessions)) {
+          if (_session.state === 'Established') {
+            try {
+              const mediaElement = document.getElementById(sessionId);
+              const remoteStream = new MediaStream();
+
+              _session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(receiver => {
+                if (receiver.track) {
+                  remoteStream.addTrack(receiver.track);
+                }
+              });
+
+              if (mediaElement) {
+                mediaElement.srcObject = remoteStream;
+                mediaElement.play();
+              } else {
+                console.log('no media Element');
+              }
+            } catch (err) {
+              console.log(err);
+              dispatch({
+                type: SET_REMOTE_AUDIO_SESSION_FAIL
+              });
+              return;
+            }
+          }
+
+          dispatch({
+            type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+          });
+        }
+      }
+    }
   }
 };
 
@@ -384,6 +422,9 @@ const setRemoteAudio = session => {
 
   if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
     console.log('safari');
+    phoneStore.dispatch({
+      type: AUDIO_SINKID_NOT_ALLOWED
+    });
     mediaElement.srcObject = remoteStream;
     mediaElement.play();
   } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
@@ -1012,7 +1053,7 @@ class Status extends Component {
     if (type === 'out') {
       this.props.setPrimaryOutput(id, this.props.sessions);
     } else {
-      this.props.setPrimaryInput(id, this.props.sessions);
+      this.props.setPrimaryInput(id, this.props.sessions, this.props.sinkIdAllowed);
     }
   }
 
@@ -1078,7 +1119,8 @@ const mapStateToProps$1 = state => ({
   outputs: state.device.audioOutput,
   primaryInput: state.device.primaryAudioInput,
   primaryOutput: state.device.primaryAudioOutput,
-  sessions: state.sipSessions.sessions
+  sessions: state.sipSessions.sessions,
+  sinkIdAllowed: state.device.sinkId
 });
 
 const actions$1 = {
@@ -2010,7 +2052,8 @@ const device = (state = {
   audioInput: [],
   audioOutput: [],
   primaryAudioOutput: 'default',
-  primaryAudioInput: 'default'
+  primaryAudioInput: 'default',
+  sinkId: true
 }, action) => {
   const {
     type,
@@ -2036,6 +2079,11 @@ const device = (state = {
     case SET_PRIMARY_INPUT:
       return { ...state,
         primaryAudioInput: payload
+      };
+
+    case AUDIO_SINKID_NOT_ALLOWED:
+      return { ...state,
+        sinkId: false
       };
 
     default:

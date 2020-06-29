@@ -13,6 +13,7 @@ export declare const SET_LOCAL_AUDIO_SESSION_FAIL = "SET_LOCAL_AUDIO_SESSION_FAI
 export declare const SET_REMOTE_AUDIO_SESSIONS_PENDING = "SET_REMOTE_AUDIO_SESSIONS_PENDING";
 export declare const SET_REMOTE_AUDIO_SESSION_SUCCESS = "SET_REMOTE_AUDIO_SESSION_SUCCESS";
 export declare const SET_REMOTE_AUDIO_SESSION_FAIL = "SET_REMOTE_AUDIO_SESSION_FAIL";
+export declare const AUDIO_SINKID_NOT_ALLOWED = "AUDIO_SINKID_NOT_ALLOWED";
 export declare const getInputAudioDevices: () => {
     type: string;
     payload: Object[];
@@ -22,4 +23,5 @@ export declare const getOutputAudioDevices: () => {
     payload: Object[];
 };
 export declare const setPrimaryOutput: (deviceId: string, sessions: any) => (dispatch: Dispatch) => void;
-export declare const setPrimaryInput: (deviceId: string, sessions: any) => (dispatch: Dispatch) => void;
+export declare const setPrimaryInput: (deviceId: string, sessions: any, sinkIdAllowed: boolean) => (dispatch: Dispatch) => void;
+export declare const sinkIdAllowed: () => (dispatch: Dispatch) => void;

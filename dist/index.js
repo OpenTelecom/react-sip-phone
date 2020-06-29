@@ -327,6 +327,7 @@ var SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
 var SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
 var SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
 var SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
+var AUDIO_SINKID_NOT_ALLOWED = 'AUDIO_SINKID_NOT_ALLOWED';
 var getInputAudioDevices = function getInputAudioDevices() {
   var inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -411,7 +412,7 @@ var setPrimaryOutput = function setPrimaryOutput(deviceId, sessions) {
     });
   };
 };
-var setPrimaryInput = function setPrimaryInput(deviceId, sessions) {
+var setPrimaryInput = function setPrimaryInput(deviceId, sessions, sinkIdAllowed) {
   return function (dispatch) {
     if (sessions) {
       if (Object.keys(sessions).length > 0) {
@@ -427,7 +428,6 @@ var setPrimaryInput = function setPrimaryInput(deviceId, sessions) {
           if (_session.state === 'Established') {
             try {
               _session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
-                console.log(sender);
                 console.log(sessionId);
 
                 if (sender.track && sender.track.kind === 'audio') {
@@ -464,11 +464,55 @@ var setPrimaryInput = function setPrimaryInput(deviceId, sessions) {
           if (typeof _ret === "object") return _ret.v;
         }
       }
+    }
 
-      dispatch({
-        type: SET_PRIMARY_INPUT,
-        payload: deviceId
-      });
+    dispatch({
+      type: SET_PRIMARY_INPUT,
+      payload: deviceId
+    });
+
+    if (sinkIdAllowed === false) {
+      if (sessions) {
+        if (Object.keys(sessions).length > 0) {
+          for (var _i3 = 0, _Object$entries3 = Object.entries(sessions); _i3 < _Object$entries3.length; _i3++) {
+            var _Object$entries3$_i = _Object$entries3[_i3],
+                sessionId = _Object$entries3$_i[0],
+                _session = _Object$entries3$_i[1];
+
+            if (_session.state === 'Established') {
+              try {
+                (function () {
+                  var mediaElement = document.getElementById(sessionId);
+                  var remoteStream = new MediaStream();
+
+                  _session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(function (receiver) {
+                    if (receiver.track) {
+                      remoteStream.addTrack(receiver.track);
+                    }
+                  });
+
+                  if (mediaElement) {
+                    mediaElement.srcObject = remoteStream;
+                    mediaElement.play();
+                  } else {
+                    console.log('no media Element');
+                  }
+                })();
+              } catch (err) {
+                console.log(err);
+                dispatch({
+                  type: SET_REMOTE_AUDIO_SESSION_FAIL
+                });
+                return;
+              }
+            }
+
+            dispatch({
+              type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+            });
+          }
+        }
+      }
     }
   };
 };
@@ -486,6 +530,9 @@ var setRemoteAudio = function setRemoteAudio(session) {
 
   if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
     console.log('safari');
+    phoneStore.dispatch({
+      type: AUDIO_SINKID_NOT_ALLOWED
+    });
     mediaElement.srcObject = remoteStream;
     mediaElement.play();
   } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
@@ -1151,7 +1198,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
     if (type === 'out') {
       this.props.setPrimaryOutput(id, this.props.sessions);
     } else {
-      this.props.setPrimaryInput(id, this.props.sessions);
+      this.props.setPrimaryInput(id, this.props.sessions, this.props.sinkIdAllowed);
     }
   };
 
@@ -1229,7 +1276,8 @@ var mapStateToProps$1 = function mapStateToProps(state) {
     outputs: state.device.audioOutput,
     primaryInput: state.device.primaryAudioInput,
     primaryOutput: state.device.primaryAudioOutput,
-    sessions: state.sipSessions.sessions
+    sessions: state.sipSessions.sessions,
+    sinkIdAllowed: state.device.sinkId
   };
 };
 
@@ -2345,7 +2393,8 @@ var device = function device(state, action) {
       audioInput: [],
       audioOutput: [],
       primaryAudioOutput: 'default',
-      primaryAudioInput: 'default'
+      primaryAudioInput: 'default',
+      sinkId: true
     };
   }
 
@@ -2371,6 +2420,11 @@ var device = function device(state, action) {
     case SET_PRIMARY_INPUT:
       return _extends(_extends({}, state), {}, {
         primaryAudioInput: payload
+      });
+
+    case AUDIO_SINKID_NOT_ALLOWED:
+      return _extends(_extends({}, state), {}, {
+        sinkId: false
       });
 
     default:
