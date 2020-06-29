@@ -158,8 +158,9 @@ export const setPrimaryInput = (deviceId: string, sessions: any, sinkIdAllowed: 
     type: SET_PRIMARY_INPUT,
     payload: deviceId
   })
+
+  //change remote audio for safari sessions  
   if (sinkIdAllowed === false) {
-    //change remote audio for safari sessions  
     if (sessions) {
       if (Object.keys(sessions).length > 0) {
         for (let [sessionId, _session] of Object.entries(sessions)) {
@@ -198,9 +199,7 @@ export const setPrimaryInput = (deviceId: string, sessions: any, sinkIdAllowed: 
         }
       }
     }
-
   }
-
 }
 
 export const sinkIdAllowed = () => (dispatch: Dispatch) => {

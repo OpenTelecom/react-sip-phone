@@ -1213,7 +1213,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
       className: styles$1.container
     }, React.createElement("div", {
       className: styles$1.userString
-    }, props.name), React.createElement("div", {
+    }, props.name), props.phoneConfig.disabledFeatures.includes('settings') ? null : React.createElement("div", {
       id: styles$1.settingsButton,
       className: state.settingsMenu ? styles$1.on : '',
       onClick: function onClick() {
@@ -2484,7 +2484,8 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
       height = _ref$height === void 0 ? 600 : _ref$height,
       _ref$phoneConfig = _ref.phoneConfig,
       phoneConfig = _ref$phoneConfig === void 0 ? {
-    disabledButtons: []
+    disabledButtons: [],
+    disabledFeatures: []
   } : _ref$phoneConfig,
       sipConfig = _ref.sipConfig,
       sipCredentials = _ref.sipCredentials,
@@ -2506,8 +2507,9 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
       height: (height < 600 ? 600 : height) + "px"
     })
   }, React.createElement(Status$1, {
+    phoneConfig: phoneConfig,
     name: name
-  }), React.createElement(D, null), React.createElement(PS, {
+  }), phoneConfig.disabledFeatures.includes('dialstring') ? null : React.createElement(D, null), React.createElement(PS, {
     phoneConfig: phoneConfig
   }), React.createElement("audio", {
     id: 'tone',

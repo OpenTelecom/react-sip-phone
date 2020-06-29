@@ -1068,7 +1068,7 @@ class Status extends Component {
       className: styles$1.container
     }, createElement("div", {
       className: styles$1.userString
-    }, props.name), createElement("div", {
+    }, props.name), props.phoneConfig.disabledFeatures.includes('settings') ? null : createElement("div", {
       id: styles$1.settingsButton,
       className: state.settingsMenu ? styles$1.on : '',
       onClick: () => this.setState({
@@ -2136,7 +2136,8 @@ const ReactSipPhone = ({
   width: _width = 300,
   height: _height = 600,
   phoneConfig: _phoneConfig = {
-    disabledButtons: []
+    disabledButtons: [],
+    disabledFeatures: []
   },
   sipConfig,
   sipCredentials,
@@ -2158,8 +2159,9 @@ const ReactSipPhone = ({
       height: `${_height < 600 ? 600 : _height}px`
     }
   }, createElement(Status$1, {
+    phoneConfig: _phoneConfig,
     name: name
-  }), createElement(D, null), createElement(PS, {
+  }), _phoneConfig.disabledFeatures.includes('dialstring') ? null : createElement(D, null), createElement(PS, {
     phoneConfig: _phoneConfig
   }), createElement("audio", {
     id: 'tone',
