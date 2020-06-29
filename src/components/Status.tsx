@@ -6,8 +6,10 @@ import Select from 'react-select';
 import settingsIcon from '../assets/settings-24px.svg'
 import micIcon from '../assets/mic-24px.svg'
 import soundIcon from '../assets/volume_up-24px.svg'
+import { PhoneConfig } from '../models'
 
 interface Props {
+  phoneConfig: PhoneConfig
   name: string
   inputs: any
   outputs: any
@@ -50,13 +52,15 @@ class Status extends React.Component<Props> {
       <React.Fragment>
         <div className={styles.container}>
           <div className={styles.userString} >{props.name}</div>
-          <div
-            id={styles.settingsButton}
-            className={state.settingsMenu ? styles.on : ''}
-            onClick={() => this.setState({ settingsMenu: !state.settingsMenu })}
-          >
-            <img src={settingsIcon} />
-          </div>
+          {props.phoneConfig.disabledFeatures.includes('settings') ? null :
+            <div
+              id={styles.settingsButton}
+              className={state.settingsMenu ? styles.on : ''}
+              onClick={() => this.setState({ settingsMenu: !state.settingsMenu })}
+            >
+              <img src={settingsIcon} />
+            </div>
+          }
         </div>
         <div
           id={styles.settingsMenu}

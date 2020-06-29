@@ -9,6 +9,9 @@ const password = urlParams.get('password')
 const websocket = urlParams.get('websocket')
 const name = urlParams.get('name')
 
+const disabledButtons = urlParams.get('buttons')
+const disabledFeatures = urlParams.get('features')
+
 const outsideComponentDial = urlParams.get('dial')
 
 const App = () => {
@@ -32,7 +35,13 @@ const App = () => {
         }}
         sipConfig={{
           websocket: websocket || '',
-          defaultCountryCode: '1'
+          defaultCountryCode: '1',
+          dialstring: true || false
+
+        }}
+        phoneConfig={{
+          disabledButtons: disabledButtons || '',
+          disabledFeatures: disabledFeatures || ''
         }}
         width={0}
       />
