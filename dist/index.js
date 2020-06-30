@@ -1223,7 +1223,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
       }
     }, React.createElement("img", {
       src: settingsIcon
-    }))), React.createElement("div", {
+    }))), props.phoneConfig.disabledFeatures.includes('settings') ? null : React.createElement("div", {
       id: styles$1.settingsMenu,
       className: state.settingsMenu ? '' : styles$1.closed
     }, React.createElement("hr", {
@@ -1913,6 +1913,14 @@ var Phone = /*#__PURE__*/function (_React$Component) {
   }
 
   var _proto = Phone.prototype;
+
+  _proto.componentDidMount = function componentDidMount() {
+    if (this.props.phoneConfig.disabledButtons.includes('dialpadopen')) {
+      this.setState({
+        dialpadOpen: true
+      });
+    }
+  };
 
   _proto.componentDidUpdate = function componentDidUpdate(newProps) {
     if (newProps.session.state === sip_js.SessionState.Established && !this.state.counterStarted) {

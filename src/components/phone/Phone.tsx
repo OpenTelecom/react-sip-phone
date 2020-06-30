@@ -39,6 +39,12 @@ class Phone extends React.Component<Props> {
     this.attendedProcess = this.attendedProcess.bind(this);
   }
 
+  componentDidMount() {
+    if (this.props.phoneConfig.disabledButtons.includes('dialpadopen')) {
+      this.setState({ dialpadOpen: true })
+    }
+  }
+
   componentDidUpdate(newProps: Props) {
     if (newProps.session.state === SessionState.Established && !this.state.counterStarted) {
       this.handleCounter()
@@ -97,9 +103,9 @@ class Phone extends React.Component<Props> {
           // @ts-ignore
           `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
         </div>
-        <br/>
+        <br />
         <div>{statusMask(props.session.state)}</div>
-        <br/>
+        <br />
         {(this.props.session.state === SessionState.Initial ||
           this.props.session.state === SessionState.Establishing) ?
           null : <div>{getDurationDisplay(this.state.duration)}</div>

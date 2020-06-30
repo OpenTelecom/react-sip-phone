@@ -1076,7 +1076,7 @@ class Status extends Component {
       })
     }, createElement("img", {
       src: settingsIcon
-    }))), createElement("div", {
+    }))), props.phoneConfig.disabledFeatures.includes('settings') ? null : createElement("div", {
       id: styles$1.settingsMenu,
       className: state.settingsMenu ? '' : styles$1.closed
     }, createElement("hr", {
@@ -1647,6 +1647,14 @@ class Phone extends Component {
       counterStarted: false
     };
     this.attendedProcess = this.attendedProcess.bind(this);
+  }
+
+  componentDidMount() {
+    if (this.props.phoneConfig.disabledButtons.includes('dialpadopen')) {
+      this.setState({
+        dialpadOpen: true
+      });
+    }
   }
 
   componentDidUpdate(newProps) {
