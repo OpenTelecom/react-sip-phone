@@ -99,11 +99,13 @@ class Phone extends React.Component<Props> {
     return (
       <React.Fragment>
         <hr style={{ width: '100%' }} />
-        <div>{
-          // @ts-ignore
-          `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
-        </div>
-        <br />
+        {props.phoneConfig.disabledFeatures.includes('remoteid') ? null :
+          <div>{
+            // @ts-ignore
+            `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
+            <br />
+
+          </div>}
         <div>{statusMask(props.session.state)}</div>
         <br />
         {(this.props.session.state === SessionState.Initial ||

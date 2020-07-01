@@ -1719,7 +1719,7 @@ class Phone extends Component {
       style: {
         width: '100%'
       }
-    }), createElement("div", null, `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`), createElement("br", null), createElement("div", null, statusMask(props.session.state)), createElement("br", null), this.props.session.state === SessionState.Initial || this.props.session.state === SessionState.Establishing ? null : createElement("div", null, getDurationDisplay(this.state.duration)), state.ended ? null : createElement(Fragment, null, createElement(Dialpad$1, {
+    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : createElement("div", null, `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`, createElement("br", null)), createElement("div", null, statusMask(props.session.state)), createElement("br", null), this.props.session.state === SessionState.Initial || this.props.session.state === SessionState.Establishing ? null : createElement("div", null, getDurationDisplay(this.state.duration)), state.ended ? null : createElement(Fragment, null, createElement(Dialpad$1, {
       open: state.dialpadOpen,
       session: props.session
     }), createElement("div", {

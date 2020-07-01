@@ -1990,7 +1990,7 @@ var Phone = /*#__PURE__*/function (_React$Component) {
       style: {
         width: '100%'
       }
-    }), React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName), React.createElement("br", null), React.createElement("div", null, statusMask(props.session.state)), React.createElement("br", null), this.props.session.state === sip_js.SessionState.Initial || this.props.session.state === sip_js.SessionState.Establishing ? null : React.createElement("div", null, getDurationDisplay(this.state.duration)), state.ended ? null : React.createElement(React.Fragment, null, React.createElement(Dialpad$1, {
+    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, React.createElement("br", null)), React.createElement("div", null, statusMask(props.session.state)), React.createElement("br", null), this.props.session.state === sip_js.SessionState.Initial || this.props.session.state === sip_js.SessionState.Establishing ? null : React.createElement("div", null, getDurationDisplay(this.state.duration)), state.ended ? null : React.createElement(React.Fragment, null, React.createElement(Dialpad$1, {
       open: state.dialpadOpen,
       session: props.session
     }), React.createElement("div", {
