@@ -27,7 +27,7 @@ const sipSessions = (
       return {
         ...state,
         sessions: { ...state.sessions, [payload.id]: payload },
-        incomingCalls: [ ...state.incomingCalls, payload.id]
+        incomingCalls: [...state.incomingCalls, payload.id]
       }
     case NEW_SESSION:
       console.log('New session added')

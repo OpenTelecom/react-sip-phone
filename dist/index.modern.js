@@ -237,6 +237,7 @@ const holdAll = id => {
 const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
 const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED';
 const REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
+const REMOTE_AUDIO_FAIL = 'REMOTE_AUDIO_FAIL';
 const LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 const SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
 const SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT';
@@ -246,6 +247,7 @@ const SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
 const SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
 const SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
 const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
+const AUDIO_SINKID_NOT_ALLOWED = 'AUDIO_SINKID_NOT_ALLOWED';
 const getInputAudioDevices = () => {
   let inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -322,7 +324,7 @@ const setPrimaryOutput = (deviceId, sessions) => dispatch => {
     payload: deviceId
   });
 };
-const setPrimaryInput = (deviceId, sessions) => dispatch => {
+const setPrimaryInput = (deviceId, sessions, sinkIdAllowed) => dispatch => {
   if (sessions) {
     if (Object.keys(sessions).length > 0) {
       dispatch({
@@ -333,7 +335,6 @@ const setPrimaryInput = (deviceId, sessions) => dispatch => {
         if (_session.state === 'Established') {
           try {
             _session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
-              console.log(sender);
               console.log(sessionId);
 
               if (sender.track && sender.track.kind === 'audio') {
@@ -362,11 +363,49 @@ const setPrimaryInput = (deviceId, sessions) => dispatch => {
         });
       }
     }
+  }
 
-    dispatch({
-      type: SET_PRIMARY_INPUT,
-      payload: deviceId
-    });
+  dispatch({
+    type: SET_PRIMARY_INPUT,
+    payload: deviceId
+  });
+
+  if (sinkIdAllowed === false) {
+    if (sessions) {
+      if (Object.keys(sessions).length > 0) {
+        for (let [sessionId, _session] of Object.entries(sessions)) {
+          if (_session.state === 'Established') {
+            try {
+              const mediaElement = document.getElementById(sessionId);
+              const remoteStream = new MediaStream();
+
+              _session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(receiver => {
+                if (receiver.track) {
+                  remoteStream.addTrack(receiver.track);
+                }
+              });
+
+              if (mediaElement) {
+                mediaElement.srcObject = remoteStream;
+                mediaElement.play();
+              } else {
+                console.log('no media Element');
+              }
+            } catch (err) {
+              console.log(err);
+              dispatch({
+                type: SET_REMOTE_AUDIO_SESSION_FAIL
+              });
+              return;
+            }
+          }
+
+          dispatch({
+            type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+          });
+        }
+      }
+    }
   }
 };
 
@@ -376,18 +415,27 @@ const setRemoteAudio = session => {
   const mediaElement = document.getElementById(session.id);
   const remoteStream = new MediaStream();
   session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(receiver => {
-    if (receiver.track) {
+    if (receiver.track.kind === 'audio') {
       remoteStream.addTrack(receiver.track);
     }
   });
 
-  if (mediaElement) {
+  if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
+    console.log('safari');
+    phoneStore.dispatch({
+      type: AUDIO_SINKID_NOT_ALLOWED
+    });
+    mediaElement.srcObject = remoteStream;
+    mediaElement.play();
+  } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
     mediaElement.setSinkId(deviceId).then(() => {
       mediaElement.srcObject = remoteStream;
       mediaElement.play();
     });
   } else {
-    console.log('no media Element');
+    phoneStore.dispatch({
+      type: REMOTE_AUDIO_FAIL
+    });
   }
 
   phoneStore.dispatch({
@@ -398,8 +446,6 @@ const setLocalAudio = session => {
   const state = phoneStore.getState();
   const deviceId = state.device.primaryAudioInput;
   session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
-    console.log(sender);
-
     if (sender.track && sender.track.kind === 'audio') {
       let audioDeviceId = deviceId;
       navigator.mediaDevices.getUserMedia({
@@ -560,17 +606,39 @@ class TonePlayer {
       this.loop.start(0);
       Tone.Transport.start();
     };
+  }
 
-    this.stop = () => {
+  stop() {
+    if (this.loop) {
       try {
         this.loop.stop(0);
+      } catch {
+        console.log('no loop to stop');
+      }
+    }
+
+    if (Tone.Transport) {
+      try {
         Tone.Transport.stop();
         Synth.triggerRelease([440, 480]);
       } catch {
-        const mediaElement = document.getElementById('ringtone');
-        mediaElement.pause();
+        console.log('no tone to stop');
       }
-    };
+    }
+
+    const mediaElement = document.getElementById('ringtone');
+
+    if (mediaElement) {
+      const promise = mediaElement.pause();
+
+      if (promise !== undefined) {
+        promise.catch(error => {
+          console.log(error);
+        }).then(() => {
+          console.log('ringtone stopped');
+        });
+      }
+    }
   }
 
 }
@@ -632,7 +700,6 @@ class SessionStateHandler {
           phoneStore.dispatch({
             type: SIPSESSION_STATECHANGE
           });
-          toneManager.stopAll();
           cleanupMedia(this.session.id);
           break;
 
@@ -640,7 +707,6 @@ class SessionStateHandler {
           phoneStore.dispatch({
             type: SIPSESSION_STATECHANGE
           });
-          toneManager.stopAll();
           setTimeout(() => {
             phoneStore.dispatch({
               type: CLOSE_SESSION,
@@ -987,7 +1053,7 @@ class Status extends Component {
     if (type === 'out') {
       this.props.setPrimaryOutput(id, this.props.sessions);
     } else {
-      this.props.setPrimaryInput(id, this.props.sessions);
+      this.props.setPrimaryInput(id, this.props.sessions, this.props.sinkIdAllowed);
     }
   }
 
@@ -1002,7 +1068,7 @@ class Status extends Component {
       className: styles$1.container
     }, createElement("div", {
       className: styles$1.userString
-    }, props.name), createElement("div", {
+    }, props.name), props.phoneConfig.disabledFeatures.includes('settings') ? null : createElement("div", {
       id: styles$1.settingsButton,
       className: state.settingsMenu ? styles$1.on : '',
       onClick: () => this.setState({
@@ -1010,7 +1076,7 @@ class Status extends Component {
       })
     }, createElement("img", {
       src: settingsIcon
-    }))), createElement("div", {
+    }))), props.phoneConfig.disabledFeatures.includes('settings') ? null : createElement("div", {
       id: styles$1.settingsMenu,
       className: state.settingsMenu ? '' : styles$1.closed
     }, createElement("hr", {
@@ -1053,7 +1119,8 @@ const mapStateToProps$1 = state => ({
   outputs: state.device.audioOutput,
   primaryInput: state.device.primaryAudioInput,
   primaryOutput: state.device.primaryAudioOutput,
-  sessions: state.sipSessions.sessions
+  sessions: state.sipSessions.sessions,
+  sinkIdAllowed: state.device.sinkId
 });
 
 const actions$1 = {
@@ -1427,10 +1494,13 @@ class AttendedTransfer extends Component {
               attendedTransferSessionPending: false
             });
             this.props.stateChange(newState, outgoingSession.id);
+            setLocalAudio(outgoingSession);
+            setRemoteAudio(outgoingSession);
             break;
 
           case SessionState.Terminating:
             this.props.stateChange(newState, outgoingSession.id);
+            cleanupMedia(outgoingSession.id);
             break;
 
           case SessionState.Terminated:
@@ -1579,6 +1649,14 @@ class Phone extends Component {
     this.attendedProcess = this.attendedProcess.bind(this);
   }
 
+  componentDidMount() {
+    if (this.props.phoneConfig.disabledButtons.includes('dialpadopen')) {
+      this.setState({
+        dialpadOpen: true
+      });
+    }
+  }
+
   componentDidUpdate(newProps) {
     if (newProps.session.state === SessionState.Established && !this.state.counterStarted) {
       this.handleCounter();
@@ -1714,15 +1792,20 @@ const ring = require('./assets/ring.mp3');
 
 class Incoming extends Component {
   componentDidMount() {
-    console.log('this is the session');
-    console.log(this.props.session);
     toneManager.stopAll();
     toneManager.playRing('ringtone');
   }
 
   handleAccept() {
     toneManager.stopAll();
-    this.props.session.accept();
+    this.props.session.accept({
+      sessionDescriptionHandlerOptions: {
+        constraints: {
+          audio: true,
+          video: false
+        }
+      }
+    });
     this.props.acceptCall(this.props.session);
   }
 
@@ -1753,8 +1836,7 @@ class Incoming extends Component {
       src: ring,
       type: "audio/mpeg"
     })), createElement("audio", {
-      id: this.props.session.id,
-      autoPlay: true
+      id: this.props.session.id
     }));
   }
 
@@ -1978,7 +2060,8 @@ const device = (state = {
   audioInput: [],
   audioOutput: [],
   primaryAudioOutput: 'default',
-  primaryAudioInput: 'default'
+  primaryAudioInput: 'default',
+  sinkId: true
 }, action) => {
   const {
     type,
@@ -2004,6 +2087,11 @@ const device = (state = {
     case SET_PRIMARY_INPUT:
       return { ...state,
         primaryAudioInput: payload
+      };
+
+    case AUDIO_SINKID_NOT_ALLOWED:
+      return { ...state,
+        sinkId: false
       };
 
     default:
@@ -2056,7 +2144,8 @@ const ReactSipPhone = ({
   width: _width = 300,
   height: _height = 600,
   phoneConfig: _phoneConfig = {
-    disabledButtons: []
+    disabledButtons: [],
+    disabledFeatures: []
   },
   sipConfig,
   sipCredentials,
@@ -2078,8 +2167,9 @@ const ReactSipPhone = ({
       height: `${_height < 600 ? 600 : _height}px`
     }
   }, createElement(Status$1, {
+    phoneConfig: _phoneConfig,
     name: name
-  }), createElement(D, null), createElement(PS, {
+  }), _phoneConfig.disabledFeatures.includes('dialstring') ? null : createElement(D, null), createElement(PS, {
     phoneConfig: _phoneConfig
   }), createElement("audio", {
     id: 'tone',

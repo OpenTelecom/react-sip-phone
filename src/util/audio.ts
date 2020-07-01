@@ -3,7 +3,9 @@ import { Session } from 'sip.js'
 
 import {
   REMOTE_AUDIO_CONNECTED,
-  LOCAL_AUDIO_CONNECTED
+  REMOTE_AUDIO_FAIL,
+  LOCAL_AUDIO_CONNECTED,
+  AUDIO_SINKID_NOT_ALLOWED
 } from '../actions/device'
 
 //adds track from getReceiver stream to <audio id={sessionId}> in Phone.tsx
@@ -17,11 +19,25 @@ export const setRemoteAudio = (session: Session) => {
   session.sessionDescriptionHandler.peerConnection
     .getReceivers()
     .forEach((receiver: any) => {
-      if (receiver.track) {
+      if (receiver.track.kind === 'audio') {
         remoteStream.addTrack(receiver.track)
       }
     })
-  if (mediaElement) {
+
+  //checks for browser compatibility
+  //@ts-ignore
+  if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
+    console.log('safari')
+    phoneStore.dispatch({
+      type: AUDIO_SINKID_NOT_ALLOWED
+    })
+    //@ts-ignore
+    mediaElement.srcObject = remoteStream
+    //@ts-ignore
+    mediaElement.play()
+
+    //@ts-ignore
+  } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
     // @ts-ignore
     mediaElement.setSinkId(
       // audio output device_id
@@ -34,7 +50,9 @@ export const setRemoteAudio = (session: Session) => {
         mediaElement.play()
       })
   } else {
-    console.log('no media Element')
+    phoneStore.dispatch({
+      type: REMOTE_AUDIO_FAIL
+    })
   }
   phoneStore.dispatch({
     type: REMOTE_AUDIO_CONNECTED
@@ -50,8 +68,6 @@ export const setLocalAudio = (session: Session) => {
   session.sessionDescriptionHandler.peerConnection
     .getSenders()
     .forEach(function (sender: any) {
-      console.log(sender)
-
       if (sender.track && sender.track.kind === 'audio') {
         let audioDeviceId =
           // audio input device_id

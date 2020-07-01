@@ -317,6 +317,7 @@ var holdAll = function holdAll(id) {
 var AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED';
 var AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED';
 var REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED';
+var REMOTE_AUDIO_FAIL = 'REMOTE_AUDIO_FAIL';
 var LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED';
 var SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT';
 var SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT';
@@ -326,6 +327,7 @@ var SET_LOCAL_AUDIO_SESSION_FAIL = 'SET_LOCAL_AUDIO_SESSION_FAIL';
 var SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PENDING';
 var SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS';
 var SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL';
+var AUDIO_SINKID_NOT_ALLOWED = 'AUDIO_SINKID_NOT_ALLOWED';
 var getInputAudioDevices = function getInputAudioDevices() {
   var inputArray = [];
   navigator.mediaDevices.enumerateDevices().then(function (devices) {
@@ -410,7 +412,7 @@ var setPrimaryOutput = function setPrimaryOutput(deviceId, sessions) {
     });
   };
 };
-var setPrimaryInput = function setPrimaryInput(deviceId, sessions) {
+var setPrimaryInput = function setPrimaryInput(deviceId, sessions, sinkIdAllowed) {
   return function (dispatch) {
     if (sessions) {
       if (Object.keys(sessions).length > 0) {
@@ -426,7 +428,6 @@ var setPrimaryInput = function setPrimaryInput(deviceId, sessions) {
           if (_session.state === 'Established') {
             try {
               _session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
-                console.log(sender);
                 console.log(sessionId);
 
                 if (sender.track && sender.track.kind === 'audio') {
@@ -463,11 +464,55 @@ var setPrimaryInput = function setPrimaryInput(deviceId, sessions) {
           if (typeof _ret === "object") return _ret.v;
         }
       }
+    }
 
-      dispatch({
-        type: SET_PRIMARY_INPUT,
-        payload: deviceId
-      });
+    dispatch({
+      type: SET_PRIMARY_INPUT,
+      payload: deviceId
+    });
+
+    if (sinkIdAllowed === false) {
+      if (sessions) {
+        if (Object.keys(sessions).length > 0) {
+          for (var _i3 = 0, _Object$entries3 = Object.entries(sessions); _i3 < _Object$entries3.length; _i3++) {
+            var _Object$entries3$_i = _Object$entries3[_i3],
+                sessionId = _Object$entries3$_i[0],
+                _session = _Object$entries3$_i[1];
+
+            if (_session.state === 'Established') {
+              try {
+                (function () {
+                  var mediaElement = document.getElementById(sessionId);
+                  var remoteStream = new MediaStream();
+
+                  _session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(function (receiver) {
+                    if (receiver.track) {
+                      remoteStream.addTrack(receiver.track);
+                    }
+                  });
+
+                  if (mediaElement) {
+                    mediaElement.srcObject = remoteStream;
+                    mediaElement.play();
+                  } else {
+                    console.log('no media Element');
+                  }
+                })();
+              } catch (err) {
+                console.log(err);
+                dispatch({
+                  type: SET_REMOTE_AUDIO_SESSION_FAIL
+                });
+                return;
+              }
+            }
+
+            dispatch({
+              type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+            });
+          }
+        }
+      }
     }
   };
 };
@@ -478,18 +523,27 @@ var setRemoteAudio = function setRemoteAudio(session) {
   var mediaElement = document.getElementById(session.id);
   var remoteStream = new MediaStream();
   session.sessionDescriptionHandler.peerConnection.getReceivers().forEach(function (receiver) {
-    if (receiver.track) {
+    if (receiver.track.kind === 'audio') {
       remoteStream.addTrack(receiver.track);
     }
   });
 
-  if (mediaElement) {
+  if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
+    console.log('safari');
+    phoneStore.dispatch({
+      type: AUDIO_SINKID_NOT_ALLOWED
+    });
+    mediaElement.srcObject = remoteStream;
+    mediaElement.play();
+  } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
     mediaElement.setSinkId(deviceId).then(function () {
       mediaElement.srcObject = remoteStream;
       mediaElement.play();
     });
   } else {
-    console.log('no media Element');
+    phoneStore.dispatch({
+      type: REMOTE_AUDIO_FAIL
+    });
   }
 
   phoneStore.dispatch({
@@ -500,8 +554,6 @@ var setLocalAudio = function setLocalAudio(session) {
   var state = phoneStore.getState();
   var deviceId = state.device.primaryAudioInput;
   session.sessionDescriptionHandler.peerConnection.getSenders().forEach(function (sender) {
-    console.log(sender);
-
     if (sender.track && sender.track.kind === 'audio') {
       var audioDeviceId = deviceId;
       navigator.mediaDevices.getUserMedia({
@@ -606,78 +658,105 @@ var callDisconnect = function callDisconnect(deviceId) {
   }
 };
 
-var TonePlayer = function TonePlayer() {
-  var _this = this;
+var TonePlayer = /*#__PURE__*/function () {
+  function TonePlayer() {
+    var _this = this;
 
-  this.ringtone = function (deviceId) {
+    this.ringtone = function (deviceId) {
+      var mediaElement = document.getElementById('ringtone');
+
+      if (deviceId !== 'default') {
+        if (mediaElement) {
+          mediaElement.setSinkId(deviceId).then(function () {
+            mediaElement.play();
+          });
+        } else {
+          console.log('no media Element');
+        }
+      } else {
+        mediaElement.play();
+      }
+    };
+
+    this.ringback = function (deviceId) {
+      var dest = Tone.context.createMediaStreamDestination();
+      console.log(dest);
+      Synth.set({
+        oscillator: {
+          type: 'sine'
+        },
+        envelope: {
+          attack: 0.02,
+          decay: 0.1,
+          sustain: 0.2,
+          release: 0.02
+        }
+      }).connect(dest);
+
+      if (deviceId !== 'default') {
+        var mediaElement = document.getElementById('tone');
+
+        if (mediaElement) {
+          var _dest = Tone.context.createMediaStreamDestination();
+
+          Synth.connect(_dest);
+          mediaElement.setSinkId(deviceId).then(function () {
+            mediaElement.srcObject = _dest.stream;
+            mediaElement.play();
+          });
+        }
+      } else {
+        Synth.toMaster();
+      }
+
+      _this.loop = new Tone.Loop(function (time) {
+        Synth.triggerAttack([440, 480]);
+        Synth.triggerRelease([440, 480], time + 2);
+      }, 6);
+
+      _this.loop.start(0);
+
+      Tone.Transport.start();
+    };
+  }
+
+  var _proto = TonePlayer.prototype;
+
+  _proto.stop = function stop() {
+    if (this.loop) {
+      try {
+        this.loop.stop(0);
+      } catch (_unused) {
+        console.log('no loop to stop');
+      }
+    }
+
+    if (Tone.Transport) {
+      try {
+        Tone.Transport.stop();
+        Synth.triggerRelease([440, 480]);
+      } catch (_unused2) {
+        console.log('no tone to stop');
+      }
+    }
+
     var mediaElement = document.getElementById('ringtone');
 
-    if (deviceId !== 'default') {
-      if (mediaElement) {
-        mediaElement.setSinkId(deviceId).then(function () {
-          mediaElement.play();
-        });
-      } else {
-        console.log('no media Element');
-      }
-    } else {
-      mediaElement.play();
-    }
-  };
+    if (mediaElement) {
+      var promise = mediaElement.pause();
 
-  this.ringback = function (deviceId) {
-    var dest = Tone.context.createMediaStreamDestination();
-    console.log(dest);
-    Synth.set({
-      oscillator: {
-        type: 'sine'
-      },
-      envelope: {
-        attack: 0.02,
-        decay: 0.1,
-        sustain: 0.2,
-        release: 0.02
-      }
-    }).connect(dest);
-
-    if (deviceId !== 'default') {
-      var mediaElement = document.getElementById('tone');
-
-      if (mediaElement) {
-        var _dest = Tone.context.createMediaStreamDestination();
-
-        Synth.connect(_dest);
-        mediaElement.setSinkId(deviceId).then(function () {
-          mediaElement.srcObject = _dest.stream;
-          mediaElement.play();
+      if (promise !== undefined) {
+        promise["catch"](function (error) {
+          console.log(error);
+        }).then(function () {
+          console.log('ringtone stopped');
         });
       }
-    } else {
-      Synth.toMaster();
-    }
-
-    _this.loop = new Tone.Loop(function (time) {
-      Synth.triggerAttack([440, 480]);
-      Synth.triggerRelease([440, 480], time + 2);
-    }, 6);
-
-    _this.loop.start(0);
-
-    Tone.Transport.start();
-  };
-
-  this.stop = function () {
-    try {
-      _this.loop.stop(0);
-
-      Tone.Transport.stop();
-      Synth.triggerRelease([440, 480]);
-    } catch (_unused) {
-      var mediaElement = document.getElementById('ringtone');
-      mediaElement.pause();
     }
   };
-};
+
+  return TonePlayer;
+}();
 
 var ToneManager = /*#__PURE__*/function () {
   function ToneManager() {}
@@ -740,7 +819,6 @@ var SessionStateHandler = function SessionStateHandler(session) {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         });
-        toneManager.stopAll();
         cleanupMedia(_this.session.id);
         break;
 
@@ -748,7 +826,6 @@ var SessionStateHandler = function SessionStateHandler(session) {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         });
-        toneManager.stopAll();
         setTimeout(function () {
           phoneStore.dispatch({
             type: CLOSE_SESSION,
@@ -1121,7 +1198,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
     if (type === 'out') {
       this.props.setPrimaryOutput(id, this.props.sessions);
     } else {
-      this.props.setPrimaryInput(id, this.props.sessions);
+      this.props.setPrimaryInput(id, this.props.sessions, this.props.sinkIdAllowed);
     }
   };
 
@@ -1136,7 +1213,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
       className: styles$1.container
     }, React.createElement("div", {
       className: styles$1.userString
-    }, props.name), React.createElement("div", {
+    }, props.name), props.phoneConfig.disabledFeatures.includes('settings') ? null : React.createElement("div", {
       id: styles$1.settingsButton,
       className: state.settingsMenu ? styles$1.on : '',
       onClick: function onClick() {
@@ -1146,7 +1223,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
       }
     }, React.createElement("img", {
       src: settingsIcon
-    }))), React.createElement("div", {
+    }))), props.phoneConfig.disabledFeatures.includes('settings') ? null : React.createElement("div", {
       id: styles$1.settingsMenu,
       className: state.settingsMenu ? '' : styles$1.closed
     }, React.createElement("hr", {
@@ -1199,7 +1276,8 @@ var mapStateToProps$1 = function mapStateToProps(state) {
     outputs: state.device.audioOutput,
     primaryInput: state.device.primaryAudioInput,
     primaryOutput: state.device.primaryAudioOutput,
-    sessions: state.sipSessions.sessions
+    sessions: state.sipSessions.sessions,
+    sinkIdAllowed: state.device.sinkId
   };
 };
 
@@ -1662,11 +1740,14 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
 
             _this2.props.stateChange(newState, outgoingSession.id);
 
+            setLocalAudio(outgoingSession);
+            setRemoteAudio(outgoingSession);
             break;
 
           case sip_js.SessionState.Terminating:
             _this2.props.stateChange(newState, outgoingSession.id);
 
+            cleanupMedia(outgoingSession.id);
             break;
 
           case sip_js.SessionState.Terminated:
@@ -1833,6 +1914,14 @@ var Phone = /*#__PURE__*/function (_React$Component) {
 
   var _proto = Phone.prototype;
 
+  _proto.componentDidMount = function componentDidMount() {
+    if (this.props.phoneConfig.disabledButtons.includes('dialpadopen')) {
+      this.setState({
+        dialpadOpen: true
+      });
+    }
+  };
+
   _proto.componentDidUpdate = function componentDidUpdate(newProps) {
     if (newProps.session.state === sip_js.SessionState.Established && !this.state.counterStarted) {
       this.handleCounter();
@@ -1993,15 +2082,20 @@ var Incoming = /*#__PURE__*/function (_React$Component) {
   var _proto = Incoming.prototype;
 
   _proto.componentDidMount = function componentDidMount() {
-    console.log('this is the session');
-    console.log(this.props.session);
     toneManager.stopAll();
     toneManager.playRing('ringtone');
   };
 
   _proto.handleAccept = function handleAccept() {
     toneManager.stopAll();
-    this.props.session.accept();
+    this.props.session.accept({
+      sessionDescriptionHandlerOptions: {
+        constraints: {
+          audio: true,
+          video: false
+        }
+      }
+    });
     this.props.acceptCall(this.props.session);
   };
 
@@ -2038,8 +2132,7 @@ var Incoming = /*#__PURE__*/function (_React$Component) {
       src: ring,
       type: "audio/mpeg"
     })), React.createElement("audio", {
-      id: this.props.session.id,
-      autoPlay: true
+      id: this.props.session.id
     }));
   };
 
@@ -2308,7 +2401,8 @@ var device = function device(state, action) {
       audioInput: [],
       audioOutput: [],
       primaryAudioOutput: 'default',
-      primaryAudioInput: 'default'
+      primaryAudioInput: 'default',
+      sinkId: true
     };
   }
 
@@ -2334,6 +2428,11 @@ var device = function device(state, action) {
     case SET_PRIMARY_INPUT:
       return _extends(_extends({}, state), {}, {
         primaryAudioInput: payload
+      });
+
+    case AUDIO_SINKID_NOT_ALLOWED:
+      return _extends(_extends({}, state), {}, {
+        sinkId: false
       });
 
     default:
@@ -2393,7 +2492,8 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
       height = _ref$height === void 0 ? 600 : _ref$height,
       _ref$phoneConfig = _ref.phoneConfig,
       phoneConfig = _ref$phoneConfig === void 0 ? {
-    disabledButtons: []
+    disabledButtons: [],
+    disabledFeatures: []
   } : _ref$phoneConfig,
       sipConfig = _ref.sipConfig,
       sipCredentials = _ref.sipCredentials,
@@ -2415,8 +2515,9 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
       height: (height < 600 ? 600 : height) + "px"
     })
   }, React.createElement(Status$1, {
+    phoneConfig: phoneConfig,
     name: name
-  }), React.createElement(D, null), React.createElement(PS, {
+  }), phoneConfig.disabledFeatures.includes('dialstring') ? null : React.createElement(D, null), React.createElement(PS, {
     phoneConfig: phoneConfig
   }), React.createElement("audio", {
     id: 'tone',

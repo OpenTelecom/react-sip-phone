@@ -6,8 +6,10 @@ import Select from 'react-select';
 import settingsIcon from '../assets/settings-24px.svg'
 import micIcon from '../assets/mic-24px.svg'
 import soundIcon from '../assets/volume_up-24px.svg'
+import { PhoneConfig } from '../models'
 
 interface Props {
+  phoneConfig: PhoneConfig
   name: string
   inputs: any
   outputs: any
@@ -18,6 +20,7 @@ interface Props {
   getInputAudioDevices: Function
   getOutputAudioDevices: Function
   sessions: any
+  sinkIdAllowed: boolean
 }
 
 class Status extends React.Component<Props> {
@@ -38,7 +41,7 @@ class Status extends React.Component<Props> {
     if (type === 'out') {
       this.props.setPrimaryOutput(id, this.props.sessions)
     } else {
-      this.props.setPrimaryInput(id, this.props.sessions)
+      this.props.setPrimaryInput(id, this.props.sessions, this.props.sinkIdAllowed)
     }
   }
   render() {
@@ -49,41 +52,46 @@ class Status extends React.Component<Props> {
       <React.Fragment>
         <div className={styles.container}>
           <div className={styles.userString} >{props.name}</div>
+          {props.phoneConfig.disabledFeatures.includes('settings') ? null :
+            <div
+              id={styles.settingsButton}
+              className={state.settingsMenu ? styles.on : ''}
+              onClick={() => this.setState({ settingsMenu: !state.settingsMenu })}
+            >
+              <img src={settingsIcon} />
+            </div>
+          }
+        </div>
+        {props.phoneConfig.disabledFeatures.includes('settings') ? null :
           <div
-            id={styles.settingsButton}
-            className={state.settingsMenu ? styles.on : ''}
-            onClick={() => this.setState({ settingsMenu: !state.settingsMenu })}
+            id={styles.settingsMenu}
+            className={state.settingsMenu ? '' : styles.closed}
           >
-            <img src={settingsIcon} />
+            <hr style={{ width: '100%' }} />
+            <div className={styles.dropdownRow}>
+              <img className={styles.dropdownIcon} src={soundIcon} />
+              <Select
+                placeholder="Select Output..."
+                value={outputs.find((output: any) => output.value === props.primaryOutput) || null}
+                onChange={option => this.handleChangeDevice('out', option.value)}
+                options={outputs}
+                id={styles.dropdowns}
+              />
+            </div>
+            <div className={styles.dropdownRow}>
+              <img className={styles.dropdownIcon} src={micIcon} />
+              <Select
+                placeholder="Select Input..."
+                value={inputs.find((input: any) => input.value === props.primaryInput)}
+                onChange={option => this.handleChangeDevice('in', option.value)}
+                options={inputs}
+                id={styles.dropdowns}
+              />
+            </div>
+            <hr style={{ width: '100%' }} />
           </div>
-        </div>
-        <div
-          id={styles.settingsMenu}
-          className={state.settingsMenu ? '' : styles.closed}
-        >
-          <hr style={{ width: '100%' }} />
-          <div className={styles.dropdownRow}>
-            <img className={styles.dropdownIcon} src={soundIcon} />
-            <Select
-              placeholder="Select Output..."
-              value={outputs.find((output: any) => output.value === props.primaryOutput) || null}
-              onChange={option => this.handleChangeDevice('out', option.value)}
-              options={outputs}
-              id={styles.dropdowns}
-            />
-          </div>
-          <div className={styles.dropdownRow}>
-            <img className={styles.dropdownIcon} src={micIcon} />
-            <Select
-              placeholder="Select Input..."
-              value={inputs.find((input: any) => input.value === props.primaryInput)}
-              onChange={option => this.handleChangeDevice('in', option.value)}
-              options={inputs}
-              id={styles.dropdowns}
-            />
-          </div>
-          <hr style={{ width: '100%' }} />
-        </div>
+        }
+
       </React.Fragment>
     )
   }
@@ -93,7 +101,8 @@ const mapStateToProps = (state: any) => ({
   outputs: state.device.audioOutput,
   primaryInput: state.device.primaryAudioInput,
   primaryOutput: state.device.primaryAudioOutput,
-  sessions: state.sipSessions.sessions
+  sessions: state.sipSessions.sessions,
+  sinkIdAllowed: state.device.sinkId
 })
 
 const actions = {

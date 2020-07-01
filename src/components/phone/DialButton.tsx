@@ -12,7 +12,7 @@ const DialButton = ({ text, click, letters }: Props) => {
     className={styles.dialpadButton}
     onClick={() => click()}>
     {text}
-    <div style={{opacity: letters === '1' ? 0 : 1}} className={styles.dialpadButtonLetters}>
+    <div style={{ opacity: letters === '1' ? 0 : 1 }} className={styles.dialpadButtonLetters}>
       {letters}
     </div>
   </div>

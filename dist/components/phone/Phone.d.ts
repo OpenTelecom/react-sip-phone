@@ -19,6 +19,7 @@ declare class Phone extends React.Component<Props> {
         counterStarted: boolean;
     };
     constructor(props: any);
+    componentDidMount(): void;
     componentDidUpdate(newProps: Props): void;
     endCall(): void;
     attendedProcess(bool: boolean): void;

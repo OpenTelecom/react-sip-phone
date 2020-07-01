@@ -108,19 +108,9 @@ class TonePlayer {
 
   //get audio element, set srcObj to device, and play the track
   ringtone = (deviceId: string) => {
-    // console.log(deviceId)
-    // const ring = require('./assets/ring.mp3')
-
-    // const ringtone = new Audio(ring);
-    // ringtone.addEventListener('loadeddata', () => {
-    //   ringtone.play()
-    //   // The duration variable now holds the duration (in seconds) of the audio clip 
-    // })
-
     const mediaElement = document.getElementById('ringtone')
     if (deviceId !== 'default') {
       if (mediaElement) {
-
         // @ts-ignore
         mediaElement.setSinkId(
           // audio output device_id
@@ -158,8 +148,6 @@ class TonePlayer {
     }).connect(dest)
     if (deviceId !== 'default') {
       const mediaElement = document.getElementById('tone')
-
-
       if (mediaElement) {
         let dest = Tone.context.createMediaStreamDestination()
         Synth.connect(dest)
@@ -175,7 +163,6 @@ class TonePlayer {
           mediaElement.play()
         })
       }
-
     } else {
       Synth.toMaster()
     }
@@ -188,16 +175,36 @@ class TonePlayer {
     Tone.Transport.start()
   }
 
-  stop = () => {
-    try {
-      this.loop.stop(0)
-      Tone.Transport.stop()
-      Synth.triggerRelease([440, 480])
-    } catch{
-      const mediaElement = document.getElementById('ringtone')
-      //@ts-ignore
-      mediaElement.pause()
+  stop() {
+    if (this.loop) {
+      try {
+        this.loop.stop(0)
+      } catch{
+        console.log('no loop to stop')
+      }
+    }
 
+    if (Tone.Transport) {
+      try {
+        Tone.Transport.stop()
+        Synth.triggerRelease([440, 480])
+      } catch{
+        console.log('no tone to stop')
+      }
+    }
+
+    const mediaElement = document.getElementById('ringtone')
+    if (mediaElement) {
+      //@ts-ignore
+      const promise = mediaElement.pause()
+      if (promise !== undefined) {
+        promise.catch((error: any) => {
+          console.log(error)
+
+        }).then(() => {
+          console.log('ringtone stopped')
+        });
+      }
     }
   }
 }

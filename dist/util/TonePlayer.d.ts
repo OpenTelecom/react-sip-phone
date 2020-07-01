@@ -4,6 +4,6 @@ declare class TonePlayer {
     private loop;
     ringtone: (deviceId: string) => void;
     ringback: (deviceId: string) => void;
-    stop: () => void;
+    stop(): void;
 }
 export default TonePlayer;

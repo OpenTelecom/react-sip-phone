@@ -4,7 +4,10 @@ export const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED'
 export const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED'
 
 export const REMOTE_AUDIO_CONNECTED = 'REMOTE_AUDIO_CONNECTED'
+export const REMOTE_AUDIO_FAIL = 'REMOTE_AUDIO_FAIL'
+
 export const LOCAL_AUDIO_CONNECTED = 'LOCAL_AUDIO_CONNECTED'
+export const LOCAL_AUDIO_FAIL = 'REMOTE_AUDIO_FAIL'
 
 export const SET_PRIMARY_OUTPUT = 'SET_PRIMARY_OUTPUT'
 export const SET_PRIMARY_INPUT = 'SET_PRIMARY_INPUT'
@@ -17,6 +20,7 @@ export const SET_REMOTE_AUDIO_SESSIONS_PENDING = 'SET_REMOTE_AUDIO_SESSIONS_PEND
 export const SET_REMOTE_AUDIO_SESSION_SUCCESS = 'SET_REMOTE_AUDIO_SESSION_SUCCESS'
 export const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL'
 
+export const AUDIO_SINKID_NOT_ALLOWED = 'AUDIO_SINKID_NOT_ALLOWED'
 
 export const getInputAudioDevices = () => {
   let inputArray: Array<Object> = []
@@ -107,7 +111,7 @@ export const setPrimaryOutput = (deviceId: string, sessions: any) => (dispatch: 
   })
 }
 
-export const setPrimaryInput = (deviceId: string, sessions: any) => (dispatch: Dispatch) => {
+export const setPrimaryInput = (deviceId: string, sessions: any, sinkIdAllowed: boolean) => (dispatch: Dispatch) => {
   if (sessions) {
     if (Object.keys(sessions).length > 0) {
       dispatch({
@@ -121,7 +125,6 @@ export const setPrimaryInput = (deviceId: string, sessions: any) => (dispatch: D
             _session.sessionDescriptionHandler.peerConnection
               .getSenders()
               .forEach(function (sender: any) {
-                console.log(sender)
                 console.log(sessionId)
                 if (sender.track && sender.track.kind === 'audio') {
                   let audioDeviceId =
@@ -150,10 +153,57 @@ export const setPrimaryInput = (deviceId: string, sessions: any) => (dispatch: D
         })
       }
     }
-    dispatch({
-      type: SET_PRIMARY_INPUT,
-      payload: deviceId
-    })
+  }
+  dispatch({
+    type: SET_PRIMARY_INPUT,
+    payload: deviceId
+  })
+
+  //change remote audio for safari sessions  
+  if (sinkIdAllowed === false) {
+    if (sessions) {
+      if (Object.keys(sessions).length > 0) {
+        for (let [sessionId, _session] of Object.entries(sessions)) {
+          //@ts-ignore
+          if (_session.state === 'Established') {
+            try {
+              const mediaElement = document.getElementById(sessionId)
+              const remoteStream = new MediaStream()
+              //@ts-ignore
+              _session.sessionDescriptionHandler.peerConnection
+                .getReceivers()
+                .forEach((receiver: any) => {
+                  if (receiver.track) {
+                    remoteStream.addTrack(receiver.track)
+                  }
+                })
+              if (mediaElement) {
+                // @ts-ignore
+                mediaElement.srcObject = remoteStream
+                //@ts-ignore
+                mediaElement.play()
+              } else {
+                console.log('no media Element')
+              }
+            } catch (err) {
+              console.log(err)
+              dispatch({
+                type: SET_REMOTE_AUDIO_SESSION_FAIL
+              })
+              return
+            }
+          }
+          dispatch({
+            type: SET_REMOTE_AUDIO_SESSION_SUCCESS
+          })
+        }
+      }
+    }
   }
 }
 
+export const sinkIdAllowed = () => (dispatch: Dispatch) => {
+  dispatch({
+    type: AUDIO_SINKID_NOT_ALLOWED
+  })
+}

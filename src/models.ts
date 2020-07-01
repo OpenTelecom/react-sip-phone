@@ -12,5 +12,6 @@ export interface SipConfig {
 }
 
 export interface PhoneConfig {
-  disabledButtons: Array<string>
+  disabledButtons: Array<string>,
+  disabledFeatures: Array<string>
 }

@@ -17,18 +17,21 @@ interface Props {
 class Incoming extends React.Component<Props> {
 
   componentDidMount() {
-    console.log('this is the session')
-    console.log(this.props.session)
     toneManager.stopAll()
     toneManager.playRing('ringtone')
-
   }
 
   handleAccept() {
     toneManager.stopAll()
-    this.props.session.accept()
+    this.props.session.accept({
+      sessionDescriptionHandlerOptions: {
+        constraints: {
+          audio: true,
+          video: false
+        },
+      },
+    })
     this.props.acceptCall(this.props.session)
-
   }
 
   handleDecline() {
@@ -40,7 +43,8 @@ class Incoming extends React.Component<Props> {
   render() {
     const props = this.props
     return <div id={styles.incoming}>
-      { // @ts-ignore
+      {
+        // @ts-ignore
         `Incoming: ${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`
       }
       <div className={styles.endCallButton} onClick={() => this.handleDecline()} ><img src={declineIcon} /></div>
@@ -48,7 +52,7 @@ class Incoming extends React.Component<Props> {
       <audio id='ringtone' loop >
         <source src={ring} type="audio/mpeg" />
       </audio>
-      <audio id={this.props.session.id} autoPlay />
+      <audio id={this.props.session.id} />
     </div>
   }
 }
