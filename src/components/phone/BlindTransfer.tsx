@@ -11,9 +11,11 @@ import {
 } from '../../actions/sipSessions'
 import { getFullNumber } from '../../util/sessions'
 import blindIcon from '../../assets/arrow_forward-24px.svg'
+import SIPAccount from '../../lib/SipAccount'
 
 interface Props {
   session: Session
+  sipAccount: SIPAccount
   userAgent: UserAgent
   destination: string
   blindTransferRequest: Function
@@ -25,7 +27,7 @@ class BlindTransfer extends React.Component<Props> {
   blindTransferCall() {
     this.props.blindTransferRequest()
     const target = UserAgent.makeURI(
-      `sip:${getFullNumber(this.props.destination)}@sip.reper.io;user=phone`
+      `sip:${getFullNumber(this.props.destination)}@${this.props.sipAccount._credentials.sipuri.split('@')[1]};user=phone`
     )
     if (target) {
       try {
@@ -54,6 +56,7 @@ class BlindTransfer extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: any) => ({
+  sipAccount: state.sipAccounts.sipAccount,
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent

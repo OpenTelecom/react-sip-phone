@@ -21,10 +21,12 @@ import attendedIcon from '../../assets/phone_in_talk-24px.svg'
 import cancelIcon from '../../assets/call_end-24px.svg'
 import connectIcon from '../../assets/arrow_forward-24px.svg'
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from '../../util/audio'
+import SIPAccount from '../../lib/SipAccount'
 
 
 interface Props {
   session: Session
+  sipAccount: SIPAccount
   userAgent: UserAgent
   destination: string
   started: Function
@@ -49,7 +51,7 @@ class AttendedTransfer extends React.Component<Props> {
     this.holdAll()
     this.props.attendedTransferRequest()
     const target = UserAgent.makeURI(
-      `sip:${getFullNumber(this.props.destination)}@sip.reper.io;user=phone`
+      `sip:${getFullNumber(this.props.destination)}@${this.props.sipAccount._credentials.sipuri.split('@')[1]};user=phone`
     )
     if (target) {
       const inviter = new Inviter(this.props.userAgent, target)
@@ -196,6 +198,7 @@ class AttendedTransfer extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: any) => ({
+  sipAccount: state.sipAccounts.sipAccount,
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent

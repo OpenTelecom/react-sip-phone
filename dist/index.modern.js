@@ -940,7 +940,7 @@ class SIPAccount {
   }
 
   makeCall(number) {
-    const target = UserAgent.makeURI(`sip:${getFullNumber(number)}@sip.reper.io;user=phone`);
+    const target = UserAgent.makeURI(`sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`);
 
     if (target) {
       console.log(`Calling ${number}`);
@@ -1411,7 +1411,7 @@ var transferIcon = require("./arrow_forward-24px~UJhdZXVe.svg");
 class BlindTransfer extends Component {
   blindTransferCall() {
     this.props.blindTransferRequest();
-    const target = UserAgent.makeURI(`sip:${getFullNumber(this.props.destination)}@sip.reper.io;user=phone`);
+    const target = UserAgent.makeURI(`sip:${getFullNumber(this.props.destination)}@${this.props.sipAccount._credentials.sipuri.split('@')[1]};user=phone`);
 
     if (target) {
       try {
@@ -1437,6 +1437,7 @@ class BlindTransfer extends Component {
 }
 
 const mapStateToProps$5 = state => ({
+  sipAccount: state.sipAccounts.sipAccount,
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent
@@ -1465,7 +1466,7 @@ class AttendedTransfer extends Component {
   attendedTransferCall() {
     this.holdAll();
     this.props.attendedTransferRequest();
-    const target = UserAgent.makeURI(`sip:${getFullNumber(this.props.destination)}@sip.reper.io;user=phone`);
+    const target = UserAgent.makeURI(`sip:${getFullNumber(this.props.destination)}@${this.props.sipAccount._credentials.sipuri.split('@')[1]};user=phone`);
 
     if (target) {
       const inviter = new Inviter(this.props.userAgent, target);
@@ -1614,6 +1615,7 @@ class AttendedTransfer extends Component {
 }
 
 const mapStateToProps$6 = state => ({
+  sipAccount: state.sipAccounts.sipAccount,
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent

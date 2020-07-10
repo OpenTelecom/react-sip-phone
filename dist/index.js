@@ -1059,7 +1059,7 @@ var SIPAccount = /*#__PURE__*/function () {
   };
 
   _proto.makeCall = function makeCall(number) {
-    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(number) + "@sip.reper.io;user=phone");
+    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(number) + "@" + this._credentials.sipuri.split('@')[1] + ";user=phone");
 
     if (target) {
       console.log("Calling " + number);
@@ -1635,7 +1635,7 @@ var BlindTransfer = /*#__PURE__*/function (_React$Component) {
 
   _proto.blindTransferCall = function blindTransferCall() {
     this.props.blindTransferRequest();
-    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(this.props.destination) + "@sip.reper.io;user=phone");
+    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(this.props.destination) + "@" + this.props.sipAccount._credentials.sipuri.split('@')[1] + ";user=phone");
 
     if (target) {
       try {
@@ -1667,6 +1667,7 @@ var BlindTransfer = /*#__PURE__*/function (_React$Component) {
 
 var mapStateToProps$5 = function mapStateToProps(state) {
   return {
+    sipAccount: state.sipAccounts.sipAccount,
     stateChanged: state.sipSessions.stateChanged,
     sessions: state.sipSessions.sessions,
     userAgent: state.sipAccounts.userAgent
@@ -1705,7 +1706,7 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
 
     this.holdAll();
     this.props.attendedTransferRequest();
-    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(this.props.destination) + "@sip.reper.io;user=phone");
+    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(this.props.destination) + "@" + this.props.sipAccount._credentials.sipuri.split('@')[1] + ";user=phone");
 
     if (target) {
       var inviter = new sip_js.Inviter(this.props.userAgent, target);
@@ -1871,6 +1872,7 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
 
 var mapStateToProps$6 = function mapStateToProps(state) {
   return {
+    sipAccount: state.sipAccounts.sipAccount,
     stateChanged: state.sipSessions.stateChanged,
     sessions: state.sipSessions.sessions,
     userAgent: state.sipAccounts.userAgent

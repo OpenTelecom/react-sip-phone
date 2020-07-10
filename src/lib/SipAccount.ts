@@ -121,7 +121,7 @@ export default class SIPAccount {
 
     // Make a call
     const target = UserAgent.makeURI(
-      `sip:${getFullNumber(number)}@sip.reper.io;user=phone`
+      `sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`
     )
     if (target) {
       console.log(`Calling ${number}`)

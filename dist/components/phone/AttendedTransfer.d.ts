@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Session, UserAgent } from 'sip.js';
+import SIPAccount from '../../lib/SipAccount';
 interface Props {
     session: Session;
+    sipAccount: SIPAccount;
     userAgent: UserAgent;
     destination: string;
     started: Function;
