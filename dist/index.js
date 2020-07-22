@@ -211,10 +211,11 @@ var attendedTransferRequest = function attendedTransferRequest() {
     });
   };
 };
-var attendedTransferCancel = function attendedTransferCancel() {
+var attendedTransferCancel = function attendedTransferCancel(session) {
   return function (dispatch) {
     dispatch({
-      type: SIPSESSION_ATTENDED_TRANSFER_CANCEL
+      type: SIPSESSION_ATTENDED_TRANSFER_CANCEL,
+      payload: session
     });
   };
 };
@@ -225,10 +226,11 @@ var attendedTransferReady = function attendedTransferReady() {
     });
   };
 };
-var attendedTransferPending = function attendedTransferPending() {
+var attendedTransferPending = function attendedTransferPending(session) {
   return function (dispatch) {
     dispatch({
-      type: SIPSESSION_ATTENDED_TRANSFER_PENDING
+      type: SIPSESSION_ATTENDED_TRANSFER_PENDING,
+      payload: session
     });
   };
 };
@@ -1756,6 +1758,8 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
 
             _this2.attendedTransferClear();
 
+            _this2.props.attendedTransferCancel(outgoingSession);
+
             setTimeout(function () {
               _this2.props.closeSession(outgoingSession.id);
             }, 5000);
@@ -1767,12 +1771,12 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
         }
       });
       outgoingSession.invite()["catch"](function (error) {
-        _this2.props.attendedTransferFail();
+        _this2.props.attendedTransferFail(outgoingSession);
 
         console.log(error);
       });
     } else {
-      this.props.attendedTransferFail();
+      console.log('Failed to makeURI');
     }
   };
 
@@ -1800,7 +1804,7 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
 
   _proto.cancelAttendedTransfer = function cancelAttendedTransfer(attendedTransferSession) {
     attendedTransferSession.cancel();
-    this.props.attendedTransferCancel();
+    this.props.attendedTransferCancel(attendedTransferSession);
     this.setState({
       attendedTransferSessionPending: null
     });
@@ -2322,6 +2326,15 @@ var sipSessions = function sipSessions(state, action) {
       return _extends(_extends({}, state), {}, {
         sessions: _extends(_extends({}, state.sessions), {}, (_extends4 = {}, _extends4[payload.id] = payload, _extends4)),
         attendedTransfers: [].concat(state.attendedTransfers, [payload.id])
+      });
+
+    case SIPSESSION_ATTENDED_TRANSFER_CANCEL:
+    case SIPSESSION_ATTENDED_TRANSFER_FAIL:
+      var newAttendedTransfers = [].concat(state.attendedTransfers).filter(function (id) {
+        return id !== payload.id;
+      });
+      return _extends(_extends({}, state), {}, {
+        attendedTransfers: newAttendedTransfers
       });
 
     case ACCEPT_CALL:

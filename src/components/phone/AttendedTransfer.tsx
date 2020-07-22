@@ -87,7 +87,7 @@ class AttendedTransfer extends React.Component<Props> {
           case SessionState.Terminated:
             this.props.stateChange(newState, outgoingSession.id)
             this.attendedTransferClear()
-
+            this.props.attendedTransferCancel(outgoingSession)
             setTimeout(() => {
               this.props.closeSession(outgoingSession.id)
             }, 5000)
@@ -98,12 +98,11 @@ class AttendedTransfer extends React.Component<Props> {
         }
       })
       outgoingSession.invite().catch((error: Error) => {
-        this.props.attendedTransferFail()
+        this.props.attendedTransferFail(outgoingSession)
         console.log(error)
       })
     } else {
-      this.props.attendedTransferFail()
-
+      console.log('Failed to makeURI')
     }
   }
 
@@ -118,7 +117,6 @@ class AttendedTransfer extends React.Component<Props> {
     try {
       this.props.session.refer(attendedTransferSession)
       this.props.attendedTransferSuccess()
-
       this.setState({ attendedTransferSessionReady: null })
     } catch (err) {
       console.log(err)
@@ -127,7 +125,9 @@ class AttendedTransfer extends React.Component<Props> {
 
   cancelAttendedTransfer(attendedTransferSession: any) {
     attendedTransferSession.cancel()
-    this.props.attendedTransferCancel()
+
+    //add id to remove from attendedtransfer or will it be removed on terminated
+    this.props.attendedTransferCancel(attendedTransferSession)
 
     this.setState({ attendedTransferSessionPending: null })
     this.setState({ attendedTransferSession: null })

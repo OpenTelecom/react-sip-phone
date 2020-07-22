@@ -157,9 +157,10 @@ const attendedTransferRequest = () => dispatch => {
     type: SIPSESSION_ATTENDED_TRANSFER_REQUEST
   });
 };
-const attendedTransferCancel = () => dispatch => {
+const attendedTransferCancel = session => dispatch => {
   dispatch({
-    type: SIPSESSION_ATTENDED_TRANSFER_CANCEL
+    type: SIPSESSION_ATTENDED_TRANSFER_CANCEL,
+    payload: session
   });
 };
 const attendedTransferReady = () => dispatch => {
@@ -167,9 +168,10 @@ const attendedTransferReady = () => dispatch => {
     type: SIPSESSION_ATTENDED_TRANSFER_READY
   });
 };
-const attendedTransferPending = () => dispatch => {
+const attendedTransferPending = session => dispatch => {
   dispatch({
-    type: SIPSESSION_ATTENDED_TRANSFER_PENDING
+    type: SIPSESSION_ATTENDED_TRANSFER_PENDING,
+    payload: session
   });
 };
 const attendedTransferSuccess = () => dispatch => {
@@ -1507,6 +1509,7 @@ class AttendedTransfer extends Component {
           case SessionState.Terminated:
             this.props.stateChange(newState, outgoingSession.id);
             this.attendedTransferClear();
+            this.props.attendedTransferCancel(outgoingSession);
             setTimeout(() => {
               this.props.closeSession(outgoingSession.id);
             }, 5000);
@@ -1518,11 +1521,11 @@ class AttendedTransfer extends Component {
         }
       });
       outgoingSession.invite().catch(error => {
-        this.props.attendedTransferFail();
+        this.props.attendedTransferFail(outgoingSession);
         console.log(error);
       });
     } else {
-      this.props.attendedTransferFail();
+      console.log('Failed to makeURI');
     }
   }
 
@@ -1550,7 +1553,7 @@ class AttendedTransfer extends Component {
 
   cancelAttendedTransfer(attendedTransferSession) {
     attendedTransferSession.cancel();
-    this.props.attendedTransferCancel();
+    this.props.attendedTransferCancel(attendedTransferSession);
     this.setState({
       attendedTransferSessionPending: null
     });
@@ -1997,6 +2000,13 @@ const sipSessions = (state = {
           [payload.id]: payload
         },
         attendedTransfers: [...state.attendedTransfers, payload.id]
+      };
+
+    case SIPSESSION_ATTENDED_TRANSFER_CANCEL:
+    case SIPSESSION_ATTENDED_TRANSFER_FAIL:
+      const newAttendedTransfers = [...state.attendedTransfers].filter(id => id !== payload.id);
+      return { ...state,
+        attendedTransfers: newAttendedTransfers
       };
 
     case ACCEPT_CALL:

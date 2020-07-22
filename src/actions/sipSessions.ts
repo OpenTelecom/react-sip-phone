@@ -149,9 +149,11 @@ export const attendedTransferRequest = () => (dispatch: Dispatch) => {
   })
 }
 
-export const attendedTransferCancel = () => (dispatch: Dispatch) => {
+export const attendedTransferCancel = (session: Session) => (dispatch: Dispatch) => {
   dispatch({
-    type: SIPSESSION_ATTENDED_TRANSFER_CANCEL
+    type: SIPSESSION_ATTENDED_TRANSFER_CANCEL,
+    payload: session
+
   })
 }
 
@@ -161,9 +163,10 @@ export const attendedTransferReady = () => (dispatch: Dispatch) => {
   })
 }
 
-export const attendedTransferPending = () => (dispatch: Dispatch) => {
+export const attendedTransferPending = (session: Session) => (dispatch: Dispatch) => {
   dispatch({
-    type: SIPSESSION_ATTENDED_TRANSFER_PENDING
+    type: SIPSESSION_ATTENDED_TRANSFER_PENDING,
+    payload: session
   })
 }
 
