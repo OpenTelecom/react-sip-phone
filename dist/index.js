@@ -1827,11 +1827,15 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
     var _this3 = this;
 
     if (this.state.attendedTransferSessionReady) {
+      var phoneConfigAttended = {
+        disabledButtons: ['numpad', 'transfer'],
+        disabledFeatures: [''],
+        defaultDial: '',
+        sessionsLimit: 1
+      };
       return React.createElement(React.Fragment, null, React.createElement(Phone$1, {
         session: this.state.attendedTransferSessionReady,
-        phoneConfig: {
-          disabledButtons: ['numpad', 'transfer']
-        }
+        phoneConfig: phoneConfigAttended
       }), React.createElement("button", {
         className: styles$2.transferButtons,
         onClick: function onClick() {
@@ -2220,6 +2224,10 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
   var _proto = Dialstring.prototype;
 
   _proto.handleDial = function handleDial() {
+    if (this.props.phoneConfig.disabledFeatures.includes('callbutton')) {
+      this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial);
+    }
+
     if (!this.checkDialstring()) {
       this.props.sipAccount.makeCall("" + this.state.currentDialString);
     }
@@ -2232,7 +2240,15 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
   _proto.render = function render() {
     var _this2 = this;
 
-    return React.createElement("div", {
+    var props = this.props;
+    return React.createElement(React.Fragment, null, props.phoneConfig.disabledFeatures.includes('callbutton') ? React.createElement("button", {
+      className: styles$3.dialButton,
+      onClick: function onClick() {
+        return _this2.handleDial();
+      }
+    }, React.createElement("img", {
+      src: callIcon
+    })) : React.createElement("div", {
       className: styles$3.dialstringContainer
     }, React.createElement("input", {
       className: styles$3.dialInput,
@@ -2257,7 +2273,7 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
       }
     }, React.createElement("img", {
       src: callIcon
-    })));
+    }))));
   };
 
   return Dialstring;
@@ -2495,7 +2511,9 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
       _ref$phoneConfig = _ref.phoneConfig,
       phoneConfig = _ref$phoneConfig === void 0 ? {
     disabledButtons: [],
-    disabledFeatures: []
+    disabledFeatures: [],
+    defaultDial: '',
+    sessionsLimit: 0
   } : _ref$phoneConfig,
       sipConfig = _ref.sipConfig,
       sipCredentials = _ref.sipCredentials,
@@ -2519,7 +2537,10 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
   }, React.createElement(Status$1, {
     phoneConfig: phoneConfig,
     name: name
-  }), phoneConfig.disabledFeatures.includes('dialstring') ? null : React.createElement(D, null), React.createElement(PS, {
+  }), phoneConfig.disabledFeatures.includes('dialstring') ? null : React.createElement(D, {
+    sipConfig: sipConfig,
+    phoneConfig: phoneConfig
+  }), React.createElement(PS, {
     phoneConfig: phoneConfig
   }), React.createElement("audio", {
     id: 'tone',

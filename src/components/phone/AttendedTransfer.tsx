@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { phoneStore } from '../../index'
+import { PhoneConfig } from '../../models'
 import styles from './Phone.scss'
 import { Session, SessionState, UserAgent, Inviter } from 'sip.js'
 import {
@@ -155,10 +156,12 @@ class AttendedTransfer extends React.Component<Props> {
 
   render() {
     if (this.state.attendedTransferSessionReady) {
+      const phoneConfigAttended: PhoneConfig = { disabledButtons: ['numpad', 'transfer'] , disabledFeatures:[''],  defaultDial: '', sessionsLimit:1}
       return (
         <React.Fragment>{
           // @ts-ignore
-          <Phone session={this.state.attendedTransferSessionReady} phoneConfig={{ disabledButtons: ['numpad', 'transfer'] }} />
+          <Phone session={this.state.attendedTransferSessionReady} phoneConfig={phoneConfigAttended}
+           />
         }
           <button
             className={styles.transferButtons}

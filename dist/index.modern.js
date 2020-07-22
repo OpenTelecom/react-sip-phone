@@ -1575,11 +1575,15 @@ class AttendedTransfer extends Component {
 
   render() {
     if (this.state.attendedTransferSessionReady) {
+      const phoneConfigAttended = {
+        disabledButtons: ['numpad', 'transfer'],
+        disabledFeatures: [''],
+        defaultDial: '',
+        sessionsLimit: 1
+      };
       return createElement(Fragment, null, createElement(Phone$1, {
         session: this.state.attendedTransferSessionReady,
-        phoneConfig: {
-          disabledButtons: ['numpad', 'transfer']
-        }
+        phoneConfig: phoneConfigAttended
       }), createElement("button", {
         className: styles$2.transferButtons,
         onClick: () => {
@@ -1903,6 +1907,10 @@ class Dialstring extends Component {
   }
 
   handleDial() {
+    if (this.props.phoneConfig.disabledFeatures.includes('callbutton')) {
+      this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial);
+    }
+
     if (!this.checkDialstring()) {
       this.props.sipAccount.makeCall(`${this.state.currentDialString}`);
     }
@@ -1913,7 +1921,15 @@ class Dialstring extends Component {
   }
 
   render() {
-    return createElement("div", {
+    const {
+      props
+    } = this;
+    return createElement(Fragment, null, props.phoneConfig.disabledFeatures.includes('callbutton') ? createElement("button", {
+      className: styles$3.dialButton,
+      onClick: () => this.handleDial()
+    }, createElement("img", {
+      src: callIcon
+    })) : createElement("div", {
       className: styles$3.dialstringContainer
     }, createElement("input", {
       className: styles$3.dialInput,
@@ -1933,7 +1949,7 @@ class Dialstring extends Component {
       onClick: () => this.handleDial()
     }, createElement("img", {
       src: callIcon
-    })));
+    }))));
   }
 
 }
@@ -2147,7 +2163,9 @@ const ReactSipPhone = ({
   height: _height = 600,
   phoneConfig: _phoneConfig = {
     disabledButtons: [],
-    disabledFeatures: []
+    disabledFeatures: [],
+    defaultDial: '',
+    sessionsLimit: 0
   },
   sipConfig,
   sipCredentials,
@@ -2171,7 +2189,10 @@ const ReactSipPhone = ({
   }, createElement(Status$1, {
     phoneConfig: _phoneConfig,
     name: name
-  }), _phoneConfig.disabledFeatures.includes('dialstring') ? null : createElement(D, null), createElement(PS, {
+  }), _phoneConfig.disabledFeatures.includes('dialstring') ? null : createElement(D, {
+    sipConfig: sipConfig,
+    phoneConfig: _phoneConfig
+  }), createElement(PS, {
     phoneConfig: _phoneConfig
   }), createElement("audio", {
     id: 'tone',

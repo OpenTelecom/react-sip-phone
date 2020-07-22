@@ -26,7 +26,7 @@ export const ReactSipPhone = ({
   name,
   width = 300,
   height = 600,
-  phoneConfig = { disabledButtons: [], disabledFeatures: [] },
+  phoneConfig = { disabledButtons: [], disabledFeatures: [], defaultDial: '', sessionsLimit: 0 },
   sipConfig,
   sipCredentials,
   containerStyle = {}
@@ -44,7 +44,7 @@ export const ReactSipPhone = ({
             }}>
             <Status phoneConfig={phoneConfig} name={name} />
             {phoneConfig.disabledFeatures.includes('dialstring') ? null :
-              <Dialstring />}
+              <Dialstring sipConfig={sipConfig} phoneConfig={phoneConfig}/>}
 
             <PhoneSessions phoneConfig={phoneConfig} />
             <audio id='tone' autoPlay />

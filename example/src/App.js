@@ -8,11 +8,12 @@ const sipuri = urlParams.get('sipuri')
 const password = urlParams.get('password')
 const websocket = urlParams.get('websocket')
 const name = urlParams.get('name')
-
 const disabledButtons = urlParams.get('buttons')
 const disabledFeatures = urlParams.get('features')
-
 const outsideComponentDial = urlParams.get('dial')
+
+//http://localhost:3000/phone/react-sip-phone?name=testname&websocket=wss://test-websocket-01-us-east-5.test.com:5065
+//&sipuri=user_test@test.domain.com&password=tEsTpAsSwOrD&features=callbuttonsettings&buttons=holdtransfer
 
 const App = () => {
   const [dialstring, setDialstring] = useState('')
@@ -37,11 +38,12 @@ const App = () => {
           websocket: websocket || '',
           defaultCountryCode: '1',
           dialstring: true || false
-
         }}
         phoneConfig={{
-          disabledButtons: disabledButtons || '',
-          disabledFeatures: disabledFeatures || ''
+          disabledButtons: disabledButtons || '', // 'hold transfer dialpadopen mute '
+          disabledFeatures: disabledFeatures || '', // 'callbutton settings '
+          defaultDial: '6143543760',  //for use with callbutton disabled 
+          sessionsLimit: 10  //         
         }}
         width={0}
       />
