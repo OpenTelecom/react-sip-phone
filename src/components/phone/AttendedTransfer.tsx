@@ -28,7 +28,7 @@ import SIPAccount from '../../lib/SipAccount'
 interface Props {
   session: Session
   sipAccount: SIPAccount
-  userAgent: UserAgent
+  userAgent: UserAgent,
   destination: string
   started: Function
   attendedTransferRequest: Function
@@ -40,6 +40,8 @@ interface Props {
   holdCallRequest: Function
   stateChange: Function
   closeSession: Function
+  attendedTransfersList: Array<string>,
+  phoneConfig: PhoneConfig
 }
 
 class AttendedTransfer extends React.Component<Props> {
@@ -49,60 +51,65 @@ class AttendedTransfer extends React.Component<Props> {
   }
 
   attendedTransferCall() {
-    this.holdAll()
-    this.props.attendedTransferRequest()
-    const target = UserAgent.makeURI(
-      `sip:${getFullNumber(this.props.destination)}@${this.props.sipAccount._credentials.sipuri.split('@')[1]};user=phone`
-    )
-    if (target) {
-      const inviter = new Inviter(this.props.userAgent, target)
-      const outgoingSession: Session = inviter
-      phoneStore.dispatch({ type: NEW_ATTENDED_TRANSFER, payload: outgoingSession })
-      this.setState({ attendedTransferSessionPending: outgoingSession })
-
-      outgoingSession.stateChange.addListener((newState: SessionState) => {
-        switch (newState) {
-          case SessionState.Initial:
-          case SessionState.Establishing:
-            this.props.stateChange(newState, outgoingSession.id)
-            //add new session to local state
-            this.props.attendedTransferPending()
-
-            break
-          case SessionState.Established:
-            this.setState({ attendedTransferSessionReady: outgoingSession })
-            this.props.attendedTransferReady()
-
-            this.setState({ attendedTransferSessionPending: false })
-            this.props.stateChange(newState, outgoingSession.id)
-
-            setLocalAudio(outgoingSession)
-            setRemoteAudio(outgoingSession)
-
-            break
-          case SessionState.Terminating:
-            this.props.stateChange(newState, outgoingSession.id)
-            cleanupMedia(outgoingSession.id)
-            break
-          case SessionState.Terminated:
-            this.props.stateChange(newState, outgoingSession.id)
-            this.attendedTransferClear()
-            this.props.attendedTransferCancel(outgoingSession)
-            setTimeout(() => {
-              this.props.closeSession(outgoingSession.id)
-            }, 5000)
-            break
-          default:
-            console.log(`Unknown session state change: ${newState}`)
-            break
-        }
-      })
-      outgoingSession.invite().catch((error: Error) => {
-        this.props.attendedTransferFail(outgoingSession)
-        console.log(error)
-      })
+    //check amount of attendedTranfers with phoneConfig 
+    if (this.props.attendedTransfersList.length >= this.props.phoneConfig.attendedTransferLimit){
+      console.log('Unable to create more sessions for attended transfer... please check your phoneConfig options')
     } else {
-      console.log('Failed to makeURI')
+      this.holdAll()
+      this.props.attendedTransferRequest()
+      const target = UserAgent.makeURI(
+        `sip:${getFullNumber(this.props.destination)}@${this.props.sipAccount._credentials.sipuri.split('@')[1]};user=phone`
+      )
+      if (target) {
+        const inviter = new Inviter(this.props.userAgent, target)
+        const outgoingSession: Session = inviter
+        phoneStore.dispatch({ type: NEW_ATTENDED_TRANSFER, payload: outgoingSession })
+        this.setState({ attendedTransferSessionPending: outgoingSession })
+  
+        outgoingSession.stateChange.addListener((newState: SessionState) => {
+          switch (newState) {
+            case SessionState.Initial:
+            case SessionState.Establishing:
+              this.props.stateChange(newState, outgoingSession.id)
+              //add new session to local state
+              this.props.attendedTransferPending()
+  
+              break
+            case SessionState.Established:
+              this.setState({ attendedTransferSessionReady: outgoingSession })
+              this.props.attendedTransferReady()
+  
+              this.setState({ attendedTransferSessionPending: false })
+              this.props.stateChange(newState, outgoingSession.id)
+  
+              setLocalAudio(outgoingSession)
+              setRemoteAudio(outgoingSession)
+  
+              break
+            case SessionState.Terminating:
+              this.props.stateChange(newState, outgoingSession.id)
+              cleanupMedia(outgoingSession.id)
+              break
+            case SessionState.Terminated:
+              this.props.stateChange(newState, outgoingSession.id)
+              this.attendedTransferClear()
+              this.props.attendedTransferCancel(outgoingSession)
+              setTimeout(() => {
+                this.props.closeSession(outgoingSession.id)
+              }, 5000)
+              break
+            default:
+              console.log(`Unknown session state change: ${newState}`)
+              break
+          }
+        })
+        outgoingSession.invite().catch((error: Error) => {
+          this.props.attendedTransferFail(outgoingSession)
+          console.log(error)
+        })
+      } else {
+        console.log('Failed to makeURI')
+      }
     }
   }
 
@@ -125,10 +132,7 @@ class AttendedTransfer extends React.Component<Props> {
 
   cancelAttendedTransfer(attendedTransferSession: any) {
     attendedTransferSession.cancel()
-
-    //add id to remove from attendedtransfer or will it be removed on terminated
     this.props.attendedTransferCancel(attendedTransferSession)
-
     this.setState({ attendedTransferSessionPending: null })
     this.setState({ attendedTransferSession: null })
   }
@@ -156,7 +160,7 @@ class AttendedTransfer extends React.Component<Props> {
 
   render() {
     if (this.state.attendedTransferSessionReady) {
-      const phoneConfigAttended: PhoneConfig = { disabledButtons: ['numpad', 'transfer'] , disabledFeatures:[''],  defaultDial: '', sessionsLimit:1}
+      const phoneConfigAttended: PhoneConfig = { disabledButtons: ['numpad', 'transfer'] , disabledFeatures:[''],  defaultDial: '', sessionsLimit:0, attendedTransferLimit:0}
       return (
         <React.Fragment>{
           // @ts-ignore
@@ -204,7 +208,9 @@ const mapStateToProps = (state: any) => ({
   sipAccount: state.sipAccounts.sipAccount,
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
-  userAgent: state.sipAccounts.userAgent
+  userAgent: state.sipAccounts.userAgent,
+  attendedTransfersList: state.sipSessions.attendedTransfers,
+  phoneConfig:state.config.phoneConfig
 })
 const actions = {
   holdCallRequest,

@@ -15,5 +15,6 @@ export interface PhoneConfig {
   disabledButtons: Array<string>,
   disabledFeatures: Array<string>,
   defaultDial: string,
-  sessionsLimit: number
+  sessionsLimit: number,
+  attendedTransferLimit: number,
 }

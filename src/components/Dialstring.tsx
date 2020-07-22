@@ -4,11 +4,12 @@ import SIPAccount from '../lib/SipAccount'
 import styles from './Dialstring.scss'
 import callIcon from '../assets/call-24px.svg'
 import { PhoneConfig, SipConfig } from '../models'
-
 interface Props {
   sipAccount: SIPAccount
   phoneConfig: PhoneConfig
   sipConfig: SipConfig
+  sessions: Object
+
 }
 
 //call-button enabled (without dialstring) by adding 'callbutton' to phoneConfig.features string 
@@ -19,11 +20,15 @@ class Dialstring extends React.Component<Props> {
     currentDialString: ''
   }
   handleDial() {
-    if (this.props.phoneConfig.disabledFeatures.includes('callbutton')){
-      this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial)
-    }
-    if (!this.checkDialstring()) {
-      this.props.sipAccount.makeCall(`${this.state.currentDialString}`)
+    if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit){
+      console.log('Unable to create more sessions... please check your phoneConfig options')
+    } else{
+      if (this.props.phoneConfig.disabledFeatures.includes('callbutton')){
+        this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial)
+      }
+      if (!this.checkDialstring()) {
+        this.props.sipAccount.makeCall(`${this.state.currentDialString}`)
+      }
     }
   }
   checkDialstring() {
@@ -70,7 +75,8 @@ class Dialstring extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: any) => ({
-  sipAccount: state.sipAccounts.sipAccount
+  sipAccount: state.sipAccounts.sipAccount,
+  sessions: state.sipSessions.sessions
 })
 
 const actions = {

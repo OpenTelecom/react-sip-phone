@@ -5,6 +5,7 @@ interface Props {
     sipAccount: SIPAccount;
     phoneConfig: PhoneConfig;
     sipConfig: SipConfig;
+    sessions: Object;
 }
 declare class Dialstring extends React.Component<Props> {
     state: {

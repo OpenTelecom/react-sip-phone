@@ -26,7 +26,7 @@ export const ReactSipPhone = ({
   name,
   width = 300,
   height = 600,
-  phoneConfig = { disabledButtons: [], disabledFeatures: [], defaultDial: '', sessionsLimit: 0 },
+  phoneConfig,
   sipConfig,
   sipCredentials,
   containerStyle = {}

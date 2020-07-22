@@ -40,10 +40,11 @@ const App = () => {
           dialstring: true || false
         }}
         phoneConfig={{
-          disabledButtons: disabledButtons || '', // 'hold transfer dialpadopen mute '
+          disabledButtons: disabledButtons || 'dialpadopen', // 'hold transfer dialpadopen mute '
           disabledFeatures: disabledFeatures || '', // 'callbutton settings '
           defaultDial: '',  //for use with callbutton disabled 
-          sessionsLimit: 10  //         
+          sessionsLimit: 1,
+          attendedTransferLimit: 1  //         
         }}
         width={0}
       />
