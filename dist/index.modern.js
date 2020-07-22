@@ -843,6 +843,38 @@ class IncomingSessionStateHandler {
 
 }
 
+const SET_CREDENTIALS = 'SET_CREDENTIALS';
+const SET_PHONE_CONFIG = 'SET_PHONE_CONFIG';
+const SET_APP_CONFIG = 'SET_APP_CONFIG';
+const STRICT_MODE_CALL_STARTED = 'STRICT_MODE_CALL_STARTED';
+const STRICT_MODE_CALL_ENDED = 'STRICT_MODE_CALL_ENDED';
+const setCredentials = (uri = '', password = '') => {
+  return {
+    type: SET_CREDENTIALS,
+    payload: {
+      uri,
+      password
+    }
+  };
+};
+const setPhoneConfig = config => {
+  return {
+    type: SET_PHONE_CONFIG,
+    payload: config
+  };
+};
+const setAppConfig = config => {
+  return {
+    type: SET_APP_CONFIG,
+    payload: config
+  };
+};
+const setAppConfigStarted = () => {
+  return {
+    type: STRICT_MODE_CALL_STARTED
+  };
+};
+
 class SIPAccount {
   constructor(sipConfig, sipCredentials) {
     this._config = sipConfig;
@@ -942,6 +974,9 @@ class SIPAccount {
   }
 
   makeCall(number) {
+    phoneStore.dispatch({
+      type: STRICT_MODE_CALL_ENDED
+    });
     const target = UserAgent.makeURI(`sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`);
 
     if (target) {
@@ -972,24 +1007,6 @@ class SIPAccount {
 
 }
 
-const SET_CREDENTIALS = 'SET_CREDENTIALS';
-const SET_CONFIG = 'SET_CONFIG';
-const setCredentials = (uri = '', password = '') => {
-  return {
-    type: SET_CREDENTIALS,
-    payload: {
-      uri,
-      password
-    }
-  };
-};
-const setPhoneConfig = config => {
-  return {
-    type: SET_CONFIG,
-    payload: config
-  };
-};
-
 class SipWrapper extends Component {
   componentDidMount() {
     console.log('mounted');
@@ -1003,6 +1020,7 @@ class SipWrapper extends Component {
     const account = new SIPAccount(this.props.sipConfig, this.props.sipCredentials);
     this.props.setNewAccount(account);
     this.props.setPhoneConfig(this.props.phoneConfig);
+    this.props.setAppConfig(this.props.appConfig);
   }
 
   render() {
@@ -1016,7 +1034,8 @@ const mapStateToProps = () => ({});
 const actions = {
   setNewAccount,
   setPhoneConfig,
-  setCredentials
+  setCredentials,
+  setAppConfig
 };
 var SipWrapper$1 = connect(mapStateToProps, actions)(SipWrapper);
 
@@ -1701,6 +1720,7 @@ class Phone extends Component {
     setTimeout(() => {
       this.props.session.dispose();
       this.props.endCall(this.props.session.id);
+      this.props.setAppConfigStarted();
     }, 5000);
   }
 
@@ -1799,7 +1819,8 @@ const mapStateToProps$7 = state => ({
 });
 
 const actions$7 = {
-  endCall
+  endCall,
+  setAppConfigStarted
 };
 var Phone$1 = connect(mapStateToProps$7, actions$7)(Phone);
 
@@ -1943,39 +1964,54 @@ class Dialstring extends Component {
     const {
       props
     } = this;
-    return createElement(Fragment, null, props.phoneConfig.disabledFeatures.includes('callbutton') ? createElement("button", {
-      className: styles$3.dialButton,
-      onClick: () => this.handleDial()
-    }, createElement("img", {
-      src: callIcon
-    })) : createElement("div", {
-      className: styles$3.dialstringContainer
-    }, createElement("input", {
-      className: styles$3.dialInput,
-      onKeyPress: e => {
-        if (e.key === 'Enter') {
-          this.handleDial();
-          e.preventDefault();
-        }
-      },
-      placeholder: "Enter the number to dial...",
-      onChange: e => this.setState({
-        currentDialString: e.target.value
-      })
-    }), createElement("button", {
-      className: styles$3.dialButton,
-      disabled: this.checkDialstring(),
-      onClick: () => this.handleDial()
-    }, createElement("img", {
-      src: callIcon
-    }))));
+
+    if (props.appConfig.mode.includes('strict') && props.started === true) {
+      return createElement("button", {
+        className: styles$3.dialButton,
+        onClick: () => this.handleDial()
+      }, createElement("img", {
+        src: callIcon
+      }));
+    } else if (props.appConfig.mode.includes('strict')) {
+      return createElement(Fragment, null);
+    } else if (props.phoneConfig.disabledFeatures.includes('callbutton')) {
+      return createElement("button", {
+        className: styles$3.dialButton,
+        onClick: () => this.handleDial()
+      }, createElement("img", {
+        src: callIcon
+      }));
+    } else {
+      return createElement("div", {
+        className: styles$3.dialstringContainer
+      }, createElement("input", {
+        className: styles$3.dialInput,
+        onKeyPress: e => {
+          if (e.key === 'Enter') {
+            this.handleDial();
+            e.preventDefault();
+          }
+        },
+        placeholder: "Enter the number to dial...",
+        onChange: e => this.setState({
+          currentDialString: e.target.value
+        })
+      }), createElement("button", {
+        className: styles$3.dialButton,
+        disabled: this.checkDialstring(),
+        onClick: () => this.handleDial()
+      }, createElement("img", {
+        src: callIcon
+      })));
+    }
   }
 
 }
 
 const mapStateToProps$a = state => ({
   sipAccount: state.sipAccounts.sipAccount,
-  sessions: state.sipSessions.sessions
+  sessions: state.sipSessions.sessions,
+  started: state.config.appConfig.started
 });
 
 const actions$9 = {};
@@ -2147,10 +2183,14 @@ const device = (state = {
 const config = (state = {
   uri: '',
   password: '',
-  phoneConfig: {}
+  phoneConfig: {},
+  appConfig: {
+    mode: '',
+    started: false
+  }
 }, action) => {
   switch (action.type) {
-    case SET_CONFIG:
+    case SET_PHONE_CONFIG:
       return { ...state,
         phoneConfig: action.payload
       };
@@ -2160,6 +2200,31 @@ const config = (state = {
         uri: action.payload.uri,
         password: action.payload.password
       };
+
+    case SET_APP_CONFIG:
+      return { ...state,
+        appConfig: action.payload
+      };
+
+    case STRICT_MODE_CALL_STARTED:
+      if (state.appConfig.mode === 'strict') {
+        return { ...state,
+          appConfig: {
+            mode: 'strict',
+            started: true
+          }
+        };
+      }
+
+    case STRICT_MODE_CALL_ENDED:
+      if (state.appConfig.mode === 'strict') {
+        return { ...state,
+          appConfig: {
+            mode: 'strict',
+            started: false
+          }
+        };
+      }
 
     default:
       return state;
@@ -2190,6 +2255,7 @@ const ReactSipPhone = ({
   height: _height = 600,
   phoneConfig,
   sipConfig,
+  appConfig,
   sipCredentials,
   containerStyle: _containerStyle = {}
 }) => {
@@ -2201,7 +2267,8 @@ const ReactSipPhone = ({
   }, createElement(SipWrapper$1, {
     sipConfig: sipConfig,
     sipCredentials: sipCredentials,
-    phoneConfig: phoneConfig
+    phoneConfig: phoneConfig,
+    appConfig: appConfig
   }, createElement("div", {
     className: styles.container,
     style: { ..._containerStyle,
@@ -2213,7 +2280,8 @@ const ReactSipPhone = ({
     name: name
   }), phoneConfig.disabledFeatures.includes('dialstring') ? null : createElement(D, {
     sipConfig: sipConfig,
-    phoneConfig: phoneConfig
+    phoneConfig: phoneConfig,
+    appConfig: appConfig
   }), createElement(PS, {
     phoneConfig: phoneConfig
   }), createElement("audio", {

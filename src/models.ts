@@ -18,3 +18,8 @@ export interface PhoneConfig {
   sessionsLimit: number,
   attendedTransferLimit: number,
 }
+
+export interface AppConfig {
+  mode: string,
+  started:boolean
+}

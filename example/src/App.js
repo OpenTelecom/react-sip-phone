@@ -11,7 +11,7 @@ const name = urlParams.get('name')
 const disabledButtons = urlParams.get('buttons')
 const disabledFeatures = urlParams.get('features')
 const outsideComponentDial = urlParams.get('dial')
-
+const mode = urlParams.get('mode')
 //http://localhost:3000/phone/react-sip-phone?name=testname&websocket=wss://test-websocket-01-us-east-5.test.com:5065
 //&sipuri=user_test@test.domain.com&password=tEsTpAsSwOrD&features=callbuttonsettings&buttons=holdtransfer
 
@@ -43,8 +43,12 @@ const App = () => {
           disabledButtons: disabledButtons || 'dialpadopen', // 'hold transfer dialpadopen mute '
           disabledFeatures: disabledFeatures || '', // 'callbutton settings '
           defaultDial: '',  //for use with callbutton disabled 
-          sessionsLimit: 1,
-          attendedTransferLimit: 1  //         
+          sessionsLimit: 2,
+          attendedTransferLimit: 2  //         
+        }}
+        appConfig={{
+          mode: mode || '', //strict mode for use with callbutton disabled and sessionLimit set to 1
+          started: false
         }}
         width={0}
       />

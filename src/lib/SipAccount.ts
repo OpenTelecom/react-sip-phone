@@ -14,7 +14,7 @@ import { phoneStore } from '../index'
 import { NEW_USERAGENT } from '../actions/sipAccounts'
 import { SessionStateHandler, getFullNumber } from '../util/sessions'
 import { IncomingSessionStateHandler } from '../util/incomingSession'
-
+import {STRICT_MODE_CALL_ENDED} from '../actions/config'
 import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
 
@@ -118,7 +118,7 @@ export default class SIPAccount {
   }
 
   makeCall(number: string) {
-
+    phoneStore.dispatch({ type: STRICT_MODE_CALL_ENDED })
     // Make a call
     const target = UserAgent.makeURI(
       `sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`

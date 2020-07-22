@@ -3,6 +3,7 @@ import Dialpad from './Dialpad'
 import { connect } from 'react-redux'
 import { Session, SessionState, UserAgent } from 'sip.js'
 import { endCall } from '../../actions/sipSessions'
+import {setAppConfigStarted} from '../../actions/config'
 import Hold from './Hold'
 import Mute from './Mute'
 import BlindTranfer from './BlindTransfer'
@@ -19,6 +20,7 @@ interface Props {
   session: Session
   userAgent: UserAgent
   endCall: Function
+  setAppConfigStarted: Function
   phoneConfig: PhoneConfig
   deviceId: string
 }
@@ -75,6 +77,7 @@ class Phone extends React.Component<Props> {
     setTimeout(() => {
       this.props.session.dispose()
       this.props.endCall(this.props.session.id)
+      this.props.setAppConfigStarted()
     }, 5000)
   }
 
@@ -180,9 +183,9 @@ const mapStateToProps = (state: any) => ({
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
   deviceId: state.device.primaryAudioOutput
-
 })
 const actions = {
-  endCall
+  endCall,
+  setAppConfigStarted
 }
 export default connect(mapStateToProps, actions)(Phone)

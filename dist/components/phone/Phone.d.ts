@@ -5,6 +5,7 @@ interface Props {
     session: Session;
     userAgent: UserAgent;
     endCall: Function;
+    setAppConfigStarted: Function;
     phoneConfig: PhoneConfig;
     deviceId: string;
 }

@@ -3,13 +3,14 @@ import { connect } from 'react-redux'
 import SIPAccount from '../lib/SipAccount'
 import styles from './Dialstring.scss'
 import callIcon from '../assets/call-24px.svg'
-import { PhoneConfig, SipConfig } from '../models'
+import { PhoneConfig, SipConfig, AppConfig } from '../models'
 interface Props {
   sipAccount: SIPAccount
   phoneConfig: PhoneConfig
   sipConfig: SipConfig
+  appConfig: AppConfig
   sessions: Object
-
+  started: Boolean
 }
 
 //call-button enabled (without dialstring) by adding 'callbutton' to phoneConfig.features string 
@@ -37,46 +38,59 @@ class Dialstring extends React.Component<Props> {
 
   render() {
     const { props } = this
-
-    return (
-      <React.Fragment>
-        {props.phoneConfig.disabledFeatures.includes('callbutton') ?   
+    if (props.appConfig.mode.includes('strict') && props.started === true){
+      return  (
         <button
-          className={styles.dialButton}
-          onClick={() => this.handleDial()}
+        className={styles.dialButton}
+        onClick={() => this.handleDial()}
         >
           <img src={callIcon} />
         </button> 
-        :
-      <div className={styles.dialstringContainer}>
-      <input
-        className={styles.dialInput}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            this.handleDial()
-            e.preventDefault()
-          }
-        }}
-        placeholder="Enter the number to dial..."
-        onChange={(e) => this.setState({ currentDialString: e.target.value })}
-      />
+      )
+    }else if (props.appConfig.mode.includes('strict')){
+      return  (
+        <React.Fragment>
+        </React.Fragment>
+      )
+    }else if (props.phoneConfig.disabledFeatures.includes('callbutton')){
+      return (  
       <button
-        className={styles.dialButton}
-        disabled={this.checkDialstring()}
-        onClick={() => this.handleDial()}
+      className={styles.dialButton}
+      onClick={() => this.handleDial()}
       >
         <img src={callIcon} />
-      </button>
-    </div>}
-    </React.Fragment>
-
-    )
+      </button> )
+    } else{
+      return (
+        <div className={styles.dialstringContainer}>
+        <input
+          className={styles.dialInput}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              this.handleDial()
+              e.preventDefault()
+            }
+          }}
+          placeholder="Enter the number to dial..."
+          onChange={(e) => this.setState({ currentDialString: e.target.value })}
+        />
+        <button
+          className={styles.dialButton}
+          disabled={this.checkDialstring()}
+          onClick={() => this.handleDial()}
+        >
+          <img src={callIcon} />
+        </button>
+      </div>
+      )
+    }
   }
 }
 
 const mapStateToProps = (state: any) => ({
   sipAccount: state.sipAccounts.sipAccount,
-  sessions: state.sipSessions.sessions
+  sessions: state.sipSessions.sessions,
+  started:state.config.appConfig.started
 })
 
 const actions = {

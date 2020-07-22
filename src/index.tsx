@@ -6,7 +6,7 @@ import SipWrapper from './SipWrapper'
 import Status from './components/Status'
 import PhoneSessions from './components/PhoneSessions'
 import Dialstring from './components/Dialstring'
-import { SipConfig, SipCredentials, PhoneConfig } from './models'
+import { SipConfig, SipCredentials, PhoneConfig, AppConfig } from './models'
 
 import { defaultStore, persistor } from './store/configureStore'
 
@@ -17,6 +17,7 @@ interface Props {
   phoneConfig: PhoneConfig
   sipCredentials: SipCredentials
   sipConfig: SipConfig
+  appConfig: AppConfig
   containerStyle: any
 }
 
@@ -28,6 +29,7 @@ export const ReactSipPhone = ({
   height = 600,
   phoneConfig,
   sipConfig,
+  appConfig,
   sipCredentials,
   containerStyle = {}
 }: Props) => {
@@ -35,7 +37,7 @@ export const ReactSipPhone = ({
   return (
     <Provider store={phoneStore}>
       <PersistGate loading={null} persistor={persistor}>
-        <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials} phoneConfig={phoneConfig}>
+        <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials} phoneConfig={phoneConfig} appConfig={appConfig}>
           <div className={styles.container}
             style={{
               ...containerStyle,
@@ -44,7 +46,7 @@ export const ReactSipPhone = ({
             }}>
             <Status phoneConfig={phoneConfig} name={name} />
             {phoneConfig.disabledFeatures.includes('dialstring') ? null :
-              <Dialstring sipConfig={sipConfig} phoneConfig={phoneConfig}/>}
+              <Dialstring sipConfig={sipConfig} phoneConfig={phoneConfig} appConfig={appConfig}/>}
 
             <PhoneSessions phoneConfig={phoneConfig} />
             <audio id='tone' autoPlay />
