@@ -42,7 +42,7 @@ const App = () => {
         phoneConfig={{
           disabledButtons: disabledButtons || '', // 'hold transfer dialpadopen mute '
           disabledFeatures: disabledFeatures || '', // 'callbutton settings '
-          defaultDial: '6143543760',  //for use with callbutton disabled 
+          defaultDial: '',  //for use with callbutton disabled 
           sessionsLimit: 10  //         
         }}
         width={0}
