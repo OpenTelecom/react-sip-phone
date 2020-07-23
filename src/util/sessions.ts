@@ -3,6 +3,7 @@ import { SessionState, Session } from 'sip.js'
 import {
   SIPSESSION_STATECHANGE, CLOSE_SESSION
 } from '../actions/sipSessions'
+import {STRICT_MODE_SHOW_CALL_BUTTON} from '../actions/config'
 import { holdAll } from '../util/hold'
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from './audio'
 import toneManager from './ToneManager'
@@ -44,6 +45,9 @@ export class SessionStateHandler {
           phoneStore.dispatch({
             type: CLOSE_SESSION,
             payload: this.session.id
+          })
+          phoneStore.dispatch({
+            type:STRICT_MODE_SHOW_CALL_BUTTON
           })
         }, 5000)
         break

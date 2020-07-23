@@ -291,6 +291,58 @@ var unMuteFail = function unMuteFail() {
   };
 };
 
+var SET_CREDENTIALS = 'SET_CREDENTIALS';
+var SET_PHONE_CONFIG = 'SET_PHONE_CONFIG';
+var SET_APP_CONFIG = 'SET_APP_CONFIG';
+var STRICT_MODE_SHOW_CALL_BUTTON = 'STRICT_MODE_SHOW_CALL_BUTTON';
+var STRICT_MODE_HIDE_CALL_BUTTON = 'STRICT_MODE_HIDE_CALL_BUTTON';
+var ATTENDED_TRANSFER_LIMIT_REACHED = 'ATTENDED_TRANSFER_LIMIT_REACHED';
+var SESSIONS_LIMIT_REACHED = 'SESSIONS_LIMIT_REACHED';
+var setCredentials = function setCredentials(uri, password) {
+  if (uri === void 0) {
+    uri = '';
+  }
+
+  if (password === void 0) {
+    password = '';
+  }
+
+  return {
+    type: SET_CREDENTIALS,
+    payload: {
+      uri: uri,
+      password: password
+    }
+  };
+};
+var setPhoneConfig = function setPhoneConfig(config) {
+  return {
+    type: SET_PHONE_CONFIG,
+    payload: config
+  };
+};
+var setAppConfig = function setAppConfig(config) {
+  return {
+    type: SET_APP_CONFIG,
+    payload: config
+  };
+};
+var setAppConfigStarted = function setAppConfigStarted() {
+  return {
+    type: STRICT_MODE_SHOW_CALL_BUTTON
+  };
+};
+var attendedTransferLimitReached = function attendedTransferLimitReached() {
+  return {
+    type: ATTENDED_TRANSFER_LIMIT_REACHED
+  };
+};
+var sessionsLimitReached = function sessionsLimitReached() {
+  return {
+    type: SESSIONS_LIMIT_REACHED
+  };
+};
+
 var holdAll = function holdAll(id) {
   var state = phoneStore.getState();
   var onHolds = state.sipSessions.onHold;
@@ -833,6 +885,9 @@ var SessionStateHandler = function SessionStateHandler(session) {
             type: CLOSE_SESSION,
             payload: _this.session.id
           });
+          phoneStore.dispatch({
+            type: STRICT_MODE_SHOW_CALL_BUTTON
+          });
         }, 5000);
         break;
 
@@ -957,58 +1012,6 @@ var IncomingSessionStateHandler = function IncomingSessionStateHandler(incomingS
   };
 
   this.incomingSession = incomingSession;
-};
-
-var SET_CREDENTIALS = 'SET_CREDENTIALS';
-var SET_PHONE_CONFIG = 'SET_PHONE_CONFIG';
-var SET_APP_CONFIG = 'SET_APP_CONFIG';
-var STRICT_MODE_SHOW_CALL_BUTTON = 'STRICT_MODE_SHOW_CALL_BUTTON';
-var STRICT_MODE_HIDE_CALL_BUTTON = 'STRICT_MODE_HIDE_CALL_BUTTON';
-var ATTENDED_TRANSFER_LIMIT_REACHED = 'ATTENDED_TRANSFER_LIMIT_REACHED';
-var SESSIONS_LIMIT_REACHED = 'SESSIONS_LIMIT_REACHED';
-var setCredentials = function setCredentials(uri, password) {
-  if (uri === void 0) {
-    uri = '';
-  }
-
-  if (password === void 0) {
-    password = '';
-  }
-
-  return {
-    type: SET_CREDENTIALS,
-    payload: {
-      uri: uri,
-      password: password
-    }
-  };
-};
-var setPhoneConfig = function setPhoneConfig(config) {
-  return {
-    type: SET_PHONE_CONFIG,
-    payload: config
-  };
-};
-var setAppConfig = function setAppConfig(config) {
-  return {
-    type: SET_APP_CONFIG,
-    payload: config
-  };
-};
-var setAppConfigStarted = function setAppConfigStarted() {
-  return {
-    type: STRICT_MODE_SHOW_CALL_BUTTON
-  };
-};
-var attendedTransferLimitReached = function attendedTransferLimitReached() {
-  return {
-    type: ATTENDED_TRANSFER_LIMIT_REACHED
-  };
-};
-var sessionsLimitReached = function sessionsLimitReached() {
-  return {
-    type: SESSIONS_LIMIT_REACHED
-  };
 };
 
 var SIPAccount = /*#__PURE__*/function () {
