@@ -215,6 +215,50 @@ const unMuteFail = () => dispatch => {
   });
 };
 
+const SET_CREDENTIALS = 'SET_CREDENTIALS';
+const SET_PHONE_CONFIG = 'SET_PHONE_CONFIG';
+const SET_APP_CONFIG = 'SET_APP_CONFIG';
+const STRICT_MODE_SHOW_CALL_BUTTON = 'STRICT_MODE_SHOW_CALL_BUTTON';
+const STRICT_MODE_HIDE_CALL_BUTTON = 'STRICT_MODE_HIDE_CALL_BUTTON';
+const ATTENDED_TRANSFER_LIMIT_REACHED = 'ATTENDED_TRANSFER_LIMIT_REACHED';
+const SESSIONS_LIMIT_REACHED = 'SESSIONS_LIMIT_REACHED';
+const setCredentials = (uri = '', password = '') => {
+  return {
+    type: SET_CREDENTIALS,
+    payload: {
+      uri,
+      password
+    }
+  };
+};
+const setPhoneConfig = config => {
+  return {
+    type: SET_PHONE_CONFIG,
+    payload: config
+  };
+};
+const setAppConfig = config => {
+  return {
+    type: SET_APP_CONFIG,
+    payload: config
+  };
+};
+const setAppConfigStarted = () => {
+  return {
+    type: STRICT_MODE_SHOW_CALL_BUTTON
+  };
+};
+const attendedTransferLimitReached = () => {
+  return {
+    type: ATTENDED_TRANSFER_LIMIT_REACHED
+  };
+};
+const sessionsLimitReached = () => {
+  return {
+    type: SESSIONS_LIMIT_REACHED
+  };
+};
+
 const holdAll = id => {
   const state = phoneStore.getState();
   const onHolds = state.sipSessions.onHold;
@@ -714,6 +758,9 @@ class SessionStateHandler {
               type: CLOSE_SESSION,
               payload: this.session.id
             });
+            phoneStore.dispatch({
+              type: STRICT_MODE_SHOW_CALL_BUTTON
+            });
           }, 5000);
           break;
 
@@ -842,50 +889,6 @@ class IncomingSessionStateHandler {
   }
 
 }
-
-const SET_CREDENTIALS = 'SET_CREDENTIALS';
-const SET_PHONE_CONFIG = 'SET_PHONE_CONFIG';
-const SET_APP_CONFIG = 'SET_APP_CONFIG';
-const STRICT_MODE_SHOW_CALL_BUTTON = 'STRICT_MODE_SHOW_CALL_BUTTON';
-const STRICT_MODE_HIDE_CALL_BUTTON = 'STRICT_MODE_HIDE_CALL_BUTTON';
-const ATTENDED_TRANSFER_LIMIT_REACHED = 'ATTENDED_TRANSFER_LIMIT_REACHED';
-const SESSIONS_LIMIT_REACHED = 'SESSIONS_LIMIT_REACHED';
-const setCredentials = (uri = '', password = '') => {
-  return {
-    type: SET_CREDENTIALS,
-    payload: {
-      uri,
-      password
-    }
-  };
-};
-const setPhoneConfig = config => {
-  return {
-    type: SET_PHONE_CONFIG,
-    payload: config
-  };
-};
-const setAppConfig = config => {
-  return {
-    type: SET_APP_CONFIG,
-    payload: config
-  };
-};
-const setAppConfigStarted = () => {
-  return {
-    type: STRICT_MODE_SHOW_CALL_BUTTON
-  };
-};
-const attendedTransferLimitReached = () => {
-  return {
-    type: ATTENDED_TRANSFER_LIMIT_REACHED
-  };
-};
-const sessionsLimitReached = () => {
-  return {
-    type: SESSIONS_LIMIT_REACHED
-  };
-};
 
 class SIPAccount {
   constructor(sipConfig, sipCredentials) {
