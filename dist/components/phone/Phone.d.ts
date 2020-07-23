@@ -5,8 +5,10 @@ interface Props {
     session: Session;
     userAgent: UserAgent;
     endCall: Function;
+    setAppConfigStarted: Function;
     phoneConfig: PhoneConfig;
     deviceId: string;
+    strictMode: string;
 }
 declare class Phone extends React.Component<Props> {
     state: {

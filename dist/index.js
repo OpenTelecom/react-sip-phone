@@ -211,10 +211,11 @@ var attendedTransferRequest = function attendedTransferRequest() {
     });
   };
 };
-var attendedTransferCancel = function attendedTransferCancel() {
+var attendedTransferCancel = function attendedTransferCancel(session) {
   return function (dispatch) {
     dispatch({
-      type: SIPSESSION_ATTENDED_TRANSFER_CANCEL
+      type: SIPSESSION_ATTENDED_TRANSFER_CANCEL,
+      payload: session
     });
   };
 };
@@ -225,10 +226,11 @@ var attendedTransferReady = function attendedTransferReady() {
     });
   };
 };
-var attendedTransferPending = function attendedTransferPending() {
+var attendedTransferPending = function attendedTransferPending(session) {
   return function (dispatch) {
     dispatch({
-      type: SIPSESSION_ATTENDED_TRANSFER_PENDING
+      type: SIPSESSION_ATTENDED_TRANSFER_PENDING,
+      payload: session
     });
   };
 };
@@ -957,6 +959,58 @@ var IncomingSessionStateHandler = function IncomingSessionStateHandler(incomingS
   this.incomingSession = incomingSession;
 };
 
+var SET_CREDENTIALS = 'SET_CREDENTIALS';
+var SET_PHONE_CONFIG = 'SET_PHONE_CONFIG';
+var SET_APP_CONFIG = 'SET_APP_CONFIG';
+var STRICT_MODE_SHOW_CALL_BUTTON = 'STRICT_MODE_SHOW_CALL_BUTTON';
+var STRICT_MODE_HIDE_CALL_BUTTON = 'STRICT_MODE_HIDE_CALL_BUTTON';
+var ATTENDED_TRANSFER_LIMIT_REACHED = 'ATTENDED_TRANSFER_LIMIT_REACHED';
+var SESSIONS_LIMIT_REACHED = 'SESSIONS_LIMIT_REACHED';
+var setCredentials = function setCredentials(uri, password) {
+  if (uri === void 0) {
+    uri = '';
+  }
+
+  if (password === void 0) {
+    password = '';
+  }
+
+  return {
+    type: SET_CREDENTIALS,
+    payload: {
+      uri: uri,
+      password: password
+    }
+  };
+};
+var setPhoneConfig = function setPhoneConfig(config) {
+  return {
+    type: SET_PHONE_CONFIG,
+    payload: config
+  };
+};
+var setAppConfig = function setAppConfig(config) {
+  return {
+    type: SET_APP_CONFIG,
+    payload: config
+  };
+};
+var setAppConfigStarted = function setAppConfigStarted() {
+  return {
+    type: STRICT_MODE_SHOW_CALL_BUTTON
+  };
+};
+var attendedTransferLimitReached = function attendedTransferLimitReached() {
+  return {
+    type: ATTENDED_TRANSFER_LIMIT_REACHED
+  };
+};
+var sessionsLimitReached = function sessionsLimitReached() {
+  return {
+    type: SESSIONS_LIMIT_REACHED
+  };
+};
+
 var SIPAccount = /*#__PURE__*/function () {
   function SIPAccount(sipConfig, sipCredentials) {
     var _this = this;
@@ -1059,61 +1113,52 @@ var SIPAccount = /*#__PURE__*/function () {
   };
 
   _proto.makeCall = function makeCall(number) {
-    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(number) + "@" + this._credentials.sipuri.split('@')[1] + ";user=phone");
+    var state = phoneStore.getState();
+    var sessionLimit = state.config.phoneConfig.sessionsLimit;
+    var sessionsActive = state.sipSessions.sessions;
+    var strictMode = state.config.appConfig.mode;
 
-    if (target) {
-      console.log("Calling " + number);
-      var inviter = new sip_js.Inviter(this._userAgent, target);
-      var outgoingSession = inviter;
-      outgoingSession.delegate = {
-        onRefer: function onRefer(referral) {
-          console.log('Referred: ' + referral);
-        }
-      };
+    if (Object.keys(sessionsActive).length >= sessionLimit) {
       phoneStore.dispatch({
-        type: NEW_SESSION,
-        payload: outgoingSession
-      });
-      var stateHandler = new SessionStateHandler(outgoingSession);
-      outgoingSession.stateChange.addListener(stateHandler.stateChange);
-      outgoingSession.invite().then(function () {
-        console.log('Invite sent!');
-      })["catch"](function (error) {
-        console.log(error);
+        type: SESSIONS_LIMIT_REACHED
       });
     } else {
-      console.log("Failed to establish session for outgoing call to " + number);
+      var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(number) + "@" + this._credentials.sipuri.split('@')[1] + ";user=phone");
+
+      if (strictMode === 'strict') {
+        phoneStore.dispatch({
+          type: STRICT_MODE_HIDE_CALL_BUTTON
+        });
+      }
+
+      if (target) {
+        console.log("Calling " + number);
+        var inviter = new sip_js.Inviter(this._userAgent, target);
+        var outgoingSession = inviter;
+        outgoingSession.delegate = {
+          onRefer: function onRefer(referral) {
+            console.log('Referred: ' + referral);
+          }
+        };
+        phoneStore.dispatch({
+          type: NEW_SESSION,
+          payload: outgoingSession
+        });
+        var stateHandler = new SessionStateHandler(outgoingSession);
+        outgoingSession.stateChange.addListener(stateHandler.stateChange);
+        outgoingSession.invite().then(function () {
+          console.log('Invite sent!');
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      } else {
+        console.log("Failed to establish session for outgoing call to " + number);
+      }
     }
   };
 
   return SIPAccount;
 }();
-
-var SET_CREDENTIALS = 'SET_CREDENTIALS';
-var SET_CONFIG = 'SET_CONFIG';
-var setCredentials = function setCredentials(uri, password) {
-  if (uri === void 0) {
-    uri = '';
-  }
-
-  if (password === void 0) {
-    password = '';
-  }
-
-  return {
-    type: SET_CREDENTIALS,
-    payload: {
-      uri: uri,
-      password: password
-    }
-  };
-};
-var setPhoneConfig = function setPhoneConfig(config) {
-  return {
-    type: SET_CONFIG,
-    payload: config
-  };
-};
 
 var SipWrapper = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(SipWrapper, _React$Component);
@@ -1135,6 +1180,8 @@ var SipWrapper = /*#__PURE__*/function (_React$Component) {
   _proto.initializeSip = function initializeSip() {
     var account = new SIPAccount(this.props.sipConfig, this.props.sipCredentials);
     this.props.setNewAccount(account);
+    this.props.setPhoneConfig(this.props.phoneConfig);
+    this.props.setAppConfig(this.props.appConfig);
   };
 
   _proto.render = function render() {
@@ -1151,7 +1198,8 @@ var mapStateToProps = function mapStateToProps() {
 var actions = {
   setNewAccount: setNewAccount,
   setPhoneConfig: setPhoneConfig,
-  setCredentials: setCredentials
+  setCredentials: setCredentials,
+  setAppConfig: setAppConfig
 };
 var SipWrapper$1 = reactRedux.connect(mapStateToProps, actions)(SipWrapper);
 
@@ -1704,75 +1752,81 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
   _proto.attendedTransferCall = function attendedTransferCall() {
     var _this2 = this;
 
-    this.holdAll();
-    this.props.attendedTransferRequest();
-    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(this.props.destination) + "@" + this.props.sipAccount._credentials.sipuri.split('@')[1] + ";user=phone");
-
-    if (target) {
-      var inviter = new sip_js.Inviter(this.props.userAgent, target);
-      var outgoingSession = inviter;
-      phoneStore.dispatch({
-        type: NEW_ATTENDED_TRANSFER,
-        payload: outgoingSession
-      });
-      this.setState({
-        attendedTransferSessionPending: outgoingSession
-      });
-      outgoingSession.stateChange.addListener(function (newState) {
-        switch (newState) {
-          case sip_js.SessionState.Initial:
-          case sip_js.SessionState.Establishing:
-            _this2.props.stateChange(newState, outgoingSession.id);
-
-            _this2.props.attendedTransferPending();
-
-            break;
-
-          case sip_js.SessionState.Established:
-            _this2.setState({
-              attendedTransferSessionReady: outgoingSession
-            });
-
-            _this2.props.attendedTransferReady();
-
-            _this2.setState({
-              attendedTransferSessionPending: false
-            });
-
-            _this2.props.stateChange(newState, outgoingSession.id);
-
-            setLocalAudio(outgoingSession);
-            setRemoteAudio(outgoingSession);
-            break;
-
-          case sip_js.SessionState.Terminating:
-            _this2.props.stateChange(newState, outgoingSession.id);
-
-            cleanupMedia(outgoingSession.id);
-            break;
-
-          case sip_js.SessionState.Terminated:
-            _this2.props.stateChange(newState, outgoingSession.id);
-
-            _this2.attendedTransferClear();
-
-            setTimeout(function () {
-              _this2.props.closeSession(outgoingSession.id);
-            }, 5000);
-            break;
-
-          default:
-            console.log("Unknown session state change: " + newState);
-            break;
-        }
-      });
-      outgoingSession.invite()["catch"](function (error) {
-        _this2.props.attendedTransferFail();
-
-        console.log(error);
-      });
+    if (this.props.attendedTransfersList.length >= this.props.phoneConfig.attendedTransferLimit) {
+      this.props.attendedTransferLimitReached();
     } else {
-      this.props.attendedTransferFail();
+      this.holdAll();
+      this.props.attendedTransferRequest();
+      var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(this.props.destination) + "@" + this.props.sipAccount._credentials.sipuri.split('@')[1] + ";user=phone");
+
+      if (target) {
+        var inviter = new sip_js.Inviter(this.props.userAgent, target);
+        var outgoingSession = inviter;
+        phoneStore.dispatch({
+          type: NEW_ATTENDED_TRANSFER,
+          payload: outgoingSession
+        });
+        this.setState({
+          attendedTransferSessionPending: outgoingSession
+        });
+        outgoingSession.stateChange.addListener(function (newState) {
+          switch (newState) {
+            case sip_js.SessionState.Initial:
+            case sip_js.SessionState.Establishing:
+              _this2.props.stateChange(newState, outgoingSession.id);
+
+              _this2.props.attendedTransferPending();
+
+              break;
+
+            case sip_js.SessionState.Established:
+              _this2.setState({
+                attendedTransferSessionReady: outgoingSession
+              });
+
+              _this2.props.attendedTransferReady();
+
+              _this2.setState({
+                attendedTransferSessionPending: false
+              });
+
+              _this2.props.stateChange(newState, outgoingSession.id);
+
+              setLocalAudio(outgoingSession);
+              setRemoteAudio(outgoingSession);
+              break;
+
+            case sip_js.SessionState.Terminating:
+              _this2.props.stateChange(newState, outgoingSession.id);
+
+              cleanupMedia(outgoingSession.id);
+              break;
+
+            case sip_js.SessionState.Terminated:
+              _this2.props.stateChange(newState, outgoingSession.id);
+
+              _this2.attendedTransferClear();
+
+              _this2.props.attendedTransferCancel(outgoingSession);
+
+              setTimeout(function () {
+                _this2.props.closeSession(outgoingSession.id);
+              }, 5000);
+              break;
+
+            default:
+              console.log("Unknown session state change: " + newState);
+              break;
+          }
+        });
+        outgoingSession.invite()["catch"](function (error) {
+          _this2.props.attendedTransferFail(outgoingSession);
+
+          console.log(error);
+        });
+      } else {
+        console.log('Failed to makeURI');
+      }
     }
   };
 
@@ -1800,7 +1854,7 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
 
   _proto.cancelAttendedTransfer = function cancelAttendedTransfer(attendedTransferSession) {
     attendedTransferSession.cancel();
-    this.props.attendedTransferCancel();
+    this.props.attendedTransferCancel(attendedTransferSession);
     this.setState({
       attendedTransferSessionPending: null
     });
@@ -1827,11 +1881,16 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
     var _this3 = this;
 
     if (this.state.attendedTransferSessionReady) {
+      var phoneConfigAttended = {
+        disabledButtons: ['numpad', 'transfer'],
+        disabledFeatures: [''],
+        defaultDial: '',
+        sessionsLimit: 0,
+        attendedTransferLimit: 0
+      };
       return React.createElement(React.Fragment, null, React.createElement(Phone$1, {
         session: this.state.attendedTransferSessionReady,
-        phoneConfig: {
-          disabledButtons: ['numpad', 'transfer']
-        }
+        phoneConfig: phoneConfigAttended
       }), React.createElement("button", {
         className: styles$2.transferButtons,
         onClick: function onClick() {
@@ -1875,7 +1934,9 @@ var mapStateToProps$6 = function mapStateToProps(state) {
     sipAccount: state.sipAccounts.sipAccount,
     stateChanged: state.sipSessions.stateChanged,
     sessions: state.sipSessions.sessions,
-    userAgent: state.sipAccounts.userAgent
+    userAgent: state.sipAccounts.userAgent,
+    attendedTransfersList: state.sipSessions.attendedTransfers,
+    phoneConfig: state.config.phoneConfig
   };
 };
 
@@ -1887,6 +1948,7 @@ var actions$6 = {
   attendedTransferPending: attendedTransferPending,
   attendedTransferSuccess: attendedTransferSuccess,
   attendedTransferFail: attendedTransferFail,
+  attendedTransferLimitReached: attendedTransferLimitReached,
   stateChange: stateChange,
   closeSession: closeSession
 };
@@ -1954,6 +2016,10 @@ var Phone = /*#__PURE__*/function (_React$Component) {
       _this2.props.session.dispose();
 
       _this2.props.endCall(_this2.props.session.id);
+
+      if (_this2.props.strictMode === 'strict') {
+        _this2.props.setAppConfigStarted();
+      }
     }, 5000);
   };
 
@@ -2061,12 +2127,14 @@ var mapStateToProps$7 = function mapStateToProps(state) {
     stateChanged: state.sipSessions.stateChanged,
     sessions: state.sipSessions.sessions,
     userAgent: state.sipAccounts.userAgent,
-    deviceId: state.device.primaryAudioOutput
+    deviceId: state.device.primaryAudioOutput,
+    strictMode: state.config.appConfig.mode
   };
 };
 
 var actions$7 = {
-  endCall: endCall
+  endCall: endCall,
+  setAppConfigStarted: setAppConfigStarted
 };
 var Phone$1 = reactRedux.connect(mapStateToProps$7, actions$7)(Phone);
 
@@ -2160,10 +2228,14 @@ var getSessions = function getSessions(sessions, phoneConfig, attendedTransfers,
     if (attendedTransfers.includes(session)) continue;
 
     if (incomingCalls.includes(session)) {
-      elements.push(React.createElement(Incoming$1, {
-        session: sessions[session],
-        key: session
-      }));
+      if (Object.keys(sessions).length >= phoneConfig.sessionsLimit + incomingCalls.length) {
+        console.log('Unable to create more sessions... please check your phoneConfig options');
+      } else {
+        elements.push(React.createElement(Incoming$1, {
+          session: sessions[session],
+          key: session
+        }));
+      }
     } else {
       elements.push(React.createElement(Phone$1, {
         session: sessions[session],
@@ -2220,8 +2292,16 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
   var _proto = Dialstring.prototype;
 
   _proto.handleDial = function handleDial() {
-    if (!this.checkDialstring()) {
-      this.props.sipAccount.makeCall("" + this.state.currentDialString);
+    if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit) {
+      this.props.sessionsLimitReached();
+    } else {
+      if (this.props.phoneConfig.disabledFeatures.includes('callbutton')) {
+        this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial);
+      }
+
+      if (!this.checkDialstring()) {
+        this.props.sipAccount.makeCall("" + this.state.currentDialString);
+      }
     }
   };
 
@@ -2232,32 +2312,56 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
   _proto.render = function render() {
     var _this2 = this;
 
-    return React.createElement("div", {
-      className: styles$3.dialstringContainer
-    }, React.createElement("input", {
-      className: styles$3.dialInput,
-      onKeyPress: function onKeyPress(e) {
-        if (e.key === 'Enter') {
-          _this2.handleDial();
+    var props = this.props;
 
-          e.preventDefault();
+    if (props.appConfig.mode.includes('strict') && props.started === true) {
+      return React.createElement("button", {
+        className: styles$3.dialButton,
+        onClick: function onClick() {
+          return _this2.handleDial();
         }
-      },
-      placeholder: "Enter the number to dial...",
-      onChange: function onChange(e) {
-        return _this2.setState({
-          currentDialString: e.target.value
-        });
-      }
-    }), React.createElement("button", {
-      className: styles$3.dialButton,
-      disabled: this.checkDialstring(),
-      onClick: function onClick() {
-        return _this2.handleDial();
-      }
-    }, React.createElement("img", {
-      src: callIcon
-    })));
+      }, React.createElement("img", {
+        src: callIcon
+      }));
+    } else if (props.appConfig.mode.includes('strict')) {
+      return React.createElement(React.Fragment, null);
+    } else if (props.phoneConfig.disabledFeatures.includes('callbutton')) {
+      return React.createElement("button", {
+        className: styles$3.dialButton,
+        onClick: function onClick() {
+          return _this2.handleDial();
+        }
+      }, React.createElement("img", {
+        src: callIcon
+      }));
+    } else {
+      return React.createElement("div", {
+        className: styles$3.dialstringContainer
+      }, React.createElement("input", {
+        className: styles$3.dialInput,
+        onKeyPress: function onKeyPress(e) {
+          if (e.key === 'Enter') {
+            _this2.handleDial();
+
+            e.preventDefault();
+          }
+        },
+        placeholder: "Enter the number to dial...",
+        onChange: function onChange(e) {
+          return _this2.setState({
+            currentDialString: e.target.value
+          });
+        }
+      }), React.createElement("button", {
+        className: styles$3.dialButton,
+        disabled: this.checkDialstring(),
+        onClick: function onClick() {
+          return _this2.handleDial();
+        }
+      }, React.createElement("img", {
+        src: callIcon
+      })));
+    }
   };
 
   return Dialstring;
@@ -2265,11 +2369,15 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
 
 var mapStateToProps$a = function mapStateToProps(state) {
   return {
-    sipAccount: state.sipAccounts.sipAccount
+    sipAccount: state.sipAccounts.sipAccount,
+    sessions: state.sipSessions.sessions,
+    started: state.config.appConfig.started
   };
 };
 
-var actions$9 = {};
+var actions$9 = {
+  sessionsLimitReached: sessionsLimitReached
+};
 var D = reactRedux.connect(mapStateToProps$a, actions$9)(Dialstring);
 
 var sipSessions = function sipSessions(state, action) {
@@ -2306,6 +2414,15 @@ var sipSessions = function sipSessions(state, action) {
       return _extends(_extends({}, state), {}, {
         sessions: _extends(_extends({}, state.sessions), {}, (_extends4 = {}, _extends4[payload.id] = payload, _extends4)),
         attendedTransfers: [].concat(state.attendedTransfers, [payload.id])
+      });
+
+    case SIPSESSION_ATTENDED_TRANSFER_CANCEL:
+    case SIPSESSION_ATTENDED_TRANSFER_FAIL:
+      var newAttendedTransfers = [].concat(state.attendedTransfers).filter(function (id) {
+        return id !== payload.id;
+      });
+      return _extends(_extends({}, state), {}, {
+        attendedTransfers: newAttendedTransfers
       });
 
     case ACCEPT_CALL:
@@ -2447,12 +2564,16 @@ var config = function config(state, action) {
     state = {
       uri: '',
       password: '',
-      phoneConfig: {}
+      phoneConfig: {},
+      appConfig: {
+        mode: '',
+        started: false
+      }
     };
   }
 
   switch (action.type) {
-    case SET_CONFIG:
+    case SET_PHONE_CONFIG:
       return _extends(_extends({}, state), {}, {
         phoneConfig: action.payload
       });
@@ -2462,6 +2583,31 @@ var config = function config(state, action) {
         uri: action.payload.uri,
         password: action.payload.password
       });
+
+    case SET_APP_CONFIG:
+      return _extends(_extends({}, state), {}, {
+        appConfig: action.payload
+      });
+
+    case STRICT_MODE_SHOW_CALL_BUTTON:
+      if (state.appConfig.mode === 'strict') {
+        return _extends(_extends({}, state), {}, {
+          appConfig: {
+            mode: 'strict',
+            started: true
+          }
+        });
+      }
+
+    case STRICT_MODE_HIDE_CALL_BUTTON:
+      if (state.appConfig.mode === 'strict') {
+        return _extends(_extends({}, state), {}, {
+          appConfig: {
+            mode: 'strict',
+            started: false
+          }
+        });
+      }
 
     default:
       return state;
@@ -2492,12 +2638,9 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
       width = _ref$width === void 0 ? 300 : _ref$width,
       _ref$height = _ref.height,
       height = _ref$height === void 0 ? 600 : _ref$height,
-      _ref$phoneConfig = _ref.phoneConfig,
-      phoneConfig = _ref$phoneConfig === void 0 ? {
-    disabledButtons: [],
-    disabledFeatures: []
-  } : _ref$phoneConfig,
+      phoneConfig = _ref.phoneConfig,
       sipConfig = _ref.sipConfig,
+      appConfig = _ref.appConfig,
       sipCredentials = _ref.sipCredentials,
       _ref$containerStyle = _ref.containerStyle,
       containerStyle = _ref$containerStyle === void 0 ? {} : _ref$containerStyle;
@@ -2509,7 +2652,8 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
   }, React.createElement(SipWrapper$1, {
     sipConfig: sipConfig,
     sipCredentials: sipCredentials,
-    phoneConfig: phoneConfig
+    phoneConfig: phoneConfig,
+    appConfig: appConfig
   }, React.createElement("div", {
     className: styles.container,
     style: _extends(_extends({}, containerStyle), {}, {
@@ -2519,7 +2663,11 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
   }, React.createElement(Status$1, {
     phoneConfig: phoneConfig,
     name: name
-  }), phoneConfig.disabledFeatures.includes('dialstring') ? null : React.createElement(D, null), React.createElement(PS, {
+  }), phoneConfig.disabledFeatures.includes('dialstring') ? null : React.createElement(D, {
+    sipConfig: sipConfig,
+    phoneConfig: phoneConfig,
+    appConfig: appConfig
+  }), React.createElement(PS, {
     phoneConfig: phoneConfig
   }), React.createElement("audio", {
     id: 'tone',

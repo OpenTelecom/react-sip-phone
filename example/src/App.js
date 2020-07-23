@@ -8,11 +8,14 @@ const sipuri = urlParams.get('sipuri')
 const password = urlParams.get('password')
 const websocket = urlParams.get('websocket')
 const name = urlParams.get('name')
-
 const disabledButtons = urlParams.get('buttons')
 const disabledFeatures = urlParams.get('features')
-
 const outsideComponentDial = urlParams.get('dial')
+const mode = urlParams.get('mode')
+
+//example url 
+//http://localhost:3000/phone/react-sip-phone?name=testname&websocket=wss://test-websocket-01-us-east-5.test.com:5065
+//&sipuri=user_test@test.domain.com&password=tEsTpAsSwOrD&features=callbuttonsettings&buttons=holdtransfermute
 
 const App = () => {
   const [dialstring, setDialstring] = useState('')
@@ -37,11 +40,17 @@ const App = () => {
           websocket: websocket || '',
           defaultCountryCode: '1',
           dialstring: true || false
-
         }}
         phoneConfig={{
-          disabledButtons: disabledButtons || '',
-          disabledFeatures: disabledFeatures || ''
+          disabledButtons: disabledButtons || '', // Will remove button(s) from Phone component. E.g. hold transfer dialpadopen mute '
+          disabledFeatures: disabledFeatures || '', // Will remove feature(s) from application. E.g. callbutton settings remoteid
+          defaultDial: '',          // for use with callbutton disabled only. E.g. 1234567890
+          sessionsLimit: 3,         // limits amount of sessions user can have active   
+          attendedTransferLimit: 3  // limits amount of attendedTransfer sessions user can have active     
+        }}
+        appConfig={{
+          mode: mode || '', //strict mode for use with callbutton disabled and sessionLimit set to 1
+          started: false    //keeps track of call button visability (strict-mode only)
         }}
         width={0}
       />

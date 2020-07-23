@@ -1,12 +1,16 @@
 import { Action } from './models'
-import { SET_CREDENTIALS, SET_CONFIG } from '../actions/config'
+import { SET_CREDENTIALS, SET_PHONE_CONFIG, SET_APP_CONFIG, STRICT_MODE_SHOW_CALL_BUTTON, STRICT_MODE_HIDE_CALL_BUTTON } from '../actions/config'
 const config = (state = {
   uri: '',
   password: '',
-  phoneConfig: {}
+  phoneConfig: {},
+  appConfig:{
+    mode:'',
+    started:false
+  }
 }, action: Action) => {
   switch (action.type) {
-    case SET_CONFIG:
+    case SET_PHONE_CONFIG:
       return {
         ...state, phoneConfig: action.payload
       }
@@ -15,6 +19,31 @@ const config = (state = {
         ...state,
         uri: action.payload.uri,
         password: action.payload.password,
+      }
+    case SET_APP_CONFIG:
+      return {
+        ...state,
+        appConfig:action.payload
+      }
+    case STRICT_MODE_SHOW_CALL_BUTTON:
+      if(state.appConfig.mode === 'strict'){
+        return {
+          ...state,
+          appConfig:{
+            mode:'strict',
+            started:true
+          }
+        }
+      }
+      case STRICT_MODE_HIDE_CALL_BUTTON:
+        if(state.appConfig.mode === 'strict'){
+          return {
+            ...state,
+            appConfig:{
+              mode:'strict',
+              started:false
+          }
+        }
       }
     default:
       return state

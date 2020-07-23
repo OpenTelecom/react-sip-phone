@@ -12,4 +12,11 @@ export interface SipConfig {
 export interface PhoneConfig {
     disabledButtons: Array<string>;
     disabledFeatures: Array<string>;
+    defaultDial: string;
+    sessionsLimit: number;
+    attendedTransferLimit: number;
+}
+export interface AppConfig {
+    mode: string;
+    started: boolean;
 }

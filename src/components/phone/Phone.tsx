@@ -3,6 +3,7 @@ import Dialpad from './Dialpad'
 import { connect } from 'react-redux'
 import { Session, SessionState, UserAgent } from 'sip.js'
 import { endCall } from '../../actions/sipSessions'
+import {setAppConfigStarted} from '../../actions/config'
 import Hold from './Hold'
 import Mute from './Mute'
 import BlindTranfer from './BlindTransfer'
@@ -15,12 +16,15 @@ import { callDisconnect } from '../../util/TonePlayer'
 import toneManager from '../../util/ToneManager'
 import { statusMask, getDurationDisplay } from '../../util/sessions'
 import { PhoneConfig } from '../../models'
+
 interface Props {
   session: Session
   userAgent: UserAgent
   endCall: Function
+  setAppConfigStarted: Function
   phoneConfig: PhoneConfig
   deviceId: string
+  strictMode: string
 }
 
 class Phone extends React.Component<Props> {
@@ -67,14 +71,15 @@ class Phone extends React.Component<Props> {
       toneManager.stopAll()
       callDisconnect(this.props.deviceId)
       // @ts-ignore
-
       this.props.session.cancel()
-
     }
     this.setState({ ended: true })
     setTimeout(() => {
       this.props.session.dispose()
       this.props.endCall(this.props.session.id)
+      if(this.props.strictMode === 'strict'){
+        this.props.setAppConfigStarted()
+      }
     }, 5000)
   }
 
@@ -179,10 +184,11 @@ const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
-  deviceId: state.device.primaryAudioOutput
-
+  deviceId: state.device.primaryAudioOutput,
+  strictMode: state.config.appConfig.mode
 })
 const actions = {
-  endCall
+  endCall,
+  setAppConfigStarted
 }
 export default connect(mapStateToProps, actions)(Phone)

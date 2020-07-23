@@ -2,6 +2,8 @@ import { Action } from './models'
 import {
   NEW_SESSION,
   NEW_ATTENDED_TRANSFER,
+  SIPSESSION_ATTENDED_TRANSFER_CANCEL,
+  SIPSESSION_ATTENDED_TRANSFER_FAIL,
   CLOSE_SESSION,
   SIPSESSION_STATECHANGE,
   INCOMING_CALL,
@@ -41,6 +43,13 @@ const sipSessions = (
         sessions: { ...state.sessions, [payload.id]: payload },
         attendedTransfers: [...state.attendedTransfers, payload.id]
       }
+    case SIPSESSION_ATTENDED_TRANSFER_CANCEL:
+    case SIPSESSION_ATTENDED_TRANSFER_FAIL:
+      const newAttendedTransfers = [...state.attendedTransfers].filter((id) => id !== payload.id)
+        return {
+          ...state,
+          attendedTransfers: newAttendedTransfers
+        }
     case ACCEPT_CALL:
       const acceptedIncoming = [...state.incomingCalls].filter((id) => id !== payload.id)
       return {

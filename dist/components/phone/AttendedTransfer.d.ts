@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { PhoneConfig } from '../../models';
 import { Session, UserAgent } from 'sip.js';
 import SIPAccount from '../../lib/SipAccount';
 interface Props {
@@ -13,9 +14,12 @@ interface Props {
     attendedTransferPending: Function;
     attendedTransferSuccess: Function;
     attendedTransferFail: Function;
+    attendedTransferLimitReached: Function;
     holdCallRequest: Function;
     stateChange: Function;
     closeSession: Function;
+    attendedTransfersList: Array<string>;
+    phoneConfig: PhoneConfig;
 }
 declare class AttendedTransfer extends React.Component<Props> {
     state: {

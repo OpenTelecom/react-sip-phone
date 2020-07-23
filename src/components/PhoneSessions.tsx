@@ -9,7 +9,11 @@ const getSessions = (sessions: any, phoneConfig: PhoneConfig, attendedTransfers:
   for (const session in sessions) {
     if (attendedTransfers.includes(session)) continue
     if (incomingCalls.includes(session)) {
-      elements.push(<Incoming session={sessions[session]} key={session} />)
+      if (Object.keys(sessions).length >= phoneConfig.sessionsLimit + incomingCalls.length){
+        console.log('Unable to create more sessions... please check your phoneConfig options')
+      }else{
+        elements.push(<Incoming session={sessions[session]} key={session} />)
+      }
     } else {
       elements.push(
         <Phone session={sessions[session]} key={session} phoneConfig={phoneConfig} />
@@ -20,7 +24,7 @@ const getSessions = (sessions: any, phoneConfig: PhoneConfig, attendedTransfers:
 }
 
 interface Props {
-  sessions: any
+  sessions: Object
   incomingCalls: Array<string>
   phoneConfig: PhoneConfig
   attendedTransfers: Array<string>
