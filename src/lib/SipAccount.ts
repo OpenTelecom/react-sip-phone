@@ -118,11 +118,13 @@ export default class SIPAccount {
   }
 
   makeCall(number: string) {
-    const state = phoneStore.getState()
+    let state = phoneStore.getState()
     //@ts-ignore
-    const sessionLimit: number = state.config.phoneConfig.sessionsLimit
+    let sessionLimit: number = state.config.phoneConfig.sessionsLimit
     //@ts-ignore
-    const sessionsActive: Object = state.sipSessions.sessions
+    let sessionsActive: Object = state.sipSessions.sessions
+    //@ts-ignore
+    let strictMode: string= state.config.appConfig.mode
 
     //check sessionsLimit in phoneConfig
     if (Object.keys(sessionsActive).length >= sessionLimit){
@@ -133,7 +135,10 @@ export default class SIPAccount {
       `sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`
     )
     //strict mode will remove dialstring call button on session initialization
-    phoneStore.dispatch({type:STRICT_MODE_HIDE_CALL_BUTTON})
+    if (strictMode === ('strict')){
+      phoneStore.dispatch({type:STRICT_MODE_HIDE_CALL_BUTTON})
+    }
+
     if (target) {
       console.log(`Calling ${number}`)
       const inviter = new Inviter(this._userAgent, target)

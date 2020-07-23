@@ -16,6 +16,7 @@ import { callDisconnect } from '../../util/TonePlayer'
 import toneManager from '../../util/ToneManager'
 import { statusMask, getDurationDisplay } from '../../util/sessions'
 import { PhoneConfig } from '../../models'
+
 interface Props {
   session: Session
   userAgent: UserAgent
@@ -23,6 +24,7 @@ interface Props {
   setAppConfigStarted: Function
   phoneConfig: PhoneConfig
   deviceId: string
+  strictMode: string
 }
 
 class Phone extends React.Component<Props> {
@@ -75,7 +77,9 @@ class Phone extends React.Component<Props> {
     setTimeout(() => {
       this.props.session.dispose()
       this.props.endCall(this.props.session.id)
-      this.props.setAppConfigStarted()
+      if(this.props.strictMode === 'strict'){
+        this.props.setAppConfigStarted()
+      }
     }, 5000)
   }
 
@@ -180,7 +184,8 @@ const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
-  deviceId: state.device.primaryAudioOutput
+  deviceId: state.device.primaryAudioOutput,
+  strictMode: state.config.appConfig.mode
 })
 const actions = {
   endCall,

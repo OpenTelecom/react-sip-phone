@@ -986,9 +986,10 @@ class SIPAccount {
   }
 
   makeCall(number) {
-    const state = phoneStore.getState();
-    const sessionLimit = state.config.phoneConfig.sessionsLimit;
-    const sessionsActive = state.sipSessions.sessions;
+    let state = phoneStore.getState();
+    let sessionLimit = state.config.phoneConfig.sessionsLimit;
+    let sessionsActive = state.sipSessions.sessions;
+    let strictMode = state.config.appConfig.mode;
 
     if (Object.keys(sessionsActive).length >= sessionLimit) {
       phoneStore.dispatch({
@@ -996,9 +997,12 @@ class SIPAccount {
       });
     } else {
       const target = UserAgent.makeURI(`sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`);
-      phoneStore.dispatch({
-        type: STRICT_MODE_HIDE_CALL_BUTTON
-      });
+
+      if (strictMode === 'strict') {
+        phoneStore.dispatch({
+          type: STRICT_MODE_HIDE_CALL_BUTTON
+        });
+      }
 
       if (target) {
         console.log(`Calling ${number}`);
@@ -1743,7 +1747,10 @@ class Phone extends Component {
     setTimeout(() => {
       this.props.session.dispose();
       this.props.endCall(this.props.session.id);
-      this.props.setAppConfigStarted();
+
+      if (this.props.strictMode === 'strict') {
+        this.props.setAppConfigStarted();
+      }
     }, 5000);
   }
 
@@ -1838,7 +1845,8 @@ const mapStateToProps$7 = state => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
-  deviceId: state.device.primaryAudioOutput
+  deviceId: state.device.primaryAudioOutput,
+  strictMode: state.config.appConfig.mode
 });
 
 const actions$7 = {

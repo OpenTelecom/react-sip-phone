@@ -1116,6 +1116,7 @@ var SIPAccount = /*#__PURE__*/function () {
     var state = phoneStore.getState();
     var sessionLimit = state.config.phoneConfig.sessionsLimit;
     var sessionsActive = state.sipSessions.sessions;
+    var strictMode = state.config.appConfig.mode;
 
     if (Object.keys(sessionsActive).length >= sessionLimit) {
       phoneStore.dispatch({
@@ -1123,9 +1124,12 @@ var SIPAccount = /*#__PURE__*/function () {
       });
     } else {
       var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(number) + "@" + this._credentials.sipuri.split('@')[1] + ";user=phone");
-      phoneStore.dispatch({
-        type: STRICT_MODE_HIDE_CALL_BUTTON
-      });
+
+      if (strictMode === 'strict') {
+        phoneStore.dispatch({
+          type: STRICT_MODE_HIDE_CALL_BUTTON
+        });
+      }
 
       if (target) {
         console.log("Calling " + number);
@@ -2013,7 +2017,9 @@ var Phone = /*#__PURE__*/function (_React$Component) {
 
       _this2.props.endCall(_this2.props.session.id);
 
-      _this2.props.setAppConfigStarted();
+      if (_this2.props.strictMode === 'strict') {
+        _this2.props.setAppConfigStarted();
+      }
     }, 5000);
   };
 
@@ -2121,7 +2127,8 @@ var mapStateToProps$7 = function mapStateToProps(state) {
     stateChanged: state.sipSessions.stateChanged,
     sessions: state.sipSessions.sessions,
     userAgent: state.sipAccounts.userAgent,
-    deviceId: state.device.primaryAudioOutput
+    deviceId: state.device.primaryAudioOutput,
+    strictMode: state.config.appConfig.mode
   };
 };
 
