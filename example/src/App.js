@@ -42,15 +42,15 @@ const App = () => {
           dialstring: true || false
         }}
         phoneConfig={{
-          disabledButtons: disabledButtons || '', // Will remove button from Phone component. E.g. hold transfer dialpadopen mute '
-          disabledFeatures: disabledFeatures || '', // Will remove feature from application. E.g. callbutton settings remoteid
-          defaultDial: '',          //for use with callbutton disabled only. E.g. 1234567890
-          sessionsLimit: 1,         // limits amount of sessions user can have active   
-          attendedTransferLimit: 1  // limits amount of attendedTransfer sessions user can have active     
+          disabledButtons: disabledButtons || '', // Will remove button(s) from Phone component. E.g. hold transfer dialpadopen mute '
+          disabledFeatures: disabledFeatures || '', // Will remove feature(s) from application. E.g. callbutton settings remoteid
+          defaultDial: '',          // for use with callbutton disabled only. E.g. 1234567890
+          sessionsLimit: 3,         // limits amount of sessions user can have active   
+          attendedTransferLimit: 3  // limits amount of attendedTransfer sessions user can have active     
         }}
         appConfig={{
           mode: mode || '', //strict mode for use with callbutton disabled and sessionLimit set to 1
-          started: false    //keeps track of call button visability
+          started: false    //keeps track of call button visability (strict-mode only)
         }}
         width={0}
       />
