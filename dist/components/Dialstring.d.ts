@@ -8,6 +8,7 @@ interface Props {
     appConfig: AppConfig;
     sessions: Object;
     started: Boolean;
+    sessionsLimitReached: Function;
 }
 declare class Dialstring extends React.Component<Props> {
     state: {

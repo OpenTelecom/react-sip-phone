@@ -14,6 +14,7 @@ interface Props {
     attendedTransferPending: Function;
     attendedTransferSuccess: Function;
     attendedTransferFail: Function;
+    attendedTransferLimitReached: Function;
     holdCallRequest: Function;
     stateChange: Function;
     closeSession: Function;

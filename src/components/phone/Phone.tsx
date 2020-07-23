@@ -69,9 +69,7 @@ class Phone extends React.Component<Props> {
       toneManager.stopAll()
       callDisconnect(this.props.deviceId)
       // @ts-ignore
-
       this.props.session.cancel()
-
     }
     this.setState({ ended: true })
     setTimeout(() => {

@@ -12,8 +12,10 @@ const disabledButtons = urlParams.get('buttons')
 const disabledFeatures = urlParams.get('features')
 const outsideComponentDial = urlParams.get('dial')
 const mode = urlParams.get('mode')
+
+//example url 
 //http://localhost:3000/phone/react-sip-phone?name=testname&websocket=wss://test-websocket-01-us-east-5.test.com:5065
-//&sipuri=user_test@test.domain.com&password=tEsTpAsSwOrD&features=callbuttonsettings&buttons=holdtransfer
+//&sipuri=user_test@test.domain.com&password=tEsTpAsSwOrD&features=callbuttonsettings&buttons=holdtransfermute
 
 const App = () => {
   const [dialstring, setDialstring] = useState('')
@@ -40,15 +42,15 @@ const App = () => {
           dialstring: true || false
         }}
         phoneConfig={{
-          disabledButtons: disabledButtons || 'dialpadopen', // 'hold transfer dialpadopen mute '
-          disabledFeatures: disabledFeatures || '', // 'callbutton settings '
-          defaultDial: '',  //for use with callbutton disabled 
-          sessionsLimit: 2,
-          attendedTransferLimit: 2  //         
+          disabledButtons: disabledButtons || 'dialpadopen', // Will remove button from Phone component. E.g. hold transfer dialpadopen mute '
+          disabledFeatures: disabledFeatures || '', // Will remove feature from application. E.g. callbutton settings 
+          defaultDial: '',          //for use with callbutton disabled only. E.g. 1234567890
+          sessionsLimit: 1,         // limits amount of sessions user can have active   
+          attendedTransferLimit: 1  // limits amount of attendedTransfer sessions user can have active     
         }}
         appConfig={{
           mode: mode || '', //strict mode for use with callbutton disabled and sessionLimit set to 1
-          started: false
+          started: false    //keeps track of call button visability
         }}
         width={0}
       />

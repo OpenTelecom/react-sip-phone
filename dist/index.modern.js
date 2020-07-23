@@ -846,8 +846,10 @@ class IncomingSessionStateHandler {
 const SET_CREDENTIALS = 'SET_CREDENTIALS';
 const SET_PHONE_CONFIG = 'SET_PHONE_CONFIG';
 const SET_APP_CONFIG = 'SET_APP_CONFIG';
-const STRICT_MODE_CALL_STARTED = 'STRICT_MODE_CALL_STARTED';
-const STRICT_MODE_CALL_ENDED = 'STRICT_MODE_CALL_ENDED';
+const STRICT_MODE_SHOW_CALL_BUTTON = 'STRICT_MODE_SHOW_CALL_BUTTON';
+const STRICT_MODE_HIDE_CALL_BUTTON = 'STRICT_MODE_HIDE_CALL_BUTTON';
+const ATTENDED_TRANSFER_LIMIT_REACHED = 'ATTENDED_TRANSFER_LIMIT_REACHED';
+const SESSIONS_LIMIT_REACHED = 'SESSIONS_LIMIT_REACHED';
 const setCredentials = (uri = '', password = '') => {
   return {
     type: SET_CREDENTIALS,
@@ -871,7 +873,17 @@ const setAppConfig = config => {
 };
 const setAppConfigStarted = () => {
   return {
-    type: STRICT_MODE_CALL_STARTED
+    type: STRICT_MODE_SHOW_CALL_BUTTON
+  };
+};
+const attendedTransferLimitReached = () => {
+  return {
+    type: ATTENDED_TRANSFER_LIMIT_REACHED
+  };
+};
+const sessionsLimitReached = () => {
+  return {
+    type: SESSIONS_LIMIT_REACHED
   };
 };
 
@@ -974,34 +986,44 @@ class SIPAccount {
   }
 
   makeCall(number) {
-    phoneStore.dispatch({
-      type: STRICT_MODE_CALL_ENDED
-    });
-    const target = UserAgent.makeURI(`sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`);
+    const state = phoneStore.getState();
+    const sessionLimit = state.config.phoneConfig.sessionsLimit;
+    const sessionsActive = state.sipSessions.sessions;
 
-    if (target) {
-      console.log(`Calling ${number}`);
-      const inviter = new Inviter(this._userAgent, target);
-      const outgoingSession = inviter;
-      outgoingSession.delegate = {
-        onRefer(referral) {
-          console.log('Referred: ' + referral);
-        }
-
-      };
+    if (Object.keys(sessionsActive).length >= sessionLimit) {
       phoneStore.dispatch({
-        type: NEW_SESSION,
-        payload: outgoingSession
-      });
-      const stateHandler = new SessionStateHandler(outgoingSession);
-      outgoingSession.stateChange.addListener(stateHandler.stateChange);
-      outgoingSession.invite().then(() => {
-        console.log('Invite sent!');
-      }).catch(error => {
-        console.log(error);
+        type: SESSIONS_LIMIT_REACHED
       });
     } else {
-      console.log(`Failed to establish session for outgoing call to ${number}`);
+      const target = UserAgent.makeURI(`sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`);
+      phoneStore.dispatch({
+        type: STRICT_MODE_HIDE_CALL_BUTTON
+      });
+
+      if (target) {
+        console.log(`Calling ${number}`);
+        const inviter = new Inviter(this._userAgent, target);
+        const outgoingSession = inviter;
+        outgoingSession.delegate = {
+          onRefer(referral) {
+            console.log('Referred: ' + referral);
+          }
+
+        };
+        phoneStore.dispatch({
+          type: NEW_SESSION,
+          payload: outgoingSession
+        });
+        const stateHandler = new SessionStateHandler(outgoingSession);
+        outgoingSession.stateChange.addListener(stateHandler.stateChange);
+        outgoingSession.invite().then(() => {
+          console.log('Invite sent!');
+        }).catch(error => {
+          console.log(error);
+        });
+      } else {
+        console.log(`Failed to establish session for outgoing call to ${number}`);
+      }
     }
   }
 
@@ -1487,7 +1509,7 @@ class AttendedTransfer extends Component {
 
   attendedTransferCall() {
     if (this.props.attendedTransfersList.length >= this.props.phoneConfig.attendedTransferLimit) {
-      console.log('Unable to create more sessions for attended transfer... please check your phoneConfig options');
+      this.props.attendedTransferLimitReached();
     } else {
       this.holdAll();
       this.props.attendedTransferRequest();
@@ -1663,6 +1685,7 @@ const actions$6 = {
   attendedTransferPending,
   attendedTransferSuccess,
   attendedTransferFail,
+  attendedTransferLimitReached,
   stateChange,
   closeSession
 };
@@ -1944,7 +1967,7 @@ class Dialstring extends Component {
 
   handleDial() {
     if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit) {
-      console.log('Unable to create more sessions... please check your phoneConfig options');
+      this.props.sessionsLimitReached();
     } else {
       if (this.props.phoneConfig.disabledFeatures.includes('callbutton')) {
         this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial);
@@ -2014,7 +2037,9 @@ const mapStateToProps$a = state => ({
   started: state.config.appConfig.started
 });
 
-const actions$9 = {};
+const actions$9 = {
+  sessionsLimitReached
+};
 const D = connect(mapStateToProps$a, actions$9)(Dialstring);
 
 const sipSessions = (state = {
@@ -2206,7 +2231,7 @@ const config = (state = {
         appConfig: action.payload
       };
 
-    case STRICT_MODE_CALL_STARTED:
+    case STRICT_MODE_SHOW_CALL_BUTTON:
       if (state.appConfig.mode === 'strict') {
         return { ...state,
           appConfig: {
@@ -2216,7 +2241,7 @@ const config = (state = {
         };
       }
 
-    case STRICT_MODE_CALL_ENDED:
+    case STRICT_MODE_HIDE_CALL_BUTTON:
       if (state.appConfig.mode === 'strict') {
         return { ...state,
           appConfig: {

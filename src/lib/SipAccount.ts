@@ -14,7 +14,7 @@ import { phoneStore } from '../index'
 import { NEW_USERAGENT } from '../actions/sipAccounts'
 import { SessionStateHandler, getFullNumber } from '../util/sessions'
 import { IncomingSessionStateHandler } from '../util/incomingSession'
-import {STRICT_MODE_CALL_ENDED} from '../actions/config'
+import {STRICT_MODE_HIDE_CALL_BUTTON, SESSIONS_LIMIT_REACHED} from '../actions/config'
 import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
 
@@ -118,11 +118,22 @@ export default class SIPAccount {
   }
 
   makeCall(number: string) {
-    phoneStore.dispatch({ type: STRICT_MODE_CALL_ENDED })
+    const state = phoneStore.getState()
+    //@ts-ignore
+    const sessionLimit: number = state.config.phoneConfig.sessionsLimit
+    //@ts-ignore
+    const sessionsActive: Object = state.sipSessions.sessions
+
+    //check sessionsLimit in phoneConfig
+    if (Object.keys(sessionsActive).length >= sessionLimit){
+      phoneStore.dispatch({ type: SESSIONS_LIMIT_REACHED })
+    } else{
     // Make a call
     const target = UserAgent.makeURI(
       `sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`
     )
+    //strict mode will remove dialstring call button on session initialization
+    phoneStore.dispatch({type:STRICT_MODE_HIDE_CALL_BUTTON})
     if (target) {
       console.log(`Calling ${number}`)
       const inviter = new Inviter(this._userAgent, target)
@@ -150,7 +161,10 @@ export default class SIPAccount {
         })
     } else {
       console.log(`Failed to establish session for outgoing call to ${number}`)
+      }
     }
+
+    
     // toneManager.playRing('ringback')
 
   }

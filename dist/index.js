@@ -962,8 +962,10 @@ var IncomingSessionStateHandler = function IncomingSessionStateHandler(incomingS
 var SET_CREDENTIALS = 'SET_CREDENTIALS';
 var SET_PHONE_CONFIG = 'SET_PHONE_CONFIG';
 var SET_APP_CONFIG = 'SET_APP_CONFIG';
-var STRICT_MODE_CALL_STARTED = 'STRICT_MODE_CALL_STARTED';
-var STRICT_MODE_CALL_ENDED = 'STRICT_MODE_CALL_ENDED';
+var STRICT_MODE_SHOW_CALL_BUTTON = 'STRICT_MODE_SHOW_CALL_BUTTON';
+var STRICT_MODE_HIDE_CALL_BUTTON = 'STRICT_MODE_HIDE_CALL_BUTTON';
+var ATTENDED_TRANSFER_LIMIT_REACHED = 'ATTENDED_TRANSFER_LIMIT_REACHED';
+var SESSIONS_LIMIT_REACHED = 'SESSIONS_LIMIT_REACHED';
 var setCredentials = function setCredentials(uri, password) {
   if (uri === void 0) {
     uri = '';
@@ -995,7 +997,17 @@ var setAppConfig = function setAppConfig(config) {
 };
 var setAppConfigStarted = function setAppConfigStarted() {
   return {
-    type: STRICT_MODE_CALL_STARTED
+    type: STRICT_MODE_SHOW_CALL_BUTTON
+  };
+};
+var attendedTransferLimitReached = function attendedTransferLimitReached() {
+  return {
+    type: ATTENDED_TRANSFER_LIMIT_REACHED
+  };
+};
+var sessionsLimitReached = function sessionsLimitReached() {
+  return {
+    type: SESSIONS_LIMIT_REACHED
   };
 };
 
@@ -1101,33 +1113,43 @@ var SIPAccount = /*#__PURE__*/function () {
   };
 
   _proto.makeCall = function makeCall(number) {
-    phoneStore.dispatch({
-      type: STRICT_MODE_CALL_ENDED
-    });
-    var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(number) + "@" + this._credentials.sipuri.split('@')[1] + ";user=phone");
+    var state = phoneStore.getState();
+    var sessionLimit = state.config.phoneConfig.sessionsLimit;
+    var sessionsActive = state.sipSessions.sessions;
 
-    if (target) {
-      console.log("Calling " + number);
-      var inviter = new sip_js.Inviter(this._userAgent, target);
-      var outgoingSession = inviter;
-      outgoingSession.delegate = {
-        onRefer: function onRefer(referral) {
-          console.log('Referred: ' + referral);
-        }
-      };
+    if (Object.keys(sessionsActive).length >= sessionLimit) {
       phoneStore.dispatch({
-        type: NEW_SESSION,
-        payload: outgoingSession
-      });
-      var stateHandler = new SessionStateHandler(outgoingSession);
-      outgoingSession.stateChange.addListener(stateHandler.stateChange);
-      outgoingSession.invite().then(function () {
-        console.log('Invite sent!');
-      })["catch"](function (error) {
-        console.log(error);
+        type: SESSIONS_LIMIT_REACHED
       });
     } else {
-      console.log("Failed to establish session for outgoing call to " + number);
+      var target = sip_js.UserAgent.makeURI("sip:" + getFullNumber(number) + "@" + this._credentials.sipuri.split('@')[1] + ";user=phone");
+      phoneStore.dispatch({
+        type: STRICT_MODE_HIDE_CALL_BUTTON
+      });
+
+      if (target) {
+        console.log("Calling " + number);
+        var inviter = new sip_js.Inviter(this._userAgent, target);
+        var outgoingSession = inviter;
+        outgoingSession.delegate = {
+          onRefer: function onRefer(referral) {
+            console.log('Referred: ' + referral);
+          }
+        };
+        phoneStore.dispatch({
+          type: NEW_SESSION,
+          payload: outgoingSession
+        });
+        var stateHandler = new SessionStateHandler(outgoingSession);
+        outgoingSession.stateChange.addListener(stateHandler.stateChange);
+        outgoingSession.invite().then(function () {
+          console.log('Invite sent!');
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      } else {
+        console.log("Failed to establish session for outgoing call to " + number);
+      }
     }
   };
 
@@ -1727,7 +1749,7 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
     var _this2 = this;
 
     if (this.props.attendedTransfersList.length >= this.props.phoneConfig.attendedTransferLimit) {
-      console.log('Unable to create more sessions for attended transfer... please check your phoneConfig options');
+      this.props.attendedTransferLimitReached();
     } else {
       this.holdAll();
       this.props.attendedTransferRequest();
@@ -1922,6 +1944,7 @@ var actions$6 = {
   attendedTransferPending: attendedTransferPending,
   attendedTransferSuccess: attendedTransferSuccess,
   attendedTransferFail: attendedTransferFail,
+  attendedTransferLimitReached: attendedTransferLimitReached,
   stateChange: stateChange,
   closeSession: closeSession
 };
@@ -2263,7 +2286,7 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
 
   _proto.handleDial = function handleDial() {
     if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit) {
-      console.log('Unable to create more sessions... please check your phoneConfig options');
+      this.props.sessionsLimitReached();
     } else {
       if (this.props.phoneConfig.disabledFeatures.includes('callbutton')) {
         this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial);
@@ -2345,7 +2368,9 @@ var mapStateToProps$a = function mapStateToProps(state) {
   };
 };
 
-var actions$9 = {};
+var actions$9 = {
+  sessionsLimitReached: sessionsLimitReached
+};
 var D = reactRedux.connect(mapStateToProps$a, actions$9)(Dialstring);
 
 var sipSessions = function sipSessions(state, action) {
@@ -2557,7 +2582,7 @@ var config = function config(state, action) {
         appConfig: action.payload
       });
 
-    case STRICT_MODE_CALL_STARTED:
+    case STRICT_MODE_SHOW_CALL_BUTTON:
       if (state.appConfig.mode === 'strict') {
         return _extends(_extends({}, state), {}, {
           appConfig: {
@@ -2567,7 +2592,7 @@ var config = function config(state, action) {
         });
       }
 
-    case STRICT_MODE_CALL_ENDED:
+    case STRICT_MODE_HIDE_CALL_BUTTON:
       if (state.appConfig.mode === 'strict') {
         return _extends(_extends({}, state), {}, {
           appConfig: {

@@ -1,5 +1,5 @@
 import { Action } from './models'
-import { SET_CREDENTIALS, SET_PHONE_CONFIG, SET_APP_CONFIG, STRICT_MODE_CALL_STARTED, STRICT_MODE_CALL_ENDED } from '../actions/config'
+import { SET_CREDENTIALS, SET_PHONE_CONFIG, SET_APP_CONFIG, STRICT_MODE_SHOW_CALL_BUTTON, STRICT_MODE_HIDE_CALL_BUTTON } from '../actions/config'
 const config = (state = {
   uri: '',
   password: '',
@@ -25,7 +25,7 @@ const config = (state = {
         ...state,
         appConfig:action.payload
       }
-    case STRICT_MODE_CALL_STARTED:
+    case STRICT_MODE_SHOW_CALL_BUTTON:
       if(state.appConfig.mode === 'strict'){
         return {
           ...state,
@@ -35,7 +35,7 @@ const config = (state = {
           }
         }
       }
-      case STRICT_MODE_CALL_ENDED:
+      case STRICT_MODE_HIDE_CALL_BUTTON:
         if(state.appConfig.mode === 'strict'){
           return {
             ...state,

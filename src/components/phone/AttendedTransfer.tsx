@@ -16,6 +16,7 @@ import {
   stateChange,
   closeSession
 } from '../../actions/sipSessions';
+import {attendedTransferLimitReached} from '../../actions/config'
 import Phone from './Phone'
 import { getFullNumber } from '../../util/sessions'
 import attendedIcon from '../../assets/phone_in_talk-24px.svg'
@@ -37,6 +38,7 @@ interface Props {
   attendedTransferPending: Function
   attendedTransferSuccess: Function
   attendedTransferFail: Function
+  attendedTransferLimitReached: Function
   holdCallRequest: Function
   stateChange: Function
   closeSession: Function
@@ -53,7 +55,7 @@ class AttendedTransfer extends React.Component<Props> {
   attendedTransferCall() {
     //check amount of attendedTranfers with phoneConfig 
     if (this.props.attendedTransfersList.length >= this.props.phoneConfig.attendedTransferLimit){
-      console.log('Unable to create more sessions for attended transfer... please check your phoneConfig options')
+      this.props.attendedTransferLimitReached()
     } else {
       this.holdAll()
       this.props.attendedTransferRequest()
@@ -220,6 +222,7 @@ const actions = {
   attendedTransferPending,
   attendedTransferSuccess,
   attendedTransferFail,
+  attendedTransferLimitReached,
   stateChange,
   closeSession,
 }
