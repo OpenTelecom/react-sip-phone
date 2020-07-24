@@ -33,6 +33,10 @@
     opacity: 0;
     height: 0; }
 
+._Status__statusLarge__3G14Z {
+  padding: 2px;
+  font-size: 25px; }
+
 ._Status__dialpadButton__38DZj {
   border: 0;
   padding: 0;
@@ -206,6 +210,10 @@
 ._Status__userString__gelBY {
   padding: 2px; }
 
+._Status__userStringLarge__rgh4W {
+  padding: 2px;
+  font-size: 25px; }
+
 #_Status__settingsButton__3TfJl {
   border: 0;
   padding: 0;
@@ -282,6 +290,10 @@
     visibility: hidden;
     opacity: 0;
     height: 0; }
+
+._Phone__statusLarge__3n9O3 {
+  padding: 2px;
+  font-size: 25px; }
 
 ._Phone__dialpadButton__2Mev0 {
   border: 0;
@@ -477,12 +489,44 @@
   ._Dialstring__dialButton__3GsXr:hover {
     opacity: 0.5; }
 
+._Dialstring__dialButtonStrict__tfL15 {
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+  background-color: #96bdf7;
+  color: #333132;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  height: 80px;
+  width: 80px;
+  background: none; }
+  ._Dialstring__dialButtonStrict__tfL15:focus {
+    outline: none;
+    box-shadow: none; }
+  ._Dialstring__dialButtonStrict__tfL15:hover {
+    opacity: 0.5; }
+
 ._Dialstring__dialInput__32AFz {
   border: none;
   padding: none;
   font-size: 1em; }
   ._Dialstring__dialInput__32AFz:focus {
     outline: none; }
+
+._Dialstring__dialstringContainerStrict__2qSFk {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 50%;
+  padding: 0 0 0 20px; }
 
 ._Dialstring__dialstringContainer__2sye_ {
   display: flex;

@@ -6,7 +6,8 @@ const config = (state = {
   phoneConfig: {},
   appConfig:{
     mode:'',
-    started:false
+    started:false,
+    appSize:''
   }
 }, action: Action) => {
   switch (action.type) {
@@ -30,6 +31,7 @@ const config = (state = {
         return {
           ...state,
           appConfig:{
+            ...state.appConfig,
             mode:'strict',
             started:true
           }
@@ -40,6 +42,7 @@ const config = (state = {
           return {
             ...state,
             appConfig:{
+              ...state.appConfig,
               mode:'strict',
               started:false
           }

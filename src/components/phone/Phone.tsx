@@ -25,6 +25,7 @@ interface Props {
   phoneConfig: PhoneConfig
   deviceId: string
   strictMode: string
+  appSize: string
 }
 
 class Phone extends React.Component<Props> {
@@ -111,7 +112,11 @@ class Phone extends React.Component<Props> {
             <br />
 
           </div>}
-        <div>{statusMask(props.session.state)}</div>
+        {props.appSize === 'large' ? 
+        <div className={styles.statusLarge} >{statusMask(props.session.state)}</div>
+        :
+        <div >{statusMask(props.session.state)}</div>
+        }
         <br />
         {(this.props.session.state === SessionState.Initial ||
           this.props.session.state === SessionState.Establishing) ?
@@ -185,7 +190,8 @@ const mapStateToProps = (state: any) => ({
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
   deviceId: state.device.primaryAudioOutput,
-  strictMode: state.config.appConfig.mode
+  strictMode: state.config.appConfig.mode,
+  appSize: state.config.appConfig.appSize
 })
 const actions = {
   endCall,

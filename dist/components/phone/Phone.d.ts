@@ -9,6 +9,7 @@ interface Props {
     phoneConfig: PhoneConfig;
     deviceId: string;
     strictMode: string;
+    appSize: string;
 }
 declare class Phone extends React.Component<Props> {
     state: {

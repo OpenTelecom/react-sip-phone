@@ -1206,7 +1206,7 @@ var actions = {
 };
 var SipWrapper$1 = reactRedux.connect(mapStateToProps, actions)(SipWrapper);
 
-var styles$1 = {"container":"_Status__container__Adysl","incoming":"_Status__incoming__14y58","dialpad":"_Status__dialpad__24i7u","closed":"_Status__closed__3nIZK","dialpadButton":"_Status__dialpadButton__38DZj","dialpadButtonLetters":"_Status__dialpadButtonLetters__N-jqm","dialpadRow":"_Status__dialpadRow__19SxG","actionButton":"_Status__actionButton__1hhhF","on":"_Status__on__3ZwLv","endCallButton":"_Status__endCallButton__3z8u3","startCallButton":"_Status__startCallButton__3UW76","actionsContainer":"_Status__actionsContainer__2kDeL","transferMenu":"_Status__transferMenu__1yjIy","transferInput":"_Status__transferInput__2tho8","transferButtons":"_Status__transferButtons__Rc_m0","userString":"_Status__userString__gelBY","settingsButton":"_Status__settingsButton__3TfJl","settingsMenu":"_Status__settingsMenu__6JtnT","dropdowns":"_Status__dropdowns__2FMhO","dropdownRow":"_Status__dropdownRow__2NuIJ","dropdownIcon":"_Status__dropdownIcon__1K5Gw"};
+var styles$1 = {"container":"_Status__container__Adysl","incoming":"_Status__incoming__14y58","dialpad":"_Status__dialpad__24i7u","closed":"_Status__closed__3nIZK","statusLarge":"_Status__statusLarge__3G14Z","dialpadButton":"_Status__dialpadButton__38DZj","dialpadButtonLetters":"_Status__dialpadButtonLetters__N-jqm","dialpadRow":"_Status__dialpadRow__19SxG","actionButton":"_Status__actionButton__1hhhF","on":"_Status__on__3ZwLv","endCallButton":"_Status__endCallButton__3z8u3","startCallButton":"_Status__startCallButton__3UW76","actionsContainer":"_Status__actionsContainer__2kDeL","transferMenu":"_Status__transferMenu__1yjIy","transferInput":"_Status__transferInput__2tho8","transferButtons":"_Status__transferButtons__Rc_m0","userString":"_Status__userString__gelBY","userStringLarge":"_Status__userStringLarge__rgh4W","settingsButton":"_Status__settingsButton__3TfJl","settingsMenu":"_Status__settingsMenu__6JtnT","dropdowns":"_Status__dropdowns__2FMhO","dropdownRow":"_Status__dropdownRow__2NuIJ","dropdownIcon":"_Status__dropdownIcon__1K5Gw"};
 
 var settingsIcon = require("./settings-24px~HQuidduc.svg");
 
@@ -1262,7 +1262,9 @@ var Status = /*#__PURE__*/function (_React$Component) {
     var outputs = this.mapOptions(props.outputs);
     return React.createElement(React.Fragment, null, React.createElement("div", {
       className: styles$1.container
-    }, React.createElement("div", {
+    }, props.appConfig.appSize === 'large' ? React.createElement("div", {
+      className: styles$1.userStringLarge
+    }, props.name) : React.createElement("div", {
       className: styles$1.userString
     }, props.name), props.phoneConfig.disabledFeatures.includes('settings') ? null : React.createElement("div", {
       id: styles$1.settingsButton,
@@ -1340,7 +1342,7 @@ var actions$1 = {
 };
 var Status$1 = reactRedux.connect(mapStateToProps$1, actions$1)(Status);
 
-var styles$2 = {"container":"_Phone__container__33s4p","incoming":"_Phone__incoming__3dASG","dialpad":"_Phone__dialpad__-iUpI","closed":"_Phone__closed__1Yn0M","dialpadButton":"_Phone__dialpadButton__2Mev0","dialpadButtonLetters":"_Phone__dialpadButtonLetters__30C7x","dialpadRow":"_Phone__dialpadRow__ftZ8R","actionButton":"_Phone__actionButton__1gnBl","on":"_Phone__on__11LDZ","endCallButton":"_Phone__endCallButton__EoCL2","startCallButton":"_Phone__startCallButton__PaJuy","actionsContainer":"_Phone__actionsContainer__25gV2","transferMenu":"_Phone__transferMenu__1yYD-","transferInput":"_Phone__transferInput__ovMXl","transferButtons":"_Phone__transferButtons__1-bn8"};
+var styles$2 = {"container":"_Phone__container__33s4p","incoming":"_Phone__incoming__3dASG","dialpad":"_Phone__dialpad__-iUpI","closed":"_Phone__closed__1Yn0M","statusLarge":"_Phone__statusLarge__3n9O3","dialpadButton":"_Phone__dialpadButton__2Mev0","dialpadButtonLetters":"_Phone__dialpadButtonLetters__30C7x","dialpadRow":"_Phone__dialpadRow__ftZ8R","actionButton":"_Phone__actionButton__1gnBl","on":"_Phone__on__11LDZ","endCallButton":"_Phone__endCallButton__EoCL2","startCallButton":"_Phone__startCallButton__PaJuy","actionsContainer":"_Phone__actionsContainer__25gV2","transferMenu":"_Phone__transferMenu__1yYD-","transferInput":"_Phone__transferInput__ovMXl","transferButtons":"_Phone__transferButtons__1-bn8"};
 
 var DialButton = function DialButton(_ref) {
   var text = _ref.text,
@@ -2061,7 +2063,9 @@ var Phone = /*#__PURE__*/function (_React$Component) {
       style: {
         width: '100%'
       }
-    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, React.createElement("br", null)), React.createElement("div", null, statusMask(props.session.state)), React.createElement("br", null), this.props.session.state === sip_js.SessionState.Initial || this.props.session.state === sip_js.SessionState.Establishing ? null : React.createElement("div", null, getDurationDisplay(this.state.duration)), state.ended ? null : React.createElement(React.Fragment, null, React.createElement(Dialpad$1, {
+    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, React.createElement("br", null)), props.appSize === 'large' ? React.createElement("div", {
+      className: styles$2.statusLarge
+    }, statusMask(props.session.state)) : React.createElement("div", null, statusMask(props.session.state)), React.createElement("br", null), this.props.session.state === sip_js.SessionState.Initial || this.props.session.state === sip_js.SessionState.Establishing ? null : React.createElement("div", null, getDurationDisplay(this.state.duration)), state.ended ? null : React.createElement(React.Fragment, null, React.createElement(Dialpad$1, {
       open: state.dialpadOpen,
       session: props.session
     }), React.createElement("div", {
@@ -2131,7 +2135,8 @@ var mapStateToProps$7 = function mapStateToProps(state) {
     sessions: state.sipSessions.sessions,
     userAgent: state.sipAccounts.userAgent,
     deviceId: state.device.primaryAudioOutput,
-    strictMode: state.config.appConfig.mode
+    strictMode: state.config.appConfig.mode,
+    appSize: state.config.appConfig.appSize
   };
 };
 
@@ -2277,7 +2282,9 @@ var mapStateToProps$9 = function mapStateToProps(state) {
 
 var PS = reactRedux.connect(mapStateToProps$9)(PhoneSessions);
 
-var styles$3 = {"container":"_Dialstring__container__2iAE_","dialButton":"_Dialstring__dialButton__3GsXr","dialInput":"_Dialstring__dialInput__32AFz","dialstringContainer":"_Dialstring__dialstringContainer__2sye_"};
+var styles$3 = {"container":"_Dialstring__container__2iAE_","dialButton":"_Dialstring__dialButton__3GsXr","dialButtonStrict":"_Dialstring__dialButtonStrict__tfL15","dialInput":"_Dialstring__dialInput__32AFz","dialstringContainerStrict":"_Dialstring__dialstringContainerStrict__2qSFk","dialstringContainer":"_Dialstring__dialstringContainer__2sye_"};
+
+var callIconLarge = require("./call-large-40px~tyHaARth.svg");
 
 var Dialstring = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(Dialstring, _React$Component);
@@ -2298,7 +2305,7 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
     if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit) {
       this.props.sessionsLimitReached();
     } else {
-      if (this.props.phoneConfig.disabledFeatures.includes('callbutton')) {
+      if (this.props.appConfig.mode === 'strict') {
         this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial);
       }
 
@@ -2318,25 +2325,18 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
     var props = this.props;
 
     if (props.appConfig.mode.includes('strict') && props.started === true) {
-      return React.createElement("button", {
-        className: styles$3.dialButton,
+      return React.createElement("div", {
+        className: styles$3.dialstringContainerStrict
+      }, React.createElement("button", {
+        className: styles$3.dialButtonStrict,
         onClick: function onClick() {
           return _this2.handleDial();
         }
       }, React.createElement("img", {
-        src: callIcon
-      }));
+        src: callIconLarge
+      })));
     } else if (props.appConfig.mode.includes('strict')) {
-      return React.createElement(React.Fragment, null);
-    } else if (props.phoneConfig.disabledFeatures.includes('callbutton')) {
-      return React.createElement("button", {
-        className: styles$3.dialButton,
-        onClick: function onClick() {
-          return _this2.handleDial();
-        }
-      }, React.createElement("img", {
-        src: callIcon
-      }));
+      return null;
     } else {
       return React.createElement("div", {
         className: styles$3.dialstringContainer
@@ -2570,7 +2570,8 @@ var config = function config(state, action) {
       phoneConfig: {},
       appConfig: {
         mode: '',
-        started: false
+        started: false,
+        appSize: ''
       }
     };
   }
@@ -2595,20 +2596,20 @@ var config = function config(state, action) {
     case STRICT_MODE_SHOW_CALL_BUTTON:
       if (state.appConfig.mode === 'strict') {
         return _extends(_extends({}, state), {}, {
-          appConfig: {
+          appConfig: _extends(_extends({}, state.appConfig), {}, {
             mode: 'strict',
             started: true
-          }
+          })
         });
       }
 
     case STRICT_MODE_HIDE_CALL_BUTTON:
       if (state.appConfig.mode === 'strict') {
         return _extends(_extends({}, state), {}, {
-          appConfig: {
+          appConfig: _extends(_extends({}, state.appConfig), {}, {
             mode: 'strict',
             started: false
-          }
+          })
         });
       }
 
@@ -2665,6 +2666,7 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
     })
   }, React.createElement(Status$1, {
     phoneConfig: phoneConfig,
+    appConfig: appConfig,
     name: name
   }), phoneConfig.disabledFeatures.includes('dialstring') ? null : React.createElement(D, {
     sipConfig: sipConfig,
