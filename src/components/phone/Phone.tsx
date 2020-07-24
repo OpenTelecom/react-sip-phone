@@ -102,6 +102,22 @@ class Phone extends React.Component<Props> {
 
   render() {
     const { state, props } = this
+    let durationDisplay
+    if(props.appSize === 'large'){
+      if ((this.props.session.state === SessionState.Initial ||
+        this.props.session.state === SessionState.Establishing)){
+          durationDisplay = null
+        } else {
+          durationDisplay = <div className={styles.statusLarge}>{getDurationDisplay(this.state.duration)}</div>
+        }
+    } else {
+      if ((this.props.session.state === SessionState.Initial ||
+        this.props.session.state === SessionState.Establishing)){
+          durationDisplay =  null
+        } else {
+          durationDisplay = <div>{getDurationDisplay(this.state.duration)}</div>
+        }
+    }
     return (
       <React.Fragment>
         <hr style={{ width: '100%' }} />
@@ -110,7 +126,6 @@ class Phone extends React.Component<Props> {
             // @ts-ignore
             `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
             <br />
-
           </div>}
         {props.appSize === 'large' ? 
         <div className={styles.statusLarge} >{statusMask(props.session.state)}</div>
@@ -118,10 +133,7 @@ class Phone extends React.Component<Props> {
         <div >{statusMask(props.session.state)}</div>
         }
         <br />
-        {(this.props.session.state === SessionState.Initial ||
-          this.props.session.state === SessionState.Establishing) ?
-          null : <div>{getDurationDisplay(this.state.duration)}</div>
-        }
+        {durationDisplay}
         {
           state.ended ? null :
             <React.Fragment>

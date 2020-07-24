@@ -2059,13 +2059,31 @@ var Phone = /*#__PURE__*/function (_React$Component) {
 
     var state = this.state,
         props = this.props;
+    var durationDisplay;
+
+    if (props.appSize === 'large') {
+      if (this.props.session.state === sip_js.SessionState.Initial || this.props.session.state === sip_js.SessionState.Establishing) {
+        durationDisplay = null;
+      } else {
+        durationDisplay = React.createElement("div", {
+          className: styles$2.statusLarge
+        }, getDurationDisplay(this.state.duration));
+      }
+    } else {
+      if (this.props.session.state === sip_js.SessionState.Initial || this.props.session.state === sip_js.SessionState.Establishing) {
+        durationDisplay = null;
+      } else {
+        durationDisplay = React.createElement("div", null, getDurationDisplay(this.state.duration));
+      }
+    }
+
     return React.createElement(React.Fragment, null, React.createElement("hr", {
       style: {
         width: '100%'
       }
     }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, React.createElement("br", null)), props.appSize === 'large' ? React.createElement("div", {
       className: styles$2.statusLarge
-    }, statusMask(props.session.state)) : React.createElement("div", null, statusMask(props.session.state)), React.createElement("br", null), this.props.session.state === sip_js.SessionState.Initial || this.props.session.state === sip_js.SessionState.Establishing ? null : React.createElement("div", null, getDurationDisplay(this.state.duration)), state.ended ? null : React.createElement(React.Fragment, null, React.createElement(Dialpad$1, {
+    }, statusMask(props.session.state)) : React.createElement("div", null, statusMask(props.session.state)), React.createElement("br", null), durationDisplay, state.ended ? null : React.createElement(React.Fragment, null, React.createElement(Dialpad$1, {
       open: state.dialpadOpen,
       session: props.session
     }), React.createElement("div", {
