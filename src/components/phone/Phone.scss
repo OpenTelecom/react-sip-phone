@@ -36,6 +36,11 @@
   }
 }
 
+.statusLarge{
+  padding: 2px;
+  font-size: 25px;
+}
+
 .dialpadButton {
   @include common-button;
   @include phone-buttons;

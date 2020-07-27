@@ -44,7 +44,7 @@ export const ReactSipPhone = ({
               width: `${width < 300 ? 300 : width}px`,
               height: `${height < 600 ? 600 : height}px`
             }}>
-            <Status phoneConfig={phoneConfig} name={name} />
+            <Status phoneConfig={phoneConfig} appConfig={appConfig} name={name} />
             {phoneConfig.disabledFeatures.includes('dialstring') ? null :
               <Dialstring sipConfig={sipConfig} phoneConfig={phoneConfig} appConfig={appConfig}/>}
 

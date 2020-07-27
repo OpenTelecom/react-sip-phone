@@ -21,5 +21,6 @@ export interface PhoneConfig {
 
 export interface AppConfig {
   mode: string,
-  started:boolean
+  started:boolean,
+  appSize:string
 }

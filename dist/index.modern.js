@@ -990,11 +990,14 @@ class SIPAccount {
 
   makeCall(number) {
     let state = phoneStore.getState();
-    let sessionLimit = state.config.phoneConfig.sessionsLimit;
-    let sessionsActive = state.sipSessions.sessions;
+    let sessionsLimit = state.config.phoneConfig.sessionsLimit;
+    let sessionsActiveObject = state.sipSessions.sessions;
     let strictMode = state.config.appConfig.mode;
+    let attendedTransfersActive = state.sipSessions.attendedTransfers.length;
+    let sessionsActive = Object.keys(sessionsActiveObject).length;
+    let sessionDiff = sessionsActive - attendedTransfersActive;
 
-    if (Object.keys(sessionsActive).length >= sessionLimit) {
+    if (sessionDiff >= sessionsLimit) {
       phoneStore.dispatch({
         type: SESSIONS_LIMIT_REACHED
       });
@@ -1068,7 +1071,7 @@ const actions = {
 };
 var SipWrapper$1 = connect(mapStateToProps, actions)(SipWrapper);
 
-var styles$1 = {"container":"_Status__container__Adysl","incoming":"_Status__incoming__14y58","dialpad":"_Status__dialpad__24i7u","closed":"_Status__closed__3nIZK","dialpadButton":"_Status__dialpadButton__38DZj","dialpadButtonLetters":"_Status__dialpadButtonLetters__N-jqm","dialpadRow":"_Status__dialpadRow__19SxG","actionButton":"_Status__actionButton__1hhhF","on":"_Status__on__3ZwLv","endCallButton":"_Status__endCallButton__3z8u3","startCallButton":"_Status__startCallButton__3UW76","actionsContainer":"_Status__actionsContainer__2kDeL","transferMenu":"_Status__transferMenu__1yjIy","transferInput":"_Status__transferInput__2tho8","transferButtons":"_Status__transferButtons__Rc_m0","userString":"_Status__userString__gelBY","settingsButton":"_Status__settingsButton__3TfJl","settingsMenu":"_Status__settingsMenu__6JtnT","dropdowns":"_Status__dropdowns__2FMhO","dropdownRow":"_Status__dropdownRow__2NuIJ","dropdownIcon":"_Status__dropdownIcon__1K5Gw"};
+var styles$1 = {"container":"_Status__container__Adysl","incoming":"_Status__incoming__14y58","dialpad":"_Status__dialpad__24i7u","closed":"_Status__closed__3nIZK","statusLarge":"_Status__statusLarge__3G14Z","dialpadButton":"_Status__dialpadButton__38DZj","dialpadButtonLetters":"_Status__dialpadButtonLetters__N-jqm","dialpadRow":"_Status__dialpadRow__19SxG","actionButton":"_Status__actionButton__1hhhF","on":"_Status__on__3ZwLv","endCallButton":"_Status__endCallButton__3z8u3","startCallButton":"_Status__startCallButton__3UW76","actionsContainer":"_Status__actionsContainer__2kDeL","transferMenu":"_Status__transferMenu__1yjIy","transferInput":"_Status__transferInput__2tho8","transferButtons":"_Status__transferButtons__Rc_m0","userString":"_Status__userString__gelBY","userStringLarge":"_Status__userStringLarge__rgh4W","settingsButton":"_Status__settingsButton__3TfJl","settingsMenu":"_Status__settingsMenu__6JtnT","dropdowns":"_Status__dropdowns__2FMhO","dropdownRow":"_Status__dropdownRow__2NuIJ","dropdownIcon":"_Status__dropdownIcon__1K5Gw"};
 
 var settingsIcon = require("./settings-24px~HQuidduc.svg");
 
@@ -1117,7 +1120,9 @@ class Status extends Component {
     const outputs = this.mapOptions(props.outputs);
     return createElement(Fragment, null, createElement("div", {
       className: styles$1.container
-    }, createElement("div", {
+    }, props.appConfig.appSize === 'large' ? createElement("div", {
+      className: styles$1.userStringLarge
+    }, props.name) : createElement("div", {
       className: styles$1.userString
     }, props.name), props.phoneConfig.disabledFeatures.includes('settings') ? null : createElement("div", {
       id: styles$1.settingsButton,
@@ -1182,7 +1187,7 @@ const actions$1 = {
 };
 var Status$1 = connect(mapStateToProps$1, actions$1)(Status);
 
-var styles$2 = {"container":"_Phone__container__33s4p","incoming":"_Phone__incoming__3dASG","dialpad":"_Phone__dialpad__-iUpI","closed":"_Phone__closed__1Yn0M","dialpadButton":"_Phone__dialpadButton__2Mev0","dialpadButtonLetters":"_Phone__dialpadButtonLetters__30C7x","dialpadRow":"_Phone__dialpadRow__ftZ8R","actionButton":"_Phone__actionButton__1gnBl","on":"_Phone__on__11LDZ","endCallButton":"_Phone__endCallButton__EoCL2","startCallButton":"_Phone__startCallButton__PaJuy","actionsContainer":"_Phone__actionsContainer__25gV2","transferMenu":"_Phone__transferMenu__1yYD-","transferInput":"_Phone__transferInput__ovMXl","transferButtons":"_Phone__transferButtons__1-bn8"};
+var styles$2 = {"container":"_Phone__container__33s4p","incoming":"_Phone__incoming__3dASG","dialpad":"_Phone__dialpad__-iUpI","closed":"_Phone__closed__1Yn0M","statusLarge":"_Phone__statusLarge__3n9O3","dialpadButton":"_Phone__dialpadButton__2Mev0","dialpadButtonLetters":"_Phone__dialpadButtonLetters__30C7x","dialpadRow":"_Phone__dialpadRow__ftZ8R","actionButton":"_Phone__actionButton__1gnBl","on":"_Phone__on__11LDZ","endCallButton":"_Phone__endCallButton__EoCL2","startCallButton":"_Phone__startCallButton__PaJuy","actionsContainer":"_Phone__actionsContainer__25gV2","transferMenu":"_Phone__transferMenu__1yYD-","transferInput":"_Phone__transferInput__ovMXl","transferButtons":"_Phone__transferButtons__1-bn8"};
 
 const DialButton = ({
   text,
@@ -1785,11 +1790,31 @@ class Phone extends Component {
       state,
       props
     } = this;
+    let durationDisplay;
+
+    if (props.appSize === 'large') {
+      if (this.props.session.state === SessionState.Initial || this.props.session.state === SessionState.Establishing) {
+        durationDisplay = null;
+      } else {
+        durationDisplay = createElement("div", {
+          className: styles$2.statusLarge
+        }, getDurationDisplay(this.state.duration));
+      }
+    } else {
+      if (this.props.session.state === SessionState.Initial || this.props.session.state === SessionState.Establishing) {
+        durationDisplay = null;
+      } else {
+        durationDisplay = createElement("div", null, getDurationDisplay(this.state.duration));
+      }
+    }
+
     return createElement(Fragment, null, createElement("hr", {
       style: {
         width: '100%'
       }
-    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : createElement("div", null, `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`, createElement("br", null)), createElement("div", null, statusMask(props.session.state)), createElement("br", null), this.props.session.state === SessionState.Initial || this.props.session.state === SessionState.Establishing ? null : createElement("div", null, getDurationDisplay(this.state.duration)), state.ended ? null : createElement(Fragment, null, createElement(Dialpad$1, {
+    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : createElement("div", null, `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`, createElement("br", null)), props.appSize === 'large' ? createElement("div", {
+      className: styles$2.statusLarge
+    }, statusMask(props.session.state)) : createElement("div", null, statusMask(props.session.state)), createElement("br", null), durationDisplay, state.ended ? null : createElement(Fragment, null, createElement(Dialpad$1, {
       open: state.dialpadOpen,
       session: props.session
     }), createElement("div", {
@@ -1849,7 +1874,8 @@ const mapStateToProps$7 = state => ({
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
   deviceId: state.device.primaryAudioOutput,
-  strictMode: state.config.appConfig.mode
+  strictMode: state.config.appConfig.mode,
+  appSize: state.config.appConfig.appSize
 });
 
 const actions$7 = {
@@ -1966,7 +1992,9 @@ const mapStateToProps$9 = state => ({
 
 const PS = connect(mapStateToProps$9)(PhoneSessions);
 
-var styles$3 = {"container":"_Dialstring__container__2iAE_","dialButton":"_Dialstring__dialButton__3GsXr","dialInput":"_Dialstring__dialInput__32AFz","dialstringContainer":"_Dialstring__dialstringContainer__2sye_"};
+var styles$3 = {"container":"_Dialstring__container__2iAE_","dialButton":"_Dialstring__dialButton__3GsXr","dialButtonStrict":"_Dialstring__dialButtonStrict__tfL15","dialInput":"_Dialstring__dialInput__32AFz","dialstringContainerStrict":"_Dialstring__dialstringContainerStrict__2qSFk","dialstringContainer":"_Dialstring__dialstringContainer__2sye_"};
+
+var callIconLarge = require("./call-large-40px~tyHaARth.svg");
 
 class Dialstring extends Component {
   constructor() {
@@ -1977,10 +2005,14 @@ class Dialstring extends Component {
   }
 
   handleDial() {
-    if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit) {
+    let sessionsActive = Object.keys(this.props.sessions).length;
+    let attendedTransferActive = this.props.attendedTransfersList.length;
+    let sessionDiff = sessionsActive - attendedTransferActive;
+
+    if (sessionDiff >= this.props.phoneConfig.sessionsLimit) {
       this.props.sessionsLimitReached();
     } else {
-      if (this.props.phoneConfig.disabledFeatures.includes('callbutton')) {
+      if (this.props.appConfig.mode === 'strict') {
         this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial);
       }
 
@@ -2000,21 +2032,16 @@ class Dialstring extends Component {
     } = this;
 
     if (props.appConfig.mode.includes('strict') && props.started === true) {
-      return createElement("button", {
-        className: styles$3.dialButton,
+      return createElement("div", {
+        className: styles$3.dialstringContainerStrict
+      }, createElement("button", {
+        className: styles$3.dialButtonStrict,
         onClick: () => this.handleDial()
       }, createElement("img", {
-        src: callIcon
-      }));
+        src: callIconLarge
+      })));
     } else if (props.appConfig.mode.includes('strict')) {
-      return createElement(Fragment, null);
-    } else if (props.phoneConfig.disabledFeatures.includes('callbutton')) {
-      return createElement("button", {
-        className: styles$3.dialButton,
-        onClick: () => this.handleDial()
-      }, createElement("img", {
-        src: callIcon
-      }));
+      return null;
     } else {
       return createElement("div", {
         className: styles$3.dialstringContainer
@@ -2045,7 +2072,8 @@ class Dialstring extends Component {
 const mapStateToProps$a = state => ({
   sipAccount: state.sipAccounts.sipAccount,
   sessions: state.sipSessions.sessions,
-  started: state.config.appConfig.started
+  started: state.config.appConfig.started,
+  attendedTransfersList: state.sipSessions.attendedTransfers
 });
 
 const actions$9 = {
@@ -2222,7 +2250,8 @@ const config = (state = {
   phoneConfig: {},
   appConfig: {
     mode: '',
-    started: false
+    started: false,
+    appSize: ''
   }
 }, action) => {
   switch (action.type) {
@@ -2245,7 +2274,7 @@ const config = (state = {
     case STRICT_MODE_SHOW_CALL_BUTTON:
       if (state.appConfig.mode === 'strict') {
         return { ...state,
-          appConfig: {
+          appConfig: { ...state.appConfig,
             mode: 'strict',
             started: true
           }
@@ -2255,7 +2284,7 @@ const config = (state = {
     case STRICT_MODE_HIDE_CALL_BUTTON:
       if (state.appConfig.mode === 'strict') {
         return { ...state,
-          appConfig: {
+          appConfig: { ...state.appConfig,
             mode: 'strict',
             started: false
           }
@@ -2313,6 +2342,7 @@ const ReactSipPhone = ({
     }
   }, createElement(Status$1, {
     phoneConfig: phoneConfig,
+    appConfig: appConfig,
     name: name
   }), phoneConfig.disabledFeatures.includes('dialstring') ? null : createElement(D, {
     sipConfig: sipConfig,

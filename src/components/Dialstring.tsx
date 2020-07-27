@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 import SIPAccount from '../lib/SipAccount'
 import styles from './Dialstring.scss'
 import callIcon from '../assets/call-24px.svg'
+import callIconLarge from '../assets/call-large-40px.svg'
+
 import { PhoneConfig, SipConfig, AppConfig } from '../models'
 import {sessionsLimitReached} from '../actions/config'
 interface Props {
@@ -13,27 +15,33 @@ interface Props {
   sessions: Object
   started: Boolean
   sessionsLimitReached: Function
+  attendedTransfersList: Array<string>
 }
-
-//call-button enabled (without dialstring) by adding 'callbutton' to phoneConfig.features string 
-//use sipConfig.defaultDial value to call from react-sip-phone without use of dialstring  
 
 class Dialstring extends React.Component<Props> {
   state = {
     currentDialString: ''
   }
   handleDial() {
-    if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit){
+    let sessionsActive: number = Object.keys(this.props.sessions).length
+    let attendedTransferActive: number  = this.props.attendedTransfersList.length
+    let sessionDiff: number = sessionsActive - attendedTransferActive
+
+    //sessionsLimit check
+    if ( sessionDiff >= this.props.phoneConfig.sessionsLimit){
       this.props.sessionsLimitReached()
     } else{
-      if (this.props.phoneConfig.disabledFeatures.includes('callbutton')){
+    //strict-mode check 
+      if (this.props.appConfig.mode === 'strict'){
         this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial)
       }
+    //dialstring check 
       if (!this.checkDialstring()) {
         this.props.sipAccount.makeCall(`${this.state.currentDialString}`)
       }
     }
   }
+  
   checkDialstring() {
     return this.state.currentDialString.length === 0
   }
@@ -42,26 +50,17 @@ class Dialstring extends React.Component<Props> {
     const { props } = this
     if (props.appConfig.mode.includes('strict') && props.started === true){
       return  (
+        <div className={styles.dialstringContainerStrict}>
         <button
-        className={styles.dialButton}
+        className={styles.dialButtonStrict}
         onClick={() => this.handleDial()}
         >
-          <img src={callIcon} />
+          <img src={callIconLarge} />
         </button> 
+        </div>
       )
     }else if (props.appConfig.mode.includes('strict')){
-      return  (
-        <React.Fragment>
-        </React.Fragment>
-      )
-    }else if (props.phoneConfig.disabledFeatures.includes('callbutton')){
-      return (  
-      <button
-      className={styles.dialButton}
-      onClick={() => this.handleDial()}
-      >
-        <img src={callIcon} />
-      </button> )
+      return null
     } else{
       return (
         <div className={styles.dialstringContainer}>
@@ -92,7 +91,8 @@ class Dialstring extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   sipAccount: state.sipAccounts.sipAccount,
   sessions: state.sipSessions.sessions,
-  started:state.config.appConfig.started
+  started:state.config.appConfig.started,
+  attendedTransfersList: state.sipSessions.attendedTransfers
 })
 
 const actions = {

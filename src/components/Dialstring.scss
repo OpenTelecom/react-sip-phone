@@ -7,8 +7,25 @@
   background: none;
 }
 
+.dialButtonStrict{
+  @include common-button;
+  height: 80px;
+  width: 80px;
+  background: none;
+  // background-color: #15c73b;
+}
+
 .dialInput {
   @include common-input;
+}
+
+.dialstringContainerStrict {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 50%;
+  padding: 0 0 0 20px;
+
 }
 
 .dialstringContainer {

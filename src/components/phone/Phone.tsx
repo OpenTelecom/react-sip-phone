@@ -25,6 +25,7 @@ interface Props {
   phoneConfig: PhoneConfig
   deviceId: string
   strictMode: string
+  appSize: string
 }
 
 class Phone extends React.Component<Props> {
@@ -101,6 +102,22 @@ class Phone extends React.Component<Props> {
 
   render() {
     const { state, props } = this
+    let durationDisplay
+    if(props.appSize === 'large'){
+      if ((this.props.session.state === SessionState.Initial ||
+        this.props.session.state === SessionState.Establishing)){
+          durationDisplay = null
+        } else {
+          durationDisplay = <div className={styles.statusLarge}>{getDurationDisplay(this.state.duration)}</div>
+        }
+    } else {
+      if ((this.props.session.state === SessionState.Initial ||
+        this.props.session.state === SessionState.Establishing)){
+          durationDisplay =  null
+        } else {
+          durationDisplay = <div>{getDurationDisplay(this.state.duration)}</div>
+        }
+    }
     return (
       <React.Fragment>
         <hr style={{ width: '100%' }} />
@@ -109,14 +126,14 @@ class Phone extends React.Component<Props> {
             // @ts-ignore
             `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
             <br />
-
           </div>}
-        <div>{statusMask(props.session.state)}</div>
-        <br />
-        {(this.props.session.state === SessionState.Initial ||
-          this.props.session.state === SessionState.Establishing) ?
-          null : <div>{getDurationDisplay(this.state.duration)}</div>
+        {props.appSize === 'large' ? 
+        <div className={styles.statusLarge} >{statusMask(props.session.state)}</div>
+        :
+        <div >{statusMask(props.session.state)}</div>
         }
+        <br />
+        {durationDisplay}
         {
           state.ended ? null :
             <React.Fragment>
@@ -185,7 +202,8 @@ const mapStateToProps = (state: any) => ({
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
   deviceId: state.device.primaryAudioOutput,
-  strictMode: state.config.appConfig.mode
+  strictMode: state.config.appConfig.mode,
+  appSize: state.config.appConfig.appSize
 })
 const actions = {
   endCall,

@@ -9,6 +9,7 @@ interface Props {
     sessions: Object;
     started: Boolean;
     sessionsLimitReached: Function;
+    attendedTransfersList: Array<string>;
 }
 declare class Dialstring extends React.Component<Props> {
     state: {
@@ -16,7 +17,7 @@ declare class Dialstring extends React.Component<Props> {
     };
     handleDial(): void;
     checkDialstring(): boolean;
-    render(): JSX.Element;
+    render(): JSX.Element | null;
 }
 declare const D: import("react-redux").ConnectedComponent<typeof Dialstring, Pick<React.ClassAttributes<Dialstring> & Props, "phoneConfig" | "sipConfig" | "appConfig" | "ref" | "key">>;
 export default D;

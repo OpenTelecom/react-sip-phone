@@ -39,18 +39,18 @@ const App = () => {
         sipConfig={{
           websocket: websocket || '',
           defaultCountryCode: '1',
-          dialstring: true || false
         }}
         phoneConfig={{
           disabledButtons: disabledButtons || '', // Will remove button(s) from Phone component. E.g. hold transfer dialpadopen mute '
-          disabledFeatures: disabledFeatures || '', // Will remove feature(s) from application. E.g. callbutton settings remoteid
-          defaultDial: '',          // for use with callbutton disabled only. E.g. 1234567890
+          disabledFeatures: disabledFeatures || '', // Will remove feature(s) from application. E.g. settings remoteid
+          defaultDial: '',          // (strict-mode only) the default destination. E.g. 1234567890
           sessionsLimit: 3,         // limits amount of sessions user can have active   
-          attendedTransferLimit: 3  // limits amount of attendedTransfer sessions user can have active     
+          attendedTransferLimit: 2  // limits amount of attendedTransfer sessions user can have active     
         }}
         appConfig={{
-          mode: mode || '', //strict mode for use with callbutton disabled and sessionLimit set to 1
-          started: false    //keeps track of call button visability (strict-mode only)
+          mode: mode || '', // 'strict' will activate a simple and limited user experience. set to sessionLimit 1 if using 'strict'          
+          started: false, // (strict-mode only) keeps track of call button visability during strict-mode
+          appSize: 'large' // assign 'large' for larger font in status-name and session-status (not session remote-id/display name)
         }}
         width={0}
       />

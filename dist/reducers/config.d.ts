@@ -6,6 +6,7 @@ declare const config: (state: {
     appConfig: {
         mode: string;
         started: boolean;
+        appSize: string;
     };
 } | undefined, action: Action) => {
     phoneConfig: any;
@@ -14,6 +15,7 @@ declare const config: (state: {
     appConfig: {
         mode: string;
         started: boolean;
+        appSize: string;
     };
 } | {
     uri: any;
@@ -22,6 +24,7 @@ declare const config: (state: {
     appConfig: {
         mode: string;
         started: boolean;
+        appSize: string;
     };
 } | {
     appConfig: any;
