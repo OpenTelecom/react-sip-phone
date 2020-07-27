@@ -1117,11 +1117,14 @@ var SIPAccount = /*#__PURE__*/function () {
 
   _proto.makeCall = function makeCall(number) {
     var state = phoneStore.getState();
-    var sessionLimit = state.config.phoneConfig.sessionsLimit;
-    var sessionsActive = state.sipSessions.sessions;
+    var sessionsLimit = state.config.phoneConfig.sessionsLimit;
+    var sessionsActiveObject = state.sipSessions.sessions;
     var strictMode = state.config.appConfig.mode;
+    var attendedTransfersActive = state.sipSessions.attendedTransfers.length;
+    var sessionsActive = Object.keys(sessionsActiveObject).length;
+    var sessionDiff = sessionsActive - attendedTransfersActive;
 
-    if (Object.keys(sessionsActive).length >= sessionLimit) {
+    if (sessionDiff >= sessionsLimit) {
       phoneStore.dispatch({
         type: SESSIONS_LIMIT_REACHED
       });
@@ -2320,7 +2323,11 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
   var _proto = Dialstring.prototype;
 
   _proto.handleDial = function handleDial() {
-    if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit) {
+    var sessionsActive = Object.keys(this.props.sessions).length;
+    var attendedTransferActive = this.props.attendedTransfersList.length;
+    var sessionDiff = sessionsActive - attendedTransferActive;
+
+    if (sessionDiff >= this.props.phoneConfig.sessionsLimit) {
       this.props.sessionsLimitReached();
     } else {
       if (this.props.appConfig.mode === 'strict') {
@@ -2392,7 +2399,8 @@ var mapStateToProps$a = function mapStateToProps(state) {
   return {
     sipAccount: state.sipAccounts.sipAccount,
     sessions: state.sipSessions.sessions,
-    started: state.config.appConfig.started
+    started: state.config.appConfig.started,
+    attendedTransfersList: state.sipSessions.attendedTransfers
   };
 };
 

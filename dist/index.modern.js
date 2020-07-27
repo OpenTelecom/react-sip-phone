@@ -990,11 +990,14 @@ class SIPAccount {
 
   makeCall(number) {
     let state = phoneStore.getState();
-    let sessionLimit = state.config.phoneConfig.sessionsLimit;
-    let sessionsActive = state.sipSessions.sessions;
+    let sessionsLimit = state.config.phoneConfig.sessionsLimit;
+    let sessionsActiveObject = state.sipSessions.sessions;
     let strictMode = state.config.appConfig.mode;
+    let attendedTransfersActive = state.sipSessions.attendedTransfers.length;
+    let sessionsActive = Object.keys(sessionsActiveObject).length;
+    let sessionDiff = sessionsActive - attendedTransfersActive;
 
-    if (Object.keys(sessionsActive).length >= sessionLimit) {
+    if (sessionDiff >= sessionsLimit) {
       phoneStore.dispatch({
         type: SESSIONS_LIMIT_REACHED
       });
@@ -2002,7 +2005,11 @@ class Dialstring extends Component {
   }
 
   handleDial() {
-    if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit) {
+    let sessionsActive = Object.keys(this.props.sessions).length;
+    let attendedTransferActive = this.props.attendedTransfersList.length;
+    let sessionDiff = sessionsActive - attendedTransferActive;
+
+    if (sessionDiff >= this.props.phoneConfig.sessionsLimit) {
       this.props.sessionsLimitReached();
     } else {
       if (this.props.appConfig.mode === 'strict') {
@@ -2065,7 +2072,8 @@ class Dialstring extends Component {
 const mapStateToProps$a = state => ({
   sipAccount: state.sipAccounts.sipAccount,
   sessions: state.sipSessions.sessions,
-  started: state.config.appConfig.started
+  started: state.config.appConfig.started,
+  attendedTransfersList: state.sipSessions.attendedTransfers
 });
 
 const actions$9 = {

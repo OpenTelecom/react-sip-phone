@@ -43,14 +43,14 @@ const App = () => {
         phoneConfig={{
           disabledButtons: disabledButtons || '', // Will remove button(s) from Phone component. E.g. hold transfer dialpadopen mute '
           disabledFeatures: disabledFeatures || '', // Will remove feature(s) from application. E.g. settings remoteid
-          defaultDial: '6143543760',          // (strict-mode only) the default destination. E.g. 1234567890
+          defaultDial: '',          // (strict-mode only) the default destination. E.g. 1234567890
           sessionsLimit: 3,         // limits amount of sessions user can have active   
-          attendedTransferLimit: 3  // limits amount of attendedTransfer sessions user can have active     
+          attendedTransferLimit: 2  // limits amount of attendedTransfer sessions user can have active     
         }}
         appConfig={{
-          mode: mode || '', // assign 'strict' sessionLimit set to 1 to use strict-mode
+          mode: mode || '', // 'strict' will activate a simple and limited user experience. set to sessionLimit 1 if using 'strict'          
           started: false, // (strict-mode only) keeps track of call button visability during strict-mode
-          appSize: 'large' // assign 'large' for larger font in status-name and session-status 
+          appSize: 'large' // assign 'large' for larger font in status-name and session-status (not session remote-id/display name)
         }}
         width={0}
       />

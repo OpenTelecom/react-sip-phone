@@ -9,6 +9,7 @@ interface Props {
     sessions: Object;
     started: Boolean;
     sessionsLimitReached: Function;
+    attendedTransfersList: Array<string>;
 }
 declare class Dialstring extends React.Component<Props> {
     state: {

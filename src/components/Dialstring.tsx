@@ -15,6 +15,7 @@ interface Props {
   sessions: Object
   started: Boolean
   sessionsLimitReached: Function
+  attendedTransfersList: Array<string>
 }
 
 class Dialstring extends React.Component<Props> {
@@ -22,21 +23,25 @@ class Dialstring extends React.Component<Props> {
     currentDialString: ''
   }
   handleDial() {
+    let sessionsActive: number = Object.keys(this.props.sessions).length
+    let attendedTransferActive: number  = this.props.attendedTransfersList.length
+    let sessionDiff: number = sessionsActive - attendedTransferActive
+
     //sessionsLimit check
-    if (Object.keys(this.props.sessions).length >= this.props.phoneConfig.sessionsLimit){
+    if ( sessionDiff >= this.props.phoneConfig.sessionsLimit){
       this.props.sessionsLimitReached()
-    } 
-    else{
-      //strict-mode check 
+    } else{
+    //strict-mode check 
       if (this.props.appConfig.mode === 'strict'){
         this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial)
       }
-      //dialstring check 
+    //dialstring check 
       if (!this.checkDialstring()) {
         this.props.sipAccount.makeCall(`${this.state.currentDialString}`)
       }
     }
   }
+  
   checkDialstring() {
     return this.state.currentDialString.length === 0
   }
@@ -86,7 +91,8 @@ class Dialstring extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   sipAccount: state.sipAccounts.sipAccount,
   sessions: state.sipSessions.sessions,
-  started:state.config.appConfig.started
+  started:state.config.appConfig.started,
+  attendedTransfersList: state.sipSessions.attendedTransfers
 })
 
 const actions = {

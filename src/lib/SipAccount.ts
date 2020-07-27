@@ -120,14 +120,18 @@ export default class SIPAccount {
   makeCall(number: string) {
     let state = phoneStore.getState()
     //@ts-ignore
-    let sessionLimit: number = state.config.phoneConfig.sessionsLimit
+    let sessionsLimit: number = state.config.phoneConfig.sessionsLimit
     //@ts-ignore
-    let sessionsActive: Object = state.sipSessions.sessions
+    let sessionsActiveObject: Object = state.sipSessions.sessions
     //@ts-ignore
-    let strictMode: string= state.config.appConfig.mode
+    let strictMode: string = state.config.appConfig.mode
+    //@ts-ignore
+    let attendedTransfersActive: number  = state.sipSessions.attendedTransfers.length
 
-    //check sessionsLimit in phoneConfig
-    if (Object.keys(sessionsActive).length >= sessionLimit){
+    //added sessionsLimit check if outside Application makes call using sipaccount w/o using dialstring 
+    let sessionsActive: number = Object.keys(sessionsActiveObject).length
+    let sessionDiff: number = sessionsActive - attendedTransfersActive
+    if (sessionDiff >= sessionsLimit){
       phoneStore.dispatch({ type: SESSIONS_LIMIT_REACHED })
     } else{
     // Make a call

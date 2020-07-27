@@ -42,7 +42,7 @@ interface Props {
   holdCallRequest: Function
   stateChange: Function
   closeSession: Function
-  attendedTransfersList: Array<string>,
+  attendedTransfersList: Array<string>
   phoneConfig: PhoneConfig
 }
 
