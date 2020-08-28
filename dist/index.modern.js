@@ -722,7 +722,7 @@ class ToneManager {
 const toneManager = new ToneManager();
 
 class SessionStateHandler {
-  constructor(session) {
+  constructor(session, ua) {
     this.stateChange = newState => {
       switch (newState) {
         case SessionState.Establishing:
@@ -730,6 +730,29 @@ class SessionStateHandler {
           toneManager.playRing('ringback');
           phoneStore.dispatch({
             type: SIPSESSION_STATECHANGE
+          });
+          const myTransport = this.ua.transport;
+          myTransport.on('message', message => {
+            if (message.includes("BYE ") && message.indexOf("BYE ") === 0) {
+              if (this.session.state === "Establishing") {
+                console.log(message + 'session has recieved a BYE message when the session state is establishing');
+                this.session.cancel();
+                this.session.dispose();
+                setTimeout(() => {
+                  phoneStore.dispatch({
+                    type: CLOSE_SESSION,
+                    payload: this.session.id
+                  });
+                  toneManager.stopAll();
+                  phoneStore.dispatch({
+                    type: STRICT_MODE_SHOW_CALL_BUTTON
+                  });
+                }, 5000);
+                return;
+              } else {
+                return;
+              }
+            }
           });
           break;
 
@@ -746,6 +769,7 @@ class SessionStateHandler {
           phoneStore.dispatch({
             type: SIPSESSION_STATECHANGE
           });
+          toneManager.stopAll();
           cleanupMedia(this.session.id);
           break;
 
@@ -758,6 +782,7 @@ class SessionStateHandler {
               type: CLOSE_SESSION,
               payload: this.session.id
             });
+            toneManager.stopAll();
             phoneStore.dispatch({
               type: STRICT_MODE_SHOW_CALL_BUTTON
             });
@@ -771,6 +796,7 @@ class SessionStateHandler {
     };
 
     this.session = session;
+    this.ua = ua;
   }
 
 }
@@ -1024,7 +1050,7 @@ class SIPAccount {
           type: NEW_SESSION,
           payload: outgoingSession
         });
-        const stateHandler = new SessionStateHandler(outgoingSession);
+        const stateHandler = new SessionStateHandler(outgoingSession, this._userAgent);
         outgoingSession.stateChange.addListener(stateHandler.stateChange);
         outgoingSession.invite().then(() => {
           console.log('Invite sent!');
@@ -1036,6 +1062,8 @@ class SIPAccount {
       }
     }
   }
+
+  listener() {}
 
 }
 

@@ -9,11 +9,13 @@ import {
   UserAgent,
   UserAgentOptions
 } from 'sip.js'
+
 import { TransportOptions } from 'sip.js/lib/platform/web'
 import { phoneStore } from '../index'
 import { NEW_USERAGENT } from '../actions/sipAccounts'
 import { SessionStateHandler, getFullNumber } from '../util/sessions'
 import { IncomingSessionStateHandler } from '../util/incomingSession'
+
 import {STRICT_MODE_HIDE_CALL_BUTTON, SESSIONS_LIMIT_REACHED} from '../actions/config'
 import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
@@ -74,6 +76,7 @@ export default class SIPAccount {
       phoneStore.dispatch({ type: NEW_USERAGENT, payload: this._userAgent })
     })
   }
+  
 
   setupDelegate() {
     this._userAgent.delegate = {
@@ -158,7 +161,7 @@ export default class SIPAccount {
       }
       phoneStore.dispatch({ type: NEW_SESSION, payload: outgoingSession })
       // Handle outgoing session state changes.
-      const stateHandler = new SessionStateHandler(outgoingSession)
+      const stateHandler = new SessionStateHandler(outgoingSession,this._userAgent )
       outgoingSession.stateChange.addListener(stateHandler.stateChange)
       outgoingSession
         .invite()
@@ -176,5 +179,8 @@ export default class SIPAccount {
     
     // toneManager.playRing('ringback')
 
+  }
+  listener(){
+        
   }
 }

@@ -8,4 +8,5 @@ export default class SIPAccount {
     setupDelegate(): void;
     setupRegistererListener(): void;
     makeCall(number: string): void;
+    listener(): void;
 }

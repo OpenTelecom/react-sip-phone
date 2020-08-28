@@ -847,7 +847,7 @@ var ToneManager = /*#__PURE__*/function () {
 
 var toneManager = new ToneManager();
 
-var SessionStateHandler = function SessionStateHandler(session) {
+var SessionStateHandler = function SessionStateHandler(session, ua) {
   var _this = this;
 
   this.stateChange = function (newState) {
@@ -857,6 +857,32 @@ var SessionStateHandler = function SessionStateHandler(session) {
         toneManager.playRing('ringback');
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
+        });
+        var myTransport = _this.ua.transport;
+        myTransport.on('message', function (message) {
+          if (message.includes("BYE ") && message.indexOf("BYE ") === 0) {
+            if (_this.session.state === "Establishing") {
+              console.log(message + 'session has recieved a BYE message when the session state is establishing');
+
+              _this.session.cancel();
+
+              _this.session.dispose();
+
+              setTimeout(function () {
+                phoneStore.dispatch({
+                  type: CLOSE_SESSION,
+                  payload: _this.session.id
+                });
+                toneManager.stopAll();
+                phoneStore.dispatch({
+                  type: STRICT_MODE_SHOW_CALL_BUTTON
+                });
+              }, 5000);
+              return;
+            } else {
+              return;
+            }
+          }
         });
         break;
 
@@ -873,6 +899,7 @@ var SessionStateHandler = function SessionStateHandler(session) {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         });
+        toneManager.stopAll();
         cleanupMedia(_this.session.id);
         break;
 
@@ -885,6 +912,7 @@ var SessionStateHandler = function SessionStateHandler(session) {
             type: CLOSE_SESSION,
             payload: _this.session.id
           });
+          toneManager.stopAll();
           phoneStore.dispatch({
             type: STRICT_MODE_SHOW_CALL_BUTTON
           });
@@ -898,6 +926,7 @@ var SessionStateHandler = function SessionStateHandler(session) {
   };
 
   this.session = session;
+  this.ua = ua;
 };
 var getFullNumber = function getFullNumber(number) {
   if (number.length < 10) {
@@ -1150,7 +1179,7 @@ var SIPAccount = /*#__PURE__*/function () {
           type: NEW_SESSION,
           payload: outgoingSession
         });
-        var stateHandler = new SessionStateHandler(outgoingSession);
+        var stateHandler = new SessionStateHandler(outgoingSession, this._userAgent);
         outgoingSession.stateChange.addListener(stateHandler.stateChange);
         outgoingSession.invite().then(function () {
           console.log('Invite sent!');
@@ -1162,6 +1191,8 @@ var SIPAccount = /*#__PURE__*/function () {
       }
     }
   };
+
+  _proto.listener = function listener() {};
 
   return SIPAccount;
 }();

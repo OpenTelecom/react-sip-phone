@@ -1,7 +1,8 @@
-import { SessionState, Session } from 'sip.js';
+import { SessionState, Session, UserAgent } from 'sip.js';
 export declare class SessionStateHandler {
     private session;
-    constructor(session: Session);
+    private ua;
+    constructor(session: Session, ua: UserAgent);
     stateChange: (newState: SessionState) => void;
 }
 export declare const getFullNumber: (number: string) => string;

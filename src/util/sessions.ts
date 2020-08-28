@@ -1,5 +1,7 @@
 import { phoneStore } from '../index'
-import { SessionState, Session } from 'sip.js'
+import { SessionState, Session, UserAgent} from 'sip.js'
+import { Transport as WebTransport } from "sip.js/lib/platform/Web/Transport";
+
 import {
   SIPSESSION_STATECHANGE, CLOSE_SESSION
 } from '../actions/sipSessions'
@@ -8,10 +10,13 @@ import { holdAll } from '../util/hold'
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from './audio'
 import toneManager from './ToneManager'
 
+
 export class SessionStateHandler {
   private session: Session
-  constructor(session: Session) {
+  private ua : UserAgent
+  constructor(session: Session, ua:UserAgent) {
     this.session = session
+    this.ua = ua
   }
 
   public stateChange = (newState: SessionState) => {
@@ -21,6 +26,32 @@ export class SessionStateHandler {
         toneManager.playRing('ringback')
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
+        })
+
+        //check if session recieves a BYE message while sessionstate is establishing
+        const myTransport = (this.ua.transport as WebTransport);       
+        myTransport.on('message', (message:string) => {
+          if(message.includes("BYE ") && message.indexOf("BYE ") === 0){
+            if(this.session.state === "Establishing"){
+              console.log(message + 'session has recieved a BYE message when the session state is establishing')
+              //@ts-ignore
+              this.session.cancel()
+              this.session.dispose()
+              setTimeout(() => {
+                phoneStore.dispatch({
+                  type: CLOSE_SESSION,
+                  payload: this.session.id
+                })
+                toneManager.stopAll()
+                phoneStore.dispatch({
+                  type:STRICT_MODE_SHOW_CALL_BUTTON
+                })
+              }, 5000)
+              return
+            }else{
+              return
+            }
+          }
         })
         break
       case SessionState.Established:
@@ -35,6 +66,7 @@ export class SessionStateHandler {
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE
         })
+        toneManager.stopAll()
         cleanupMedia(this.session.id)
         break
       case SessionState.Terminated:
@@ -46,6 +78,7 @@ export class SessionStateHandler {
             type: CLOSE_SESSION,
             payload: this.session.id
           })
+          toneManager.stopAll()
           phoneStore.dispatch({
             type:STRICT_MODE_SHOW_CALL_BUTTON
           })
@@ -56,7 +89,11 @@ export class SessionStateHandler {
         break
     }
   }
+  
 }
+
+
+
 
 export const getFullNumber = (number: string) => {
   if (number.length < 10) {
