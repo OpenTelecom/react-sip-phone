@@ -4,7 +4,6 @@ var React = require('react');
 var reactRedux = require('react-redux');
 var react = require('redux-persist/integration/react');
 var sip_js = require('sip.js');
-var Tone = _interopDefault(require('tone'));
 var Select = _interopDefault(require('react-select'));
 var reduxDevtoolsExtension = require('redux-devtools-extension');
 var redux = require('redux');
@@ -632,6 +631,8 @@ var cleanupMedia = function cleanupMedia(sessionId) {
     mediaElement.pause();
   }
 };
+
+var Tone = require('tone');
 
 var DTMF_MATRIX = {
   1: [697, 1209],
