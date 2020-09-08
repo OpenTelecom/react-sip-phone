@@ -1,5 +1,4 @@
-//@ts-ignore
-import Tone from 'tone'
+const Tone = require('tone')
 
 const DTMF_MATRIX = {
   1: [697, 1209],

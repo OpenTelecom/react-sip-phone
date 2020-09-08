@@ -2,7 +2,6 @@ import { Component, createElement, Fragment } from 'react';
 import { connect, Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { SessionState, UserAgent, Registerer, RegistererState, Inviter } from 'sip.js';
-import Tone from 'tone';
 import Select from 'react-select';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { combineReducers, createStore, applyMiddleware } from 'redux';
@@ -516,6 +515,8 @@ const cleanupMedia = sessionId => {
     mediaElement.pause();
   }
 };
+
+const Tone = require('tone');
 
 const DTMF_MATRIX = {
   1: [697, 1209],
