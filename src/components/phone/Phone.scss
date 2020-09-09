@@ -22,9 +22,9 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
   align-items: center;
-  width:100%
+  width: 100%;
+  padding: 0 0 0 505px;
 }
 
 #incoming {
@@ -87,6 +87,10 @@
 }
 
 .actionsContainer {
+  @include flex-container;
+}
+
+.actionsContainerStrict {
   @include actions-flex-container;
 }
 

@@ -150,8 +150,15 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center; }
+
+._Status__actionsContainerStrict__3WwIv {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
-  width: 100%; }
+  width: 100%;
+  padding: 0 0 0 505px; }
 
 #_Status__transferMenu__1yjIy {
   display: flex;
@@ -409,8 +416,15 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center; }
+
+._Phone__actionsContainerStrict__2yCVl {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
-  width: 100%; }
+  width: 100%;
+  padding: 0 0 0 505px; }
 
 #_Phone__transferMenu__1yYD- {
   display: flex;
@@ -529,7 +543,7 @@
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  padding: 0 0 0 60px; }
+  padding: 0 0 0 0px; }
 
 ._Dialstring__dialstringContainer__2sye_ {
   display: flex;
@@ -537,6 +551,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  max-width: 500px;
   border: 2px solid #333132;
   border-radius: 100px;
   padding: 0 0 0 20px; }

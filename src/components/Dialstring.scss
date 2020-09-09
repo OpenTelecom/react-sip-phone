@@ -45,7 +45,7 @@
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  padding: 0 0 0 60px;
+  padding: 0 0 0 0px;
 
 }
 
@@ -55,6 +55,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  max-width: 500px;
   border: 2px solid $almost-black;
   border-radius: 100px;
   padding: 0 0 0 20px;

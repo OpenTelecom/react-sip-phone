@@ -138,7 +138,9 @@ class Phone extends React.Component<Props> {
           state.ended ? null :
             <React.Fragment>
               <Dialpad open={state.dialpadOpen} session={props.session} />
-              <div className={styles.actionsContainer}>
+              {/* <div className={styles.actionsContainer}> */}
+              <div className={props.strictMode === 'strict' ? styles.actionsContainerStrict : styles.actionsContainer}>
+
                 {props.phoneConfig.disabledButtons.includes('mute') ? null :
                   <Mute session={props.session} />}
                 <button
