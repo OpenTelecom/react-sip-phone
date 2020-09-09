@@ -19,7 +19,8 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center; }
+  align-items: center;
+  width: 100%; }
 
 #_Status__dialpad__24i7u {
   display: flex;
@@ -150,7 +151,8 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center; }
+  align-items: center;
+  width: 100%; }
 
 #_Status__transferMenu__1yjIy {
   display: flex;
@@ -158,6 +160,7 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  width: 100%;
   transition: all 0.3s ease; }
   #_Status__transferMenu__1yjIy._Status__closed__3nIZK {
     visibility: hidden;
@@ -277,7 +280,8 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center; }
+  align-items: center;
+  width: 100%; }
 
 #_Phone__dialpad__-iUpI {
   display: flex;
@@ -408,7 +412,8 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center; }
+  align-items: center;
+  width: 100%; }
 
 #_Phone__transferMenu__1yYD- {
   display: flex;
@@ -416,6 +421,7 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  width: 100%;
   transition: all 0.3s ease; }
   #_Phone__transferMenu__1yYD-._Phone__closed__1Yn0M {
     visibility: hidden;
@@ -495,7 +501,7 @@
   background: none;
   width: 60px;
   height: 60px;
-  border-radius: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -506,7 +512,7 @@
   align-items: center;
   font-size: 1em;
   height: 200px;
-  width: 200px;
+  width: 100%;
   background: none;
   background-color: #15c73b; }
   ._Dialstring__dialButtonStrict__tfL15:focus {

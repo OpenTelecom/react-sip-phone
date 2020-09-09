@@ -615,7 +615,10 @@ var setLocalAudio = function setLocalAudio(session) {
         }
       }).then(function (stream) {
         var audioTrack = stream.getAudioTracks();
-        sender.replaceTrack(audioTrack[0]);
+
+        if (audioTrack) {
+          sender.replaceTrack(audioTrack[0]);
+        }
       });
     }
   });

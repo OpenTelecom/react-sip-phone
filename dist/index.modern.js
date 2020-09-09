@@ -499,7 +499,10 @@ const setLocalAudio = session => {
         }
       }).then(function (stream) {
         let audioTrack = stream.getAudioTracks();
-        sender.replaceTrack(audioTrack[0]);
+
+        if (audioTrack) {
+          sender.replaceTrack(audioTrack[0]);
+        }
       });
     }
   });

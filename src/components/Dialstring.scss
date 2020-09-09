@@ -8,9 +8,30 @@
 }
 
 .dialButtonStrict{
-  @include common-button;
+  border: 0;
+  padding: 0;
+  background: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  transition: opacity 0.5s ease;
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  &:hover {
+    opacity: 0.5;
+  }
+  background-color: $primary-color;
+  color: $almost-black;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
   height: 200px;
-  width: 200px;
+  width: 100%;
   background: none;
   background-color: #15c73b;
 }
