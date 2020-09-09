@@ -19,8 +19,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  width: 100%; }
+  align-items: center; }
 
 #_Status__dialpad__24i7u {
   display: flex;
@@ -160,7 +159,6 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  width: 100%;
   transition: all 0.3s ease; }
   #_Status__transferMenu__1yjIy._Status__closed__3nIZK {
     visibility: hidden;
@@ -280,8 +278,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  width: 100%; }
+  align-items: center; }
 
 #_Phone__dialpad__-iUpI {
   display: flex;
@@ -421,7 +418,6 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  width: 100%;
   transition: all 0.3s ease; }
   #_Phone__transferMenu__1yYD-._Phone__closed__1Yn0M {
     visibility: hidden;

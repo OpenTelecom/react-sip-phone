@@ -16,6 +16,14 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+}
+
+@mixin actions-flex-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   width:100%
 }
 
@@ -79,7 +87,7 @@
 }
 
 .actionsContainer {
-  @include flex-container;
+  @include actions-flex-container;
 }
 
 #transferMenu {
