@@ -152,6 +152,14 @@
   justify-content: center;
   align-items: center; }
 
+._Status__actionsContainerStrict__3WwIv {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  padding: 0 0 0 505px; }
+
 #_Status__transferMenu__1yjIy {
   display: flex;
   flex-direction: row;
@@ -410,6 +418,14 @@
   justify-content: center;
   align-items: center; }
 
+._Phone__actionsContainerStrict__2yCVl {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  padding: 0 0 0 505px; }
+
 #_Phone__transferMenu__1yYD- {
   display: flex;
   flex-direction: row;
@@ -495,7 +511,7 @@
   background: none;
   width: 60px;
   height: 60px;
-  border-radius: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -506,7 +522,7 @@
   align-items: center;
   font-size: 1em;
   height: 200px;
-  width: 200px;
+  width: 100%;
   background: none;
   background-color: #15c73b; }
   ._Dialstring__dialButtonStrict__tfL15:focus {
@@ -527,7 +543,7 @@
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  padding: 0 0 0 60px; }
+  padding: 0 0 0 0px; }
 
 ._Dialstring__dialstringContainer__2sye_ {
   display: flex;
@@ -535,6 +551,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  max-width: 500px;
   border: 2px solid #333132;
   border-radius: 100px;
   padding: 0 0 0 20px; }
