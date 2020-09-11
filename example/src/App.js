@@ -52,7 +52,7 @@ const App = () => {
           started: false, // (strict-mode only) keeps track of call button visability during strict-mode
           appSize: 'large' // assign 'large' for larger font in status-name and session-status (not session remote-id/display name)
         }}
-        width={0} // when using strict mode, set width={450} for dialpad buttons and phone action-buttons to line up 
+        width={450} // when using strict mode, set width={450} for dialpad buttons and phone action-buttons to line up 
       />
     </React.Fragment>
   )

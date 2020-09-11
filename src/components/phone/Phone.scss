@@ -2,12 +2,12 @@
 @import '../../styles.scss';
 
 @mixin phone-buttons {
-  margin: 10px;
+  margin: 20px;
 }
 
 @mixin action-buttons {
   background-color: lightgray;
-  margin: 10px;
+  margin: 20px;
 }
 
 @mixin flex-container {
@@ -24,7 +24,7 @@
   flex-wrap: wrap;
   align-items: center;
   width: 100%;
-  padding: 0 0 0 200px;
+  padding: 250px 165px 0 200px;
 }
 
 #incoming {

@@ -41,9 +41,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -53,7 +53,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
-  margin: 10px;
+  margin: 20px;
   font-size: 1.5em; }
   ._Status__dialpadButton__38DZj:focus {
     outline: none;
@@ -73,9 +73,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -86,7 +86,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 10px; }
+  margin: 20px; }
   #_Status__actionButton__1hhhF:focus {
     outline: none;
     box-shadow: none; }
@@ -99,9 +99,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -112,7 +112,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 10px;
+  margin: 20px;
   background-color: #ff6961; }
   ._Status__endCallButton__3z8u3:focus {
     outline: none;
@@ -124,9 +124,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -137,7 +137,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 10px;
+  margin: 20px;
   background-color: #15c73b; }
   ._Status__startCallButton__3UW76:focus {
     outline: none;
@@ -158,7 +158,7 @@
   flex-wrap: wrap;
   align-items: center;
   width: 100%;
-  padding: 0 0 0 200px; }
+  padding: 250px 165px 0 200px; }
 
 #_Status__transferMenu__1yjIy {
   display: flex;
@@ -187,9 +187,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -199,7 +199,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
-  margin: 10px; }
+  margin: 20px; }
   ._Status__transferButtons__Rc_m0:focus {
     outline: none;
     box-shadow: none; }
@@ -226,9 +226,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -307,9 +307,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -319,7 +319,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
-  margin: 10px;
+  margin: 20px;
   font-size: 1.5em; }
   ._Phone__dialpadButton__2Mev0:focus {
     outline: none;
@@ -339,9 +339,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -352,7 +352,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 10px; }
+  margin: 20px; }
   #_Phone__actionButton__1gnBl:focus {
     outline: none;
     box-shadow: none; }
@@ -365,9 +365,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -378,7 +378,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 10px;
+  margin: 20px;
   background-color: #ff6961; }
   ._Phone__endCallButton__EoCL2:focus {
     outline: none;
@@ -390,9 +390,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -403,7 +403,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 10px;
+  margin: 20px;
   background-color: #15c73b; }
   ._Phone__startCallButton__PaJuy:focus {
     outline: none;
@@ -424,7 +424,7 @@
   flex-wrap: wrap;
   align-items: center;
   width: 100%;
-  padding: 0 0 0 200px; }
+  padding: 250px 165px 0 200px; }
 
 #_Phone__transferMenu__1yYD- {
   display: flex;
@@ -453,9 +453,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
@@ -465,7 +465,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
-  margin: 10px; }
+  margin: 20px; }
   ._Phone__transferButtons__1-bn8:focus {
     outline: none;
     box-shadow: none; }
@@ -484,9 +484,9 @@
   border: 0;
   padding: 0;
   background: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 100px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   transition: opacity 0.5s ease;
   background-color: #96bdf7;
   color: #333132;
