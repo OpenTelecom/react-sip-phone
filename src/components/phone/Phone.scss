@@ -22,8 +22,11 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  align-items: center;
   width: 100%;
-  padding: 250px 165px 0 200px;
+  padding: 0 0 0 200px;
+  margin: 250px 165px 0 200px;
+
 }
 
 #incoming {
@@ -52,7 +55,7 @@
 .dialpadButton {
   @include common-button;
   @include phone-buttons;
-  font-size: 1.5em;
+  font-size: 2em;
 }
 
 .dialpadButtonLetters {
