@@ -154,8 +154,7 @@
 
 ._Status__actionsContainerStrict__3WwIv {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex: 1;
   align-items: center;
   width: 100%;
   padding: 250px 165px 0 200px; }
@@ -420,8 +419,7 @@
 
 ._Phone__actionsContainerStrict__2yCVl {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex: 1;
   align-items: center;
   width: 100%;
   padding: 250px 165px 0 200px; }
