@@ -21,7 +21,6 @@
 @mixin actions-flex-container {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   align-items: center;
   width: 100%;
   padding: 250px 165px 0 200px;
