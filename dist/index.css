@@ -54,7 +54,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
-  margin: 20px;
+  margin: 25px;
   font-size: 2em; }
   ._Status__dialpadButton__38DZj:focus {
     outline: none;
@@ -87,7 +87,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 20px; }
+  margin: 25px; }
   #_Status__actionButton__1hhhF:focus {
     outline: none;
     box-shadow: none; }
@@ -113,7 +113,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 20px;
+  margin: 25px;
   background-color: #ff6961; }
   ._Status__endCallButton__3z8u3:focus {
     outline: none;
@@ -138,7 +138,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 20px;
+  margin: 25px;
   background-color: #15c73b; }
   ._Status__startCallButton__3UW76:focus {
     outline: none;
@@ -200,7 +200,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
-  margin: 20px; }
+  margin: 25px; }
   ._Status__transferButtons__Rc_m0:focus {
     outline: none;
     box-shadow: none; }
@@ -321,7 +321,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
-  margin: 20px;
+  margin: 25px;
   font-size: 2em; }
   ._Phone__dialpadButton__2Mev0:focus {
     outline: none;
@@ -354,7 +354,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 20px; }
+  margin: 25px; }
   #_Phone__actionButton__1gnBl:focus {
     outline: none;
     box-shadow: none; }
@@ -380,7 +380,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 20px;
+  margin: 25px;
   background-color: #ff6961; }
   ._Phone__endCallButton__EoCL2:focus {
     outline: none;
@@ -405,7 +405,7 @@
   align-items: center;
   font-size: 1em;
   background-color: lightgray;
-  margin: 20px;
+  margin: 25px;
   background-color: #15c73b; }
   ._Phone__startCallButton__PaJuy:focus {
     outline: none;
@@ -467,7 +467,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
-  margin: 20px; }
+  margin: 25px; }
   ._Phone__transferButtons__1-bn8:focus {
     outline: none;
     box-shadow: none; }
