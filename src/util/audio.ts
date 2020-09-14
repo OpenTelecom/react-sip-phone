@@ -38,11 +38,12 @@ export const setRemoteAudio = (session: Session) => {
 
     //@ts-ignore
   } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
-    // @ts-ignore
-    mediaElement.setSinkId(
-      // audio output device_id
-      deviceId
-    )
+    mediaElement
+      // @ts-ignore
+      .setSinkId(
+        // audio output device_id
+        deviceId
+      )
       .then(() => {
         // @ts-ignore
         mediaElement.srcObject = remoteStream
@@ -80,9 +81,9 @@ export const setLocalAudio = (session: Session) => {
           .getUserMedia({ audio: { deviceId: audioDeviceId } })
           .then(function (stream) {
             let audioTrack = stream.getAudioTracks()
-            if (audioTrack){
+            if (audioTrack) {
               sender.replaceTrack(audioTrack[0])
-            } 
+            }
           })
       }
     })

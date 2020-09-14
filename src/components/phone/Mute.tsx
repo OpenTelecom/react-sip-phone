@@ -104,7 +104,9 @@ class Mute extends React.Component<Props> {
     return (
       <div
         className={this.state.onMute ? styles.on : ''}
-        id={styles.actionButton} onClick={() => this.mute()}>
+        id={styles.actionButton}
+        onClick={() => this.mute()}
+      >
         <img src={micOffIcon} />
       </div>
     )

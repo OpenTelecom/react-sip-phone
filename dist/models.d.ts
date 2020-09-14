@@ -15,9 +15,7 @@ export interface PhoneConfig {
     defaultDial: string;
     sessionsLimit: number;
     attendedTransferLimit: number;
-}
-export interface AppConfig {
     mode: string;
-    started: boolean;
     appSize: string;
+    started: boolean;
 }

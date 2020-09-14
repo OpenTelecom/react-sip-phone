@@ -19,7 +19,11 @@ interface Props {
 class Hold extends React.Component<Props> {
   hold() {
     if (this.checkHoldState()) {
-      this.props.unHoldCallRequest(this.props.session, this.props.onHold, this.props.sessions)
+      this.props.unHoldCallRequest(
+        this.props.session,
+        this.props.onHold,
+        this.props.sessions
+      )
     } else {
       this.props.holdCallRequest(this.props.session)
     }
@@ -32,7 +36,11 @@ class Hold extends React.Component<Props> {
 
   render() {
     return (
-      <button className={this.checkHoldState() ? styles.on : ''} id={styles.actionButton} onClick={() => this.hold()}>
+      <button
+        className={this.checkHoldState() ? styles.on : ''}
+        id={styles.actionButton}
+        onClick={() => this.hold()}
+      >
         <img src={holdIcon} />
       </button>
     )

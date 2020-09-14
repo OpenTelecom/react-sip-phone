@@ -320,12 +320,6 @@ var setPhoneConfig = function setPhoneConfig(config) {
     payload: config
   };
 };
-var setAppConfig = function setAppConfig(config) {
-  return {
-    type: SET_APP_CONFIG,
-    payload: config
-  };
-};
 var setAppConfigStarted = function setAppConfigStarted() {
   return {
     type: STRICT_MODE_SHOW_CALL_BUTTON
@@ -1152,7 +1146,7 @@ var SIPAccount = /*#__PURE__*/function () {
     var state = phoneStore.getState();
     var sessionsLimit = state.config.phoneConfig.sessionsLimit;
     var sessionsActiveObject = state.sipSessions.sessions;
-    var strictMode = state.config.appConfig.mode;
+    var strictMode = state.config.phoneConfig.mode;
     var attendedTransfersActive = state.sipSessions.attendedTransfers.length;
     var sessionsActive = Object.keys(sessionsActiveObject).length;
     var sessionDiff = sessionsActive - attendedTransfersActive;
@@ -1196,8 +1190,6 @@ var SIPAccount = /*#__PURE__*/function () {
     }
   };
 
-  _proto.listener = function listener() {};
-
   return SIPAccount;
 }();
 
@@ -1222,7 +1214,6 @@ var SipWrapper = /*#__PURE__*/function (_React$Component) {
     var account = new SIPAccount(this.props.sipConfig, this.props.sipCredentials);
     this.props.setNewAccount(account);
     this.props.setPhoneConfig(this.props.phoneConfig);
-    this.props.setAppConfig(this.props.appConfig);
   };
 
   _proto.render = function render() {
@@ -1239,8 +1230,7 @@ var mapStateToProps = function mapStateToProps() {
 var actions = {
   setNewAccount: setNewAccount,
   setPhoneConfig: setPhoneConfig,
-  setCredentials: setCredentials,
-  setAppConfig: setAppConfig
+  setCredentials: setCredentials
 };
 var SipWrapper$1 = reactRedux.connect(mapStateToProps, actions)(SipWrapper);
 
@@ -1300,7 +1290,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
     var outputs = this.mapOptions(props.outputs);
     return React.createElement(React.Fragment, null, React.createElement("div", {
       className: styles$1.container
-    }, props.appConfig.appSize === 'large' ? React.createElement("div", {
+    }, props.phoneConfig.appSize === 'large' ? React.createElement("div", {
       className: styles$1.userStringLarge
     }, props.name) : React.createElement("div", {
       className: styles$1.userString
@@ -1327,7 +1317,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
       className: styles$1.dropdownIcon,
       src: soundIcon
     }), React.createElement(Select, {
-      placeholder: "Select Output...",
+      placeholder: 'Select Output...',
       value: outputs.find(function (output) {
         return output.value === props.primaryOutput;
       }) || null,
@@ -1342,7 +1332,7 @@ var Status = /*#__PURE__*/function (_React$Component) {
       className: styles$1.dropdownIcon,
       src: micIcon
     }), React.createElement(Select, {
-      placeholder: "Select Input...",
+      placeholder: 'Select Input...',
       value: inputs.find(function (input) {
         return input.value === props.primaryInput;
       }),
@@ -1387,7 +1377,7 @@ var DialButton = function DialButton(_ref) {
       click = _ref.click,
       letters = _ref.letters;
   return React.createElement("div", {
-    id: "sip-dial-button",
+    id: 'sip-dial-button',
     className: styles$2.dialpadButton,
     onClick: function onClick() {
       return click();
@@ -1929,7 +1919,10 @@ var AttendedTransfer = /*#__PURE__*/function (_React$Component) {
         disabledFeatures: [''],
         defaultDial: '',
         sessionsLimit: 0,
-        attendedTransferLimit: 0
+        attendedTransferLimit: 0,
+        mode: '',
+        appSize: '',
+        started: false
       };
       return React.createElement(React.Fragment, null, React.createElement(Phone$1, {
         session: this.state.attendedTransferSessionReady,
@@ -2060,7 +2053,7 @@ var Phone = /*#__PURE__*/function (_React$Component) {
 
       _this2.props.endCall(_this2.props.session.id);
 
-      if (_this2.props.strictMode === 'strict') {
+      if (_this2.props.phoneConfig.mode === 'strict') {
         _this2.props.setAppConfigStarted();
       }
     }, 5000);
@@ -2099,7 +2092,7 @@ var Phone = /*#__PURE__*/function (_React$Component) {
         props = this.props;
     var durationDisplay;
 
-    if (props.appSize === 'large') {
+    if (props.phoneConfig.appSize === 'large') {
       if (this.props.session.state === sip_js.SessionState.Initial || this.props.session.state === sip_js.SessionState.Establishing) {
         durationDisplay = null;
       } else {
@@ -2119,13 +2112,13 @@ var Phone = /*#__PURE__*/function (_React$Component) {
       style: {
         width: '100%'
       }
-    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, React.createElement("br", null)), props.appSize === 'large' ? React.createElement("div", {
+    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, React.createElement("br", null)), props.phoneConfig.appSize === 'large' ? React.createElement("div", {
       className: styles$2.statusLarge
     }, statusMask(props.session.state)) : React.createElement("div", null, statusMask(props.session.state)), React.createElement("br", null), durationDisplay, state.ended ? null : React.createElement(React.Fragment, null, React.createElement(Dialpad$1, {
       open: state.dialpadOpen,
       session: props.session
     }), React.createElement("div", {
-      className: props.strictMode === 'strict' ? styles$2.actionsContainerStrict : styles$2.actionsContainer
+      className: props.phoneConfig.appSize === 'strict' ? styles$2.actionsContainerStrict : styles$2.actionsContainer
     }, props.phoneConfig.disabledButtons.includes('mute') ? null : React.createElement(Mute$1, {
       session: props.session
     }), React.createElement("button", {
@@ -2168,7 +2161,7 @@ var Phone = /*#__PURE__*/function (_React$Component) {
           transferDialString: e.target.value
         });
       },
-      placeholder: "Enter the transfer destination..."
+      placeholder: 'Enter the transfer destination...'
     }), this.state.attendedTransferStarted ? null : React.createElement(BlindTranfer, {
       destination: state.transferDialString,
       session: props.session
@@ -2191,8 +2184,8 @@ var mapStateToProps$7 = function mapStateToProps(state) {
     sessions: state.sipSessions.sessions,
     userAgent: state.sipAccounts.userAgent,
     deviceId: state.device.primaryAudioOutput,
-    strictMode: state.config.appConfig.mode,
-    appSize: state.config.appConfig.appSize
+    strictMode: state.config.phoneConfig.mode,
+    appSize: state.config.phoneConfig.appSize
   };
 };
 
@@ -2264,7 +2257,7 @@ var Incoming = /*#__PURE__*/function (_React$Component) {
       loop: true
     }, React.createElement("source", {
       src: ring,
-      type: "audio/mpeg"
+      type: 'audio/mpeg'
     })), React.createElement("audio", {
       id: this.props.session.id
     }));
@@ -2365,7 +2358,7 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
     if (sessionDiff >= this.props.phoneConfig.sessionsLimit) {
       this.props.sessionsLimitReached();
     } else {
-      if (this.props.appConfig.mode === 'strict') {
+      if (this.props.phoneConfig.mode === 'strict') {
         this.props.sipAccount.makeCall(this.props.phoneConfig.defaultDial);
       }
 
@@ -2384,7 +2377,7 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
 
     var props = this.props;
 
-    if (props.appConfig.mode.includes('strict') && props.started === true) {
+    if (props.phoneConfig.mode.includes('strict') && props.started === true) {
       return React.createElement("div", {
         className: styles$3.dialstringContainerStrict
       }, React.createElement("button", {
@@ -2395,7 +2388,7 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
       }, React.createElement("img", {
         src: callIconLarge
       })));
-    } else if (props.appConfig.mode.includes('strict')) {
+    } else if (props.phoneConfig.mode.includes('strict')) {
       return null;
     } else {
       return React.createElement("div", {
@@ -2409,7 +2402,7 @@ var Dialstring = /*#__PURE__*/function (_React$Component) {
             e.preventDefault();
           }
         },
-        placeholder: "Enter the number to dial...",
+        placeholder: 'Enter the number to dial...',
         onChange: function onChange(e) {
           return _this2.setState({
             currentDialString: e.target.value
@@ -2434,7 +2427,7 @@ var mapStateToProps$a = function mapStateToProps(state) {
   return {
     sipAccount: state.sipAccounts.sipAccount,
     sessions: state.sipSessions.sessions,
-    started: state.config.appConfig.started,
+    started: state.config.phoneConfig.started,
     attendedTransfersList: state.sipSessions.attendedTransfers
   };
 };
@@ -2628,11 +2621,9 @@ var config = function config(state, action) {
     state = {
       uri: '',
       password: '',
-      phoneConfig: {},
-      appConfig: {
+      phoneConfig: {
         mode: '',
-        started: false,
-        appSize: ''
+        started: false
       }
     };
   }
@@ -2655,9 +2646,9 @@ var config = function config(state, action) {
       });
 
     case STRICT_MODE_SHOW_CALL_BUTTON:
-      if (state.appConfig.mode === 'strict') {
+      if (state.phoneConfig.mode === 'strict') {
         return _extends(_extends({}, state), {}, {
-          appConfig: _extends(_extends({}, state.appConfig), {}, {
+          phoneConfig: _extends(_extends({}, state.phoneConfig), {}, {
             mode: 'strict',
             started: true
           })
@@ -2665,9 +2656,9 @@ var config = function config(state, action) {
       }
 
     case STRICT_MODE_HIDE_CALL_BUTTON:
-      if (state.appConfig.mode === 'strict') {
+      if (state.phoneConfig.mode === 'strict') {
         return _extends(_extends({}, state), {}, {
-          appConfig: _extends(_extends({}, state.appConfig), {}, {
+          phoneConfig: _extends(_extends({}, state.phoneConfig), {}, {
             mode: 'strict',
             started: false
           })
@@ -2705,7 +2696,6 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
       height = _ref$height === void 0 ? 600 : _ref$height,
       phoneConfig = _ref.phoneConfig,
       sipConfig = _ref.sipConfig,
-      appConfig = _ref.appConfig,
       sipCredentials = _ref.sipCredentials,
       _ref$containerStyle = _ref.containerStyle,
       containerStyle = _ref$containerStyle === void 0 ? {} : _ref$containerStyle;
@@ -2717,8 +2707,7 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
   }, React.createElement(SipWrapper$1, {
     sipConfig: sipConfig,
     sipCredentials: sipCredentials,
-    phoneConfig: phoneConfig,
-    appConfig: appConfig
+    phoneConfig: phoneConfig
   }, React.createElement("div", {
     className: styles.container,
     style: _extends(_extends({}, containerStyle), {}, {
@@ -2727,12 +2716,10 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
     })
   }, React.createElement(Status$1, {
     phoneConfig: phoneConfig,
-    appConfig: appConfig,
     name: name
   }), phoneConfig.disabledFeatures.includes('dialstring') ? null : React.createElement(D, {
     sipConfig: sipConfig,
-    phoneConfig: phoneConfig,
-    appConfig: appConfig
+    phoneConfig: phoneConfig
   }), React.createElement(PS, {
     phoneConfig: phoneConfig
   }), React.createElement("audio", {

@@ -1,4 +1,4 @@
-import { PhoneConfig, AppConfig } from '../models';
+import { PhoneConfig } from '../models';
 export declare const SET_CREDENTIALS = "SET_CREDENTIALS";
 export declare const SET_PHONE_CONFIG = "SET_PHONE_CONFIG";
 export declare const SET_APP_CONFIG = "SET_APP_CONFIG";
@@ -16,10 +16,6 @@ export declare const setCredentials: (uri?: string, password?: string) => {
 export declare const setPhoneConfig: (config: PhoneConfig) => {
     type: string;
     payload: PhoneConfig;
-};
-export declare const setAppConfig: (config: AppConfig) => {
-    type: string;
-    payload: AppConfig;
 };
 export declare const setAppConfigStarted: () => {
     type: string;

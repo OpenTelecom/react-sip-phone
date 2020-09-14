@@ -80,7 +80,5 @@ class Dialpad extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   deviceId: state.device.primaryAudioOutput
 })
-const actions = {
-
-}
+const actions = {}
 export default connect(mapStateToProps, actions)(Dialpad)

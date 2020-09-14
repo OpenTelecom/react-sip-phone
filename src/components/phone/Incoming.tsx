@@ -9,13 +9,12 @@ import toneManager from '../../util/ToneManager'
 
 const ring = require('./assets/ring.mp3')
 interface Props {
-  session: Invitation,
-  acceptCall: Function,
+  session: Invitation
+  acceptCall: Function
   declineCall: Function
 }
 
 class Incoming extends React.Component<Props> {
-
   componentDidMount() {
     toneManager.stopAll()
     toneManager.playRing('ringtone')
@@ -28,8 +27,8 @@ class Incoming extends React.Component<Props> {
         constraints: {
           audio: true,
           video: false
-        },
-      },
+        }
+      }
     })
     this.props.acceptCall(this.props.session)
   }
@@ -42,25 +41,38 @@ class Incoming extends React.Component<Props> {
 
   render() {
     const props = this.props
-    return <div id={styles.incoming}>
-      {
-        // @ts-ignore
-        `Incoming: ${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`
-      }
-      <div className={styles.endCallButton} onClick={() => this.handleDecline()} ><img src={declineIcon} /></div>
-      <div className={styles.startCallButton} onClick={() => this.handleAccept()} ><img src={acceptIcon} /></div>
-      <audio id='ringtone' loop >
-        <source src={ring} type="audio/mpeg" />
-      </audio>
-      <audio id={this.props.session.id} />
-    </div>
+    return (
+      <div id={styles.incoming}>
+        {
+          // @ts-ignore
+          `Incoming: ${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`
+        }
+        <div
+          className={styles.endCallButton}
+          onClick={() => this.handleDecline()}
+        >
+          <img src={declineIcon} />
+        </div>
+        <div
+          className={styles.startCallButton}
+          onClick={() => this.handleAccept()}
+        >
+          <img src={acceptIcon} />
+        </div>
+        <audio id='ringtone' loop>
+          <source src={ring} type='audio/mpeg' />
+        </audio>
+        <audio id={this.props.session.id} />
+      </div>
+    )
   }
 }
 
 const mapStateToProps = (state: any) => ({
-  stateChanged: state.sipSessions.stateChanged,
+  stateChanged: state.sipSessions.stateChanged
 })
 const actions = {
-  acceptCall, declineCall
+  acceptCall,
+  declineCall
 }
 export default connect(mapStateToProps, actions)(Incoming)

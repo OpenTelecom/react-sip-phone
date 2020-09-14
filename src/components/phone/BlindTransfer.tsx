@@ -27,7 +27,9 @@ class BlindTransfer extends React.Component<Props> {
   blindTransferCall() {
     this.props.blindTransferRequest()
     const target = UserAgent.makeURI(
-      `sip:${getFullNumber(this.props.destination)}@${this.props.sipAccount._credentials.sipuri.split('@')[1]};user=phone`
+      `sip:${getFullNumber(this.props.destination)}@${
+        this.props.sipAccount._credentials.sipuri.split('@')[1]
+      };user=phone`
     )
     if (target) {
       try {

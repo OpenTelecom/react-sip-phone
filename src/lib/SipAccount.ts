@@ -16,7 +16,10 @@ import { NEW_USERAGENT } from '../actions/sipAccounts'
 import { SessionStateHandler, getFullNumber } from '../util/sessions'
 import { IncomingSessionStateHandler } from '../util/incomingSession'
 
-import {STRICT_MODE_HIDE_CALL_BUTTON, SESSIONS_LIMIT_REACHED} from '../actions/config'
+import {
+  STRICT_MODE_HIDE_CALL_BUTTON,
+  SESSIONS_LIMIT_REACHED
+} from '../actions/config'
 import { NEW_SESSION, INCOMING_CALL } from '../actions/sipSessions'
 import { SipConfig, SipCredentials } from '../models'
 
@@ -51,8 +54,7 @@ export default class SIPAccount {
       sessionDescriptionHandlerFactoryOptions: {
         constraints: {
           audio: {
-            deviceId:
-              'default'
+            deviceId: 'default'
           },
           video: false
         },
@@ -76,7 +78,6 @@ export default class SIPAccount {
       phoneStore.dispatch({ type: NEW_USERAGENT, payload: this._userAgent })
     })
   }
-  
 
   setupDelegate() {
     this._userAgent.delegate = {
@@ -127,60 +128,63 @@ export default class SIPAccount {
     //@ts-ignore
     let sessionsActiveObject: Object = state.sipSessions.sessions
     //@ts-ignore
-    let strictMode: string = state.config.appConfig.mode
-    //@ts-ignore
-    let attendedTransfersActive: number  = state.sipSessions.attendedTransfers.length
+    let strictMode: string = state.config.phoneConfig.mode
+    let attendedTransfersActive: number =
+      //@ts-ignore
+      state.sipSessions.attendedTransfers.length
 
-    //added sessionsLimit check if outside Application makes call using sipaccount w/o using dialstring 
+    //added sessionsLimit check if outside Application makes call using sipaccount w/o using dialstring
     let sessionsActive: number = Object.keys(sessionsActiveObject).length
     let sessionDiff: number = sessionsActive - attendedTransfersActive
-    if (sessionDiff >= sessionsLimit){
+    if (sessionDiff >= sessionsLimit) {
       phoneStore.dispatch({ type: SESSIONS_LIMIT_REACHED })
-    } else{
-    // Make a call
-    const target = UserAgent.makeURI(
-      `sip:${getFullNumber(number)}@${this._credentials.sipuri.split('@')[1]};user=phone`
-    )
-    //strict mode will remove dialstring call button on session initialization
-    if (strictMode === ('strict')){
-      phoneStore.dispatch({type:STRICT_MODE_HIDE_CALL_BUTTON})
-    }
-
-    if (target) {
-      console.log(`Calling ${number}`)
-      const inviter = new Inviter(this._userAgent, target)
-      // An Inviter is a Session
-      const outgoingSession: Session = inviter
-      // Setup outgoing session delegate
-      outgoingSession.delegate = {
-        // Handle incoming REFER request.
-        onRefer(referral: Referral): void {
-          // TODO
-          console.log('Referred: ' + referral)
-        }
-      }
-      phoneStore.dispatch({ type: NEW_SESSION, payload: outgoingSession })
-      // Handle outgoing session state changes.
-      const stateHandler = new SessionStateHandler(outgoingSession,this._userAgent )
-      outgoingSession.stateChange.addListener(stateHandler.stateChange)
-      outgoingSession
-        .invite()
-        .then(() => {
-          console.log('Invite sent!')
-        })
-        .catch((error: Error) => {
-          console.log(error)
-        })
     } else {
-      console.log(`Failed to establish session for outgoing call to ${number}`)
+      // Make a call
+      const target = UserAgent.makeURI(
+        `sip:${getFullNumber(number)}@${
+          this._credentials.sipuri.split('@')[1]
+        };user=phone`
+      )
+      //strict mode will remove dialstring call button on session initialization
+      if (strictMode === 'strict') {
+        phoneStore.dispatch({ type: STRICT_MODE_HIDE_CALL_BUTTON })
+      }
+
+      if (target) {
+        console.log(`Calling ${number}`)
+        const inviter = new Inviter(this._userAgent, target)
+        // An Inviter is a Session
+        const outgoingSession: Session = inviter
+        // Setup outgoing session delegate
+        outgoingSession.delegate = {
+          // Handle incoming REFER request.
+          onRefer(referral: Referral): void {
+            // TODO
+            console.log('Referred: ' + referral)
+          }
+        }
+        phoneStore.dispatch({ type: NEW_SESSION, payload: outgoingSession })
+        // Handle outgoing session state changes.
+        const stateHandler = new SessionStateHandler(
+          outgoingSession,
+          this._userAgent
+        )
+        outgoingSession.stateChange.addListener(stateHandler.stateChange)
+        outgoingSession
+          .invite()
+          .then(() => {
+            console.log('Invite sent!')
+          })
+          .catch((error: Error) => {
+            console.log(error)
+          })
+      } else {
+        console.log(
+          `Failed to establish session for outgoing call to ${number}`
+        )
       }
     }
 
-    
     // toneManager.playRing('ringback')
-
-  }
-  listener(){
-        
   }
 }

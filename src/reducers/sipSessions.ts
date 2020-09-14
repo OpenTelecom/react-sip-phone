@@ -45,19 +45,25 @@ const sipSessions = (
       }
     case SIPSESSION_ATTENDED_TRANSFER_CANCEL:
     case SIPSESSION_ATTENDED_TRANSFER_FAIL:
-      const newAttendedTransfers = [...state.attendedTransfers].filter((id) => id !== payload.id)
-        return {
-          ...state,
-          attendedTransfers: newAttendedTransfers
-        }
+      const newAttendedTransfers = [...state.attendedTransfers].filter(
+        (id) => id !== payload.id
+      )
+      return {
+        ...state,
+        attendedTransfers: newAttendedTransfers
+      }
     case ACCEPT_CALL:
-      const acceptedIncoming = [...state.incomingCalls].filter((id) => id !== payload.id)
+      const acceptedIncoming = [...state.incomingCalls].filter(
+        (id) => id !== payload.id
+      )
       return {
         ...state,
         incomingCalls: acceptedIncoming
       }
     case DECLINE_CALL:
-      const declinedIncoming = [...state.incomingCalls].filter((id) => id !== payload.id)
+      const declinedIncoming = [...state.incomingCalls].filter(
+        (id) => id !== payload.id
+      )
       const declinedSessions: any = { ...state.sessions }
       delete declinedSessions[payload.id]
       return {
@@ -71,7 +77,9 @@ const sipSessions = (
         stateChanged: state.stateChanged + 1
       }
     case CLOSE_SESSION:
-      const closedIncoming = [...state.incomingCalls].filter((id) => id !== payload)
+      const closedIncoming = [...state.incomingCalls].filter(
+        (id) => id !== payload
+      )
       const newSessions: any = { ...state.sessions }
       delete newSessions[payload]
       const endHold = [...state.onHold].filter((id) => id !== payload)
