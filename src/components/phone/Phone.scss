@@ -55,6 +55,9 @@
   @include common-button;
   @include phone-buttons;
   font-size: 2em;
+  &:active{
+    background-color: #b2c7f1;
+  }
 }
 
 .dialpadButtonLetters {
@@ -79,12 +82,18 @@
   @include common-button;
   @include action-buttons;
   background-color: #ff6961;
+  &:active{
+    background-color: #fca09c;
+  }
 }
 
 .startCallButton {
   @include common-button;
   @include action-buttons;
   background-color: #15c73b;
+  &:active{
+    background-color: #71c082;
+  }
 }
 
 .actionsContainer {
