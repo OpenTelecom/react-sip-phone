@@ -36,29 +36,6 @@
   font-size: 1em;
 }
 
-@mixin common-button-dialpad {
-  border: 0;
-  padding: 0;
-  background: none;
-  width: 100px;
-  height: 100px;
-  border-radius: 10px;
-  transition: opacity 0.5s ease;
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
-  background-color: $primary-color;
-  color: $almost-black;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 1em;
-}
-
-
 @mixin common-input {
   border: none;
   padding: none;
