@@ -59,8 +59,8 @@
   ._Status__dialpadButton__38DZj:focus {
     outline: none;
     box-shadow: none; }
-  ._Status__dialpadButton__38DZj:hover {
-    opacity: 0.5; }
+  ._Status__dialpadButton__38DZj:active {
+    background-color: #b2c7f1; }
 
 ._Status__dialpadButtonLetters__N-jqm {
   font-size: 0.5em;
@@ -91,8 +91,6 @@
   #_Status__actionButton__1hhhF:focus {
     outline: none;
     box-shadow: none; }
-  #_Status__actionButton__1hhhF:hover {
-    opacity: 0.5; }
   #_Status__actionButton__1hhhF._Status__on__3ZwLv {
     background-color: gray; }
 
@@ -118,8 +116,8 @@
   ._Status__endCallButton__3z8u3:focus {
     outline: none;
     box-shadow: none; }
-  ._Status__endCallButton__3z8u3:hover {
-    opacity: 0.5; }
+  ._Status__endCallButton__3z8u3:active {
+    background-color: #fca09c; }
 
 ._Status__startCallButton__3UW76 {
   border: 0;
@@ -143,8 +141,8 @@
   ._Status__startCallButton__3UW76:focus {
     outline: none;
     box-shadow: none; }
-  ._Status__startCallButton__3UW76:hover {
-    opacity: 0.5; }
+  ._Status__startCallButton__3UW76:active {
+    background-color: #71c082; }
 
 ._Status__actionsContainer__2kDeL {
   display: flex;
@@ -204,8 +202,6 @@
   ._Status__transferButtons__Rc_m0:focus {
     outline: none;
     box-shadow: none; }
-  ._Status__transferButtons__Rc_m0:hover {
-    opacity: 0.5; }
 
 ._Status__container__Adysl {
   width: 100%;
@@ -246,8 +242,6 @@
   #_Status__settingsButton__3TfJl:focus {
     outline: none;
     box-shadow: none; }
-  #_Status__settingsButton__3TfJl:hover {
-    opacity: 0.5; }
   #_Status__settingsButton__3TfJl._Status__on__3ZwLv {
     background-color: gray; }
 
@@ -326,8 +320,8 @@
   ._Phone__dialpadButton__2Mev0:focus {
     outline: none;
     box-shadow: none; }
-  ._Phone__dialpadButton__2Mev0:hover {
-    opacity: 0.5; }
+  ._Phone__dialpadButton__2Mev0:active {
+    background-color: #b2c7f1; }
 
 ._Phone__dialpadButtonLetters__30C7x {
   font-size: 0.5em;
@@ -358,8 +352,6 @@
   #_Phone__actionButton__1gnBl:focus {
     outline: none;
     box-shadow: none; }
-  #_Phone__actionButton__1gnBl:hover {
-    opacity: 0.5; }
   #_Phone__actionButton__1gnBl._Phone__on__11LDZ {
     background-color: gray; }
 
@@ -385,8 +377,8 @@
   ._Phone__endCallButton__EoCL2:focus {
     outline: none;
     box-shadow: none; }
-  ._Phone__endCallButton__EoCL2:hover {
-    opacity: 0.5; }
+  ._Phone__endCallButton__EoCL2:active {
+    background-color: #fca09c; }
 
 ._Phone__startCallButton__PaJuy {
   border: 0;
@@ -410,8 +402,8 @@
   ._Phone__startCallButton__PaJuy:focus {
     outline: none;
     box-shadow: none; }
-  ._Phone__startCallButton__PaJuy:hover {
-    opacity: 0.5; }
+  ._Phone__startCallButton__PaJuy:active {
+    background-color: #71c082; }
 
 ._Phone__actionsContainer__25gV2 {
   display: flex;
@@ -471,8 +463,6 @@
   ._Phone__transferButtons__1-bn8:focus {
     outline: none;
     box-shadow: none; }
-  ._Phone__transferButtons__1-bn8:hover {
-    opacity: 0.5; }
 
 ._Dialstring__container__2iAE_ {
   display: flex;
@@ -504,8 +494,6 @@
   ._Dialstring__dialButton__3GsXr:focus {
     outline: none;
     box-shadow: none; }
-  ._Dialstring__dialButton__3GsXr:hover {
-    opacity: 0.5; }
 
 ._Dialstring__dialButtonStrict__tfL15 {
   border: 0;
@@ -530,8 +518,8 @@
   ._Dialstring__dialButtonStrict__tfL15:focus {
     outline: none;
     box-shadow: none; }
-  ._Dialstring__dialButtonStrict__tfL15:hover {
-    opacity: 0.5; }
+  ._Dialstring__dialButtonStrict__tfL15:active {
+    background-color: #8beb9f; }
 
 ._Dialstring__dialInput__32AFz {
   border: none;

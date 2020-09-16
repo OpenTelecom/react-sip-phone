@@ -1,5 +1,19 @@
 @import './variables';
 
+//Detecting devices with hover enabled 
+// @media (hover: hover) {
+//   button:hover {
+//     &:hover {
+//       opacity: 0.5;
+//     }
+//     transition: opacity 0.5s ease;
+//     &:focus {
+//       outline: none;
+//       box-shadow: none;
+//     }
+//   }
+// }
+
 @mixin common-button {
   border: 0;
   padding: 0;
@@ -11,9 +25,6 @@
   &:focus {
     outline: none;
     box-shadow: none;
-  }
-  &:hover {
-    opacity: 0.5;
   }
   background-color: $primary-color;
   color: $almost-black;
