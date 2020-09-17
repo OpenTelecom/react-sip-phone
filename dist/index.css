@@ -45,7 +45,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -60,6 +61,7 @@
     outline: none;
     box-shadow: none; }
   ._Status__dialpadButton__38DZj:active {
+    transition: none;
     background-color: #b2c7f1; }
 
 ._Status__dialpadButtonLetters__N-jqm {
@@ -77,7 +79,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -101,7 +104,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -117,6 +121,7 @@
     outline: none;
     box-shadow: none; }
   ._Status__endCallButton__3z8u3:active {
+    transition: none;
     background-color: #fca09c; }
 
 ._Status__startCallButton__3UW76 {
@@ -126,7 +131,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -137,11 +143,14 @@
   font-size: 1em;
   background-color: lightgray;
   margin: 25px;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #15c73b; }
   ._Status__startCallButton__3UW76:focus {
     outline: none;
     box-shadow: none; }
   ._Status__startCallButton__3UW76:active {
+    transition: none;
     background-color: #71c082; }
 
 ._Status__actionsContainer__2kDeL {
@@ -189,7 +198,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -226,7 +236,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -306,7 +317,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -321,6 +333,7 @@
     outline: none;
     box-shadow: none; }
   ._Phone__dialpadButton__2Mev0:active {
+    transition: none;
     background-color: #b2c7f1; }
 
 ._Phone__dialpadButtonLetters__30C7x {
@@ -338,7 +351,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -362,7 +376,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -378,6 +393,7 @@
     outline: none;
     box-shadow: none; }
   ._Phone__endCallButton__EoCL2:active {
+    transition: none;
     background-color: #fca09c; }
 
 ._Phone__startCallButton__PaJuy {
@@ -387,7 +403,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -398,11 +415,14 @@
   font-size: 1em;
   background-color: lightgray;
   margin: 25px;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #15c73b; }
   ._Phone__startCallButton__PaJuy:focus {
     outline: none;
     box-shadow: none; }
   ._Phone__startCallButton__PaJuy:active {
+    transition: none;
     background-color: #71c082; }
 
 ._Phone__actionsContainer__25gV2 {
@@ -450,7 +470,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -479,7 +500,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -502,7 +524,8 @@
   width: 60px;
   height: 60px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: #96bdf7;
   color: #333132;
   cursor: pointer;
@@ -519,6 +542,7 @@
     outline: none;
     box-shadow: none; }
   ._Dialstring__dialButtonStrict__tfL15:active {
+    transition: none;
     background-color: #8beb9f; }
 
 ._Dialstring__dialInput__32AFz {

@@ -46,7 +46,7 @@
   }
 }
 
-.statusLarge{
+.statusLarge {
   padding: 2px;
   font-size: 40px;
 }
@@ -55,7 +55,8 @@
   @include common-button;
   @include phone-buttons;
   font-size: 2em;
-  &:active{
+  &:active {
+    transition: none;
     background-color: #b2c7f1;
   }
 }
@@ -82,7 +83,8 @@
   @include common-button;
   @include action-buttons;
   background-color: #ff6961;
-  &:active{
+  &:active {
+    transition: none;
     background-color: #fca09c;
   }
 }
@@ -90,8 +92,12 @@
 .startCallButton {
   @include common-button;
   @include action-buttons;
+  transition: all 0.2s;
+  transition-delay: 300ms;
+
   background-color: #15c73b;
-  &:active{
+  &:active {
+    transition: none;
     background-color: #71c082;
   }
 }
