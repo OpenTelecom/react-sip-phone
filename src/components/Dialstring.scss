@@ -7,14 +7,15 @@
   background: none;
 }
 
-.dialButtonStrict{
+.dialButtonStrict {
   border: 0;
   padding: 0;
   background: none;
   width: 60px;
   height: 60px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   &:focus {
     outline: none;
     box-shadow: none;
@@ -31,7 +32,8 @@
   width: 100%;
   background: none;
   background-color: #15c73b;
-  &:active{
+  &:active {
+    transition: none;
     background-color: #8beb9f;
   }
 }
@@ -46,7 +48,6 @@
   justify-content: space-between;
   width: 100%;
   padding: 0 0 0 0px;
-
 }
 
 .dialstringContainer {

@@ -1,6 +1,6 @@
 @import './variables';
 
-//Detecting devices with hover enabled 
+//Detecting devices with hover enabled
 // @media (hover: hover) {
 //   button:hover {
 //     &:hover {
@@ -21,7 +21,8 @@
   width: 100px;
   height: 100px;
   border-radius: 10px;
-  transition: opacity 0.5s ease;
+  transition: all 0.2s;
+  transition-delay: 300ms;
   &:focus {
     outline: none;
     box-shadow: none;
@@ -51,5 +52,5 @@
   justify-content: flex-start;
   align-items: center;
   height: 100%;
-  font-family: Arial, Helvetica, sans-serif
+  font-family: Arial, Helvetica, sans-serif;
 }
