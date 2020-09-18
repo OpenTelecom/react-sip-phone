@@ -9,13 +9,14 @@ import Mute from './Mute'
 import BlindTranfer from './BlindTransfer'
 import AttendedTransfer from './AttendedTransfer'
 import styles from './Phone.scss'
-import endCallIcon from '../../assets/call_end-24px.svg'
-import dialpadIcon from '../../assets/dialpad-24px.svg'
-import transferIcon from '../../assets/arrow_forward-24px.svg'
 import { callDisconnect } from '../../util/TonePlayer'
 import toneManager from '../../util/ToneManager'
 import { statusMask, getDurationDisplay } from '../../util/sessions'
 import { PhoneConfig } from '../../models'
+
+const endCallIcon = require('./assets/call_end-24px.svg')
+const  dialpadIcon = require('./assets/dialpad-24px.svg')
+const transferIcon = require('./assets/arrow_forward-24px.svg')
 
 interface Props {
   session: Session

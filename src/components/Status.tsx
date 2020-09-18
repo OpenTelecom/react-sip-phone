@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import { setPrimaryInput, setPrimaryOutput, getInputAudioDevices, getOutputAudioDevices } from '../actions/device'
 import styles from './Status.scss'
 import Select from 'react-select';
-import settingsIcon from '../assets/settings-24px.svg'
-import micIcon from '../assets/mic-24px.svg'
-import soundIcon from '../assets/volume_up-24px.svg'
 import { PhoneConfig, AppConfig } from '../models'
+
+const settingsIcon = require('./assets/settings-24px.svg')
+const micIcon = require('./assets/mic-24px.svg')
+const soundIcon = require('./assets/volume_up-24px.svg')
 
 interface Props {
   phoneConfig: PhoneConfig

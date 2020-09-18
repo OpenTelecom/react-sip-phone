@@ -10,8 +10,9 @@ import {
   blindTransferFail
 } from '../../actions/sipSessions'
 import { getFullNumber } from '../../util/sessions'
-import blindIcon from '../../assets/arrow_forward-24px.svg'
 import SIPAccount from '../../lib/SipAccount'
+
+const blindIcon = require('./assets/arrow_forward-24px.svg')
 
 interface Props {
   session: Session

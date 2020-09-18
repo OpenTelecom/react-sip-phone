@@ -4,8 +4,6 @@ import { connect } from 'react-redux'
 import styles from './Phone.scss'
 import { Session, SessionState, UserAgent } from 'sip.js'
 
-import micOffIcon from '../../assets/mic_off-24px.svg'
-
 import {
   muteRequest,
   muteSuccess,
@@ -14,6 +12,8 @@ import {
   unMuteSuccess,
   unMuteFail
 } from '../../actions/sipSessions'
+
+const micOffIcon = require('./assets/mic_off-24px.svg')
 
 interface Props {
   session: Session
