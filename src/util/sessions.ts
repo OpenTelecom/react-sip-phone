@@ -1,6 +1,6 @@
 import { phoneStore } from '../index'
 import { SessionState, Session, UserAgent} from 'sip.js'
-import { Transport as WebTransport } from "sip.js/lib/platform/Web/Transport";
+import { Transport as WebTransport } from "sip.js/lib/platform/web/transport";
 
 import {
   SIPSESSION_STATECHANGE, CLOSE_SESSION
