@@ -7,14 +7,8 @@
   width: 60px;
   height: 60px;
   border-radius: 100px;
-  transition: opacity 0.5s ease;
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
-  &:hover {
-    opacity: 0.5;
-  }
+  transition: all 0.2s;
+  transition-delay: 300ms;
   background-color: $primary-color;
   color: $almost-black;
   cursor: pointer;
@@ -23,6 +17,13 @@
   justify-content: center;
   align-items: center;
   font-size: 1em;
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  &:active {
+    transition: none;
+  }
 }
 
 @mixin common-input {
@@ -40,5 +41,5 @@
   justify-content: flex-start;
   align-items: center;
   height: 100%;
-  font-family: Arial, Helvetica, sans-serif
+  font-family: Arial, Helvetica, sans-serif;
 }
