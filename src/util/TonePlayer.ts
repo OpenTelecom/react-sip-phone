@@ -1,5 +1,4 @@
-//@ts-ignore
-import Tone from 'tone'
+const Tone = require('tone');
 
 const DTMF_MATRIX = {
   1: [697, 1209],
@@ -179,7 +178,7 @@ class TonePlayer {
     if (this.loop) {
       try {
         this.loop.stop(0)
-      } catch{
+      } catch {
         console.log('no loop to stop')
       }
     }
@@ -188,7 +187,7 @@ class TonePlayer {
       try {
         Tone.Transport.stop()
         Synth.triggerRelease([440, 480])
-      } catch{
+      } catch {
         console.log('no tone to stop')
       }
     }

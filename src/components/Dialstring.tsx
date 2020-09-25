@@ -2,11 +2,12 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import SIPAccount from '../lib/SipAccount'
 import styles from './Dialstring.scss'
-import callIcon from '../assets/call-24px.svg'
-import callIconLarge from '../assets/call-large-40px.svg'
-
 import { PhoneConfig, SipConfig, AppConfig } from '../models'
 import {sessionsLimitReached} from '../actions/config'
+
+const callIcon = require('./assets/call-24px.svg')
+const callIconLarge = require('./assets/call-large-40px.svg')
+
 interface Props {
   sipAccount: SIPAccount
   phoneConfig: PhoneConfig

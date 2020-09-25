@@ -2,10 +2,9 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import styles from './Phone.scss'
 import { Session, UserAgent } from 'sip.js'
-
-import holdIcon from '../../assets/phone_paused-24px.svg'
-
 import { holdCallRequest, unHoldCallRequest } from '../../actions/sipSessions'
+
+const holdIcon = require('./assets/phone_paused-24px.svg')
 
 interface Props {
   session: Session

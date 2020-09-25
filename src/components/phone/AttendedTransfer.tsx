@@ -19,12 +19,12 @@ import {
 import {attendedTransferLimitReached} from '../../actions/config'
 import Phone from './Phone'
 import { getFullNumber } from '../../util/sessions'
-import attendedIcon from '../../assets/phone_in_talk-24px.svg'
-import cancelIcon from '../../assets/call_end-24px.svg'
-import connectIcon from '../../assets/arrow_forward-24px.svg'
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from '../../util/audio'
 import SIPAccount from '../../lib/SipAccount'
 
+const attendedIcon = require('./assets/phone_in_talk-24px.svg')
+const cancelIcon = require('./assets/call_end-24px.svg')
+const connectIcon = require('./assets/arrow_forward-24px.svg')
 
 interface Props {
   session: Session

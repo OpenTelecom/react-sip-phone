@@ -3,11 +3,12 @@ import { Invitation } from 'sip.js'
 import { connect } from 'react-redux'
 import styles from './Phone.scss'
 import { acceptCall, declineCall } from '../../actions/sipSessions'
-import acceptIcon from '../../assets/call-24px.svg'
-import declineIcon from '../../assets/call_end-24px.svg'
 import toneManager from '../../util/ToneManager'
 
+const acceptIcon = require('./assets/call-24px.svg')
+const declineIcon = require('./assets/call_end-24px.svg')
 const ring = require('./assets/ring.mp3')
+
 interface Props {
   session: Invitation,
   acceptCall: Function,
