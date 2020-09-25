@@ -27,7 +27,7 @@ export const playDTMF = (key: any, deviceId: string) => {
   if (!obj) {
     console.log('invalid DTMF tone input')
   }
-  Synth.volume.value = -22
+  Synth.volume.value = -10
   Synth.set({
     oscillator: {
       type: 'sine'
