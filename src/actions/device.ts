@@ -1,4 +1,4 @@
-import { Dispatch } from 'redux';
+import { Dispatch } from 'redux'
 
 export const AUDIO_INPUT_DEVICES_DETECTED = 'AUDIO_INPUT_DEVICES_DETECTED'
 export const AUDIO_OUTPUT_DEVICES_DETECTED = 'AUDIO_OUTPUT_DEVICES_DETECTED'
@@ -23,7 +23,7 @@ export const SET_REMOTE_AUDIO_SESSION_FAIL = 'SET_REMOTE_AUDIO_SESSION_FAIL'
 export const AUDIO_SINKID_NOT_ALLOWED = 'AUDIO_SINKID_NOT_ALLOWED'
 
 export const getInputAudioDevices = () => {
-  let inputArray: Array<Object> = []
+  const inputArray: Array<Object> = []
   navigator.mediaDevices
     .enumerateDevices()
     .then(function (devices: Array<Object>) {
@@ -40,7 +40,7 @@ export const getInputAudioDevices = () => {
 }
 
 export const getOutputAudioDevices = () => {
-  let outputArray: Array<Object> = []
+  const outputArray: Array<Object> = []
   navigator.mediaDevices
     .enumerateDevices()
     .then(function (devices: Array<Object>) {
@@ -56,21 +56,23 @@ export const getOutputAudioDevices = () => {
   }
 }
 
-export const setPrimaryOutput = (deviceId: string, sessions: any) => (dispatch: Dispatch) => {
+export const setPrimaryOutput = (deviceId: string, sessions: any) => (
+  dispatch: Dispatch
+) => {
   if (sessions) {
     if (Object.keys(sessions).length > 0) {
       dispatch({
         type: SET_REMOTE_AUDIO_SESSIONS_PENDING
       })
-      for (let [sessionId, _session] of Object.entries(sessions)) {
-        //@ts-ignore
+      for (const [sessionId, _session] of Object.entries(sessions)) {
+        // @ts-ignore
         if (_session.state === 'Established') {
           try {
             const mediaElement = document.getElementById(sessionId)
             const remoteStream = new MediaStream()
-            //@ts-ignore
+            // @ts-ignore
             _session.sessionDescriptionHandler.peerConnection
-              //check if session is established?
+              // check if session is established?
               .getReceivers()
               .forEach((receiver: any) => {
                 if (receiver.track) {
@@ -79,15 +81,12 @@ export const setPrimaryOutput = (deviceId: string, sessions: any) => (dispatch: 
               })
             if (mediaElement) {
               // @ts-ignore
-              mediaElement.setSinkId(
-                deviceId
-              )
-                .then(() => {
-                  // @ts-ignore
-                  mediaElement.srcObject = remoteStream
-                  //@ts-ignore
-                  mediaElement.play()
-                })
+              mediaElement.setSinkId(deviceId).then(() => {
+                // @ts-ignore
+                mediaElement.srcObject = remoteStream
+                // @ts-ignore
+                mediaElement.play()
+              })
             } else {
               console.log('no media Element')
             }
@@ -111,31 +110,34 @@ export const setPrimaryOutput = (deviceId: string, sessions: any) => (dispatch: 
   })
 }
 
-export const setPrimaryInput = (deviceId: string, sessions: any, sinkIdAllowed: boolean) => (dispatch: Dispatch) => {
+export const setPrimaryInput = (
+  deviceId: string,
+  sessions: any,
+  sinkIdAllowed: boolean
+) => (dispatch: Dispatch) => {
   if (sessions) {
     if (Object.keys(sessions).length > 0) {
       dispatch({
         type: SET_LOCAL_AUDIO_SESSIONS_PENDING
       })
-      for (let [sessionId, _session] of Object.entries(sessions)) {
-        //@ts-ignore
+      for (const [sessionId, _session] of Object.entries(sessions)) {
+        // @ts-ignore
         if (_session.state === 'Established') {
           try {
-            //@ts-ignore
+            // @ts-ignore
             _session.sessionDescriptionHandler.peerConnection
               .getSenders()
               .forEach(function (sender: any) {
                 console.log(sessionId)
                 if (sender.track && sender.track.kind === 'audio') {
-                  let audioDeviceId =
-                    deviceId
+                  const audioDeviceId = deviceId
                   navigator.mediaDevices
                     // @ts-ignore
 
-                    //creates a stream w track
+                    // creates a stream w track
                     .getUserMedia({ audio: { deviceId: audioDeviceId } })
                     .then(function (stream) {
-                      let audioTrack = stream.getAudioTracks()
+                      const audioTrack = stream.getAudioTracks()
                       sender.replaceTrack(audioTrack[0])
                     })
                 }
@@ -159,17 +161,17 @@ export const setPrimaryInput = (deviceId: string, sessions: any, sinkIdAllowed: 
     payload: deviceId
   })
 
-  //change remote audio for safari sessions  
+  // change remote audio for safari sessions
   if (sinkIdAllowed === false) {
     if (sessions) {
       if (Object.keys(sessions).length > 0) {
-        for (let [sessionId, _session] of Object.entries(sessions)) {
-          //@ts-ignore
+        for (const [sessionId, _session] of Object.entries(sessions)) {
+          // @ts-ignore
           if (_session.state === 'Established') {
             try {
               const mediaElement = document.getElementById(sessionId)
               const remoteStream = new MediaStream()
-              //@ts-ignore
+              // @ts-ignore
               _session.sessionDescriptionHandler.peerConnection
                 .getReceivers()
                 .forEach((receiver: any) => {
@@ -180,7 +182,7 @@ export const setPrimaryInput = (deviceId: string, sessions: any, sinkIdAllowed: 
               if (mediaElement) {
                 // @ts-ignore
                 mediaElement.srcObject = remoteStream
-                //@ts-ignore
+                // @ts-ignore
                 mediaElement.play()
               } else {
                 console.log('no media Element')

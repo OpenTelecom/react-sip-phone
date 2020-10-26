@@ -23,7 +23,7 @@ const Synth = Tone.PolySynth && new Tone.PolySynth(2, Tone.Synth)
 const FMSynth = Tone.PolySynth && new Tone.PolySynth(2, Tone.FMSynth)
 
 export const playDTMF = (key: any, deviceId: string) => {
-  let obj = DTMF_MATRIX[key]
+  const obj = DTMF_MATRIX[key]
   if (!obj) {
     console.log('invalid DTMF tone input')
   }
@@ -42,24 +42,16 @@ export const playDTMF = (key: any, deviceId: string) => {
 
   if (deviceId !== 'default') {
     const mediaElement = document.getElementById('tone')
-
-
     if (mediaElement) {
-      let dest = Tone.context.createMediaStreamDestination()
+      const dest = Tone.context.createMediaStreamDestination()
       Synth.connect(dest)
       // @ts-ignore
-      mediaElement.setSinkId(
-        // audio output device_id
-        deviceId
-      ).then(() => {
+      mediaElement.setSinkId(deviceId).then(() => {
         // @ts-ignore
         mediaElement.srcObject = dest.stream
-        //@ts-ignore
-
+        // @ts-ignore
         mediaElement.play()
       })
-
-
     }
   } else {
     Synth.toMaster()
@@ -76,27 +68,18 @@ export const callDisconnect = (deviceId: string) => {
   if (deviceId !== 'default') {
     const mediaElement = document.getElementById('tone')
 
-
     if (mediaElement) {
-      let dest = Tone.context.createMediaStreamDestination()
+      const dest = Tone.context.createMediaStreamDestination()
       Synth.connect(dest)
       // @ts-ignore
-      mediaElement.setSinkId(
-        // audio output device_id
-        deviceId
-      ).then(() => {
+      mediaElement.setSinkId(deviceId).then(() => {
         // @ts-ignore
         mediaElement.srcObject = dest.stream
-        //@ts-ignore
-
+        // @ts-ignore
         mediaElement.play()
       })
-
-
     }
-
-  }
-  else {
+  } else {
     FMSynth.toMaster()
   }
 }
@@ -104,18 +87,13 @@ export const callDisconnect = (deviceId: string) => {
 class TonePlayer {
   private loop: any
 
-
-  //get audio element, set srcObj to device, and play the track
+  // get audio element, set srcObj to device, and play the track
   ringtone = (deviceId: string) => {
     const mediaElement = document.getElementById('ringtone')
     if (deviceId !== 'default') {
       if (mediaElement) {
         // @ts-ignore
-        mediaElement.setSinkId(
-          // audio output device_id
-          // 'default'
-          deviceId
-        ).then(() => {
+        mediaElement.setSinkId(deviceId).then(() => {
           // @ts-ignore
           mediaElement.play()
         })
@@ -126,13 +104,10 @@ class TonePlayer {
       // @ts-ignore
       mediaElement.play()
     }
-
-
-
   }
 
   ringback = (deviceId: string) => {
-    let dest = Tone.context.createMediaStreamDestination()
+    const dest = Tone.context.createMediaStreamDestination()
     console.log(dest)
     Synth.set({
       oscillator: {
@@ -148,17 +123,13 @@ class TonePlayer {
     if (deviceId !== 'default') {
       const mediaElement = document.getElementById('tone')
       if (mediaElement) {
-        let dest = Tone.context.createMediaStreamDestination()
+        const dest = Tone.context.createMediaStreamDestination()
         Synth.connect(dest)
         // @ts-ignore
-        mediaElement.setSinkId(
-          // audio output device_id
-          deviceId
-        ).then(() => {
+        mediaElement.setSinkId(deviceId).then(() => {
           // @ts-ignore
           mediaElement.srcObject = dest.stream
-          //@ts-ignore
-
+          // @ts-ignore
           mediaElement.play()
         })
       }
@@ -194,15 +165,16 @@ class TonePlayer {
 
     const mediaElement = document.getElementById('ringtone')
     if (mediaElement) {
-      //@ts-ignore
+      // @ts-ignore
       const promise = mediaElement.pause()
       if (promise !== undefined) {
-        promise.catch((error: any) => {
-          console.log(error)
-
-        }).then(() => {
-          console.log('ringtone stopped')
-        });
+        promise
+          .catch((error: any) => {
+            console.log(error)
+          })
+          .then(() => {
+            console.log('ringtone stopped')
+          })
       }
     }
   }

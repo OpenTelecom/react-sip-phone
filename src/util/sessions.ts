@@ -1,20 +1,16 @@
 import { phoneStore } from '../index'
 import { SessionState, Session, UserAgent} from 'sip.js'
 import { Transport as WebTransport } from "sip.js/lib/platform/web/transport";
-
-import {
-  SIPSESSION_STATECHANGE, CLOSE_SESSION
-} from '../actions/sipSessions'
-import {STRICT_MODE_SHOW_CALL_BUTTON} from '../actions/config'
+import { SIPSESSION_STATECHANGE, CLOSE_SESSION } from '../actions/sipSessions'
+import { STRICT_MODE_SHOW_CALL_BUTTON } from '../actions/config'
 import { holdAll } from '../util/hold'
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from './audio'
 import toneManager from './ToneManager'
 
-
 export class SessionStateHandler {
   private session: Session
-  private ua : UserAgent
-  constructor(session: Session, ua:UserAgent) {
+  private ua: UserAgent
+  constructor(session: Session, ua: UserAgent) {
     this.session = session
     this.ua = ua
   }
@@ -28,13 +24,15 @@ export class SessionStateHandler {
           type: SIPSESSION_STATECHANGE
         })
 
-        //check if session recieves a BYE message while sessionstate is establishing
-        const myTransport = (this.ua.transport as WebTransport);       
-        myTransport.on('message', (message:string) => {
-          if(message.includes("BYE ") && message.indexOf("BYE ") === 0){
-            if(this.session.state === "Establishing"){
-              console.log(message + 'session has recieved a BYE message when the session state is establishing')
-              //@ts-ignore
+        // check if session recieves a BYE message while sessionstate is establishing
+        const myTransport = this.ua.transport as WebTransport
+        myTransport.on('message', (message: string) => {
+          if (message.includes('BYE ') && message.indexOf('BYE ') === 0) {
+            if (this.session.state === 'Establishing') {
+              console.log(
+                `${message} session has recieved a BYE message when the session state is establishing`
+              )
+              // @ts-ignore
               this.session.cancel()
               this.session.dispose()
               setTimeout(() => {
@@ -44,11 +42,11 @@ export class SessionStateHandler {
                 })
                 toneManager.stopAll()
                 phoneStore.dispatch({
-                  type:STRICT_MODE_SHOW_CALL_BUTTON
+                  type: STRICT_MODE_SHOW_CALL_BUTTON
                 })
               }, 5000)
               return
-            }else{
+            } else {
               return
             }
           }
@@ -80,7 +78,7 @@ export class SessionStateHandler {
           })
           toneManager.stopAll()
           phoneStore.dispatch({
-            type:STRICT_MODE_SHOW_CALL_BUTTON
+            type: STRICT_MODE_SHOW_CALL_BUTTON
           })
         }, 5000)
         break
@@ -89,11 +87,7 @@ export class SessionStateHandler {
         break
     }
   }
-  
 }
-
-
-
 
 export const getFullNumber = (number: string) => {
   if (number.length < 10) {
@@ -126,9 +120,9 @@ export const statusMask = (status: string) => {
 
 export const getDurationDisplay = (duration: number) => {
   let minutes = Math.floor(duration / 60)
-  let hours = Math.floor(minutes / 60)
+  const hours = Math.floor(minutes / 60)
   minutes = minutes % 60
-  let seconds = duration % 60
+  const seconds = duration % 60
   let dh, dm, ds
   if (hours && hours < 10) {
     dh = `0${hours}:`
