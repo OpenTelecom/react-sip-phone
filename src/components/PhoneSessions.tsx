@@ -18,7 +18,7 @@ const getSessions = (
         console.log('Unable to create more sessions...')
         console.log('Check your phoneConfig.sessionsLimit option!')
       } else {
-        elements.push(<Incoming session={sessions[session]} key={session} />)
+        elements.push(<Incoming session={sessions[session]} key={session} autoanswer={phoneConfig.autoAnswer}/>)
       }
     } else {
       elements.push(
