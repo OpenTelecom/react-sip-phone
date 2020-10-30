@@ -46,7 +46,7 @@ const App = () => {
           defaultDial: '',          // (strict-mode only) the default destination. E.g. 1234567890
           sessionsLimit: 3,         // limits amount of sessions user can have active
           attendedTransferLimit: 2, // limits amount of attendedTransfer sessions user can have active
-          autoAnswer: true         // enable the auto-answer on incoming calls
+          autoAnswer: false         // enable the auto-answer on incoming calls
         }}
         appConfig={{
           mode: mode || '', // 'strict' will activate a simple and limited user experience. set to sessionLimit 1 if using 'strict'
