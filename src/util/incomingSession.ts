@@ -1,9 +1,6 @@
 import { phoneStore } from '../index'
 import { SessionState, Session } from 'sip.js'
-import {
-  SIPSESSION_STATECHANGE,
-  CLOSE_SESSION,
-} from '../actions/sipSessions'
+import { SIPSESSION_STATECHANGE, CLOSE_SESSION } from '../actions/sipSessions'
 import { holdAll } from '../util/hold'
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from './audio'
 

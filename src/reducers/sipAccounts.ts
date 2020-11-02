@@ -1,5 +1,6 @@
 import { Action } from './models'
 import { NEW_USERAGENT, NEW_ACCOUNT } from '../actions/sipAccounts'
+
 const sipAccounts = (
   state = {
     sipAccount: null,
@@ -24,4 +25,5 @@ const sipAccounts = (
       return state
   }
 }
+
 export default sipAccounts

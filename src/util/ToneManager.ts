@@ -3,11 +3,10 @@ import { phoneStore } from '../index'
 
 class ToneManager {
   currentTone: any
-  constructor() { }
 
   playRing(type: string) {
     const state = phoneStore.getState()
-    //@ts-ignore
+    // @ts-ignore
     const deviceId = state.device.primaryAudioOutput
     if (this.currentTone) {
       this.currentTone.stop()

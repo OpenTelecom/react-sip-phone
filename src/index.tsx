@@ -33,20 +33,35 @@ export const ReactSipPhone = ({
   sipCredentials,
   containerStyle = {}
 }: Props) => {
-  //If no store is passed into component, default store is used
+  // If no store is passed into component, default store is used
   return (
     <Provider store={phoneStore}>
       <PersistGate loading={null} persistor={persistor}>
-        <SipWrapper sipConfig={sipConfig} sipCredentials={sipCredentials} phoneConfig={phoneConfig} appConfig={appConfig}>
+        <SipWrapper
+          sipConfig={sipConfig}
+          sipCredentials={sipCredentials}
+          phoneConfig={phoneConfig}
+          appConfig={appConfig}
+        >
           <div className={styles.container}
             style={{
               ...containerStyle,
               width: `${width < 300 ? 300 : width}px`,
               height: `${height < 600 ? 600 : height}px`
-            }}>
-            <Status phoneConfig={phoneConfig} appConfig={appConfig} name={name} />
-            {phoneConfig.disabledFeatures.includes('dialstring') ? null :
-              <Dialstring sipConfig={sipConfig} phoneConfig={phoneConfig} appConfig={appConfig}/>}
+            }}
+          >
+            <Status
+              phoneConfig={phoneConfig}
+              appConfig={appConfig}
+              name={name}
+            />
+            {phoneConfig.disabledFeatures.includes('dialstring') ? null : (
+              <Dialstring
+                sipConfig={sipConfig}
+                phoneConfig={phoneConfig}
+                appConfig={appConfig}
+              />
+            )}
 
             <PhoneSessions phoneConfig={phoneConfig} />
             <audio id='tone' autoPlay />

@@ -8,14 +8,15 @@ import {
   AUDIO_SINKID_NOT_ALLOWED
 } from '../actions/device'
 
-//adds track from getReceiver stream to <audio id={sessionId}> in Phone.tsx
+// adds track from getReceiver stream to <audio id={sessionId}> in Phone.tsx
 export const setRemoteAudio = (session: Session) => {
+  console.log('setRemoteAudio')
   const state = phoneStore.getState()
-  //@ts-ignore
+  // @ts-ignore
   const deviceId = state.device.primaryAudioOutput
   const mediaElement = document.getElementById(session.id)
   const remoteStream = new MediaStream()
-  //@ts-ignore
+  // @ts-ignore
   session.sessionDescriptionHandler.peerConnection
     .getReceivers()
     .forEach((receiver: any) => {
@@ -24,31 +25,27 @@ export const setRemoteAudio = (session: Session) => {
       }
     })
 
-  //checks for browser compatibility
-  //@ts-ignore
+  // checks for browser compatibility
+  // @ts-ignore
   if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
     console.log('safari')
     phoneStore.dispatch({
       type: AUDIO_SINKID_NOT_ALLOWED
     })
-    //@ts-ignore
+    // @ts-ignore
     mediaElement.srcObject = remoteStream
-    //@ts-ignore
+    // @ts-ignore
     mediaElement.play()
 
-    //@ts-ignore
+    // @ts-ignore
   } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
     // @ts-ignore
-    mediaElement.setSinkId(
-      // audio output device_id
-      deviceId
-    )
-      .then(() => {
-        // @ts-ignore
-        mediaElement.srcObject = remoteStream
-        //@ts-ignore
-        mediaElement.play()
-      })
+    mediaElement.setSinkId(deviceId).then(() => {
+      // @ts-ignore
+      mediaElement.srcObject = remoteStream
+      // @ts-ignore
+      mediaElement.play()
+    })
   } else {
     phoneStore.dispatch({
       type: REMOTE_AUDIO_FAIL
@@ -59,27 +56,21 @@ export const setRemoteAudio = (session: Session) => {
   })
 }
 
-//creates new audio track then replaces audio track in getSender stream w/ new track
+// creates new audio track then replaces audio track in getSender stream w/ new track
 export const setLocalAudio = (session: Session) => {
   const state = phoneStore.getState()
-  //@ts-ignore
+  // @ts-ignore
   const deviceId = state.device.primaryAudioInput
   // @ts-ignore
   session.sessionDescriptionHandler.peerConnection
     .getSenders()
     .forEach(function (sender: any) {
       if (sender.track && sender.track.kind === 'audio') {
-        let audioDeviceId =
-          // audio input device_id
-          // 'default'
-          deviceId
+        const audioDeviceId = deviceId
         navigator.mediaDevices
-          // @ts-ignore
-
-          //creates a stream w track
           .getUserMedia({ audio: { deviceId: audioDeviceId } })
           .then(function (stream) {
-            let audioTrack = stream.getAudioTracks()
+            const audioTrack = stream.getAudioTracks()
             if (audioTrack) {
               sender.replaceTrack(audioTrack[0])
             }

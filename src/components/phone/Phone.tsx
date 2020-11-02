@@ -3,7 +3,7 @@ import Dialpad from './Dialpad'
 import { connect } from 'react-redux'
 import { Session, SessionState, UserAgent } from 'sip.js'
 import { endCall } from '../../actions/sipSessions'
-import {setAppConfigStarted} from '../../actions/config'
+import { setAppConfigStarted } from '../../actions/config'
 import Hold from './Hold'
 import Mute from './Mute'
 import BlindTranfer from './BlindTransfer'
@@ -15,7 +15,7 @@ import { statusMask, getDurationDisplay } from '../../util/sessions'
 import { PhoneConfig } from '../../models'
 
 const endCallIcon = require('./assets/call_end-24px.svg')
-const  dialpadIcon = require('./assets/dialpad-24px.svg')
+const dialpadIcon = require('./assets/dialpad-24px.svg')
 const transferIcon = require('./assets/arrow_forward-24px.svg')
 
 interface Props {
@@ -79,7 +79,7 @@ class Phone extends React.Component<Props> {
     setTimeout(() => {
       this.props.session.dispose()
       this.props.endCall(this.props.session.id)
-      if(this.props.strictMode === 'strict'){
+      if (this.props.strictMode === 'strict') {
         this.props.setAppConfigStarted()
       }
     }, 5000)
@@ -90,7 +90,10 @@ class Phone extends React.Component<Props> {
   }
 
   handleCounter() {
-    if (this.props.session && this.props.session.state !== SessionState.Terminated) {
+    if (
+      this.props.session &&
+      this.props.session.state !== SessionState.Terminated
+    ) {
       if (this.state.counterStarted === false) {
         this.setState({ counterStarted: true })
       }
@@ -104,96 +107,116 @@ class Phone extends React.Component<Props> {
   render() {
     const { state, props } = this
     let durationDisplay
-    if(props.appSize === 'large'){
-      if ((this.props.session.state === SessionState.Initial ||
-        this.props.session.state === SessionState.Establishing)){
-          durationDisplay = null
-        } else {
-          durationDisplay = <div className={styles.statusLarge}>{getDurationDisplay(this.state.duration)}</div>
-        }
+    if (props.appSize === 'large') {
+      if (
+        this.props.session.state === SessionState.Initial ||
+        this.props.session.state === SessionState.Establishing
+      ) {
+        durationDisplay = null
+      } else {
+        durationDisplay = (
+          <div className={styles.statusLarge}>
+            {getDurationDisplay(this.state.duration)}
+          </div>
+        )
+      }
     } else {
-      if ((this.props.session.state === SessionState.Initial ||
-        this.props.session.state === SessionState.Establishing)){
-          durationDisplay =  null
-        } else {
-          durationDisplay = <div>{getDurationDisplay(this.state.duration)}</div>
-        }
+      if (
+        this.props.session.state === SessionState.Initial ||
+        this.props.session.state === SessionState.Establishing
+      ) {
+        durationDisplay = null
+      } else {
+        durationDisplay = <div>{getDurationDisplay(this.state.duration)}</div>
+      }
     }
     return (
       <React.Fragment>
         <hr style={{ width: '100%' }} />
-        {props.phoneConfig.disabledFeatures.includes('remoteid') ? null :
-          <div>{
-            // @ts-ignore
-            `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`}
+        {props.phoneConfig.disabledFeatures.includes('remoteid') ? null : (
+          <div>
+            {
+              // @ts-ignore
+              `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`
+            }
             <br />
-          </div>}
-        {props.appSize === 'large' ? 
-        <div className={styles.statusLarge} >{statusMask(props.session.state)}</div>
-        :
-        <div >{statusMask(props.session.state)}</div>
-        }
+          </div>
+        )}
+        {props.appSize === 'large' ? (
+          <div className={styles.statusLarge}>
+            {statusMask(props.session.state)}
+          </div>
+        ) : (
+          <div>{statusMask(props.session.state)}</div>
+        )}
         <br />
         {durationDisplay}
-        {
-          state.ended ? null :
-            <React.Fragment>
-              <Dialpad open={state.dialpadOpen} session={props.session} />
-              <div className={styles.actionsContainer}>
-                {props.phoneConfig.disabledButtons.includes('mute') ? null :
-                  <Mute session={props.session} />}
-                <button
-                  className={styles.endCallButton}
-                  disabled={state.ended}
-                  onClick={() => this.endCall()}
-                >
-                  <img src={endCallIcon} />
-                </button>
-                {props.phoneConfig.disabledButtons.includes('hold') ? null :
-                  <Hold session={props.session} />}
-                {props.phoneConfig.disabledButtons.includes('numpad') ? null :
-                  <div
-                    id={styles.actionButton}
-                    className={state.dialpadOpen ? styles.on : ''}
-                    onClick={() => this.setState({ dialpadOpen: !state.dialpadOpen })}
-                  >
-                    <img src={dialpadIcon} />
-                  </div>}
-                {props.phoneConfig.disabledButtons.includes('transfer') ? null :
-                  <div
-                    id={styles.actionButton}
-                    className={state.transferMenu ? styles.on : ''}
-                    onClick={() => this.setState({ transferMenu: !state.transferMenu })}
-                  >
-                    <img src={transferIcon} />
-                  </div>}
+        {state.ended ? null : (
+          <React.Fragment>
+            <Dialpad open={state.dialpadOpen} session={props.session} />
+            <div className={styles.actionsContainer}>
+              {props.phoneConfig.disabledButtons.includes('mute') ? null : (
+                <Mute session={props.session} />
+              )}
+              <button
+                className={styles.endCallButton}
+                disabled={state.ended}
+                onClick={() => this.endCall()}
+              >
+                <img src={endCallIcon} />
+              </button>
+              {props.phoneConfig.disabledButtons.includes('hold') ? null : (
+                <Hold session={props.session} />
+              )}
+              {props.phoneConfig.disabledButtons.includes('numpad') ? null : (
                 <div
-                  id={styles.transferMenu}
-                  className={state.transferMenu ? '' : styles.closed}
+                  id={styles.actionButton}
+                  className={state.dialpadOpen ? styles.on : ''}
+                  onClick={() =>
+                    this.setState({ dialpadOpen: !state.dialpadOpen })
+                  }
                 >
-                  <input
-                    id={styles.transferInput}
-                    onChange={(e) =>
-                      this.setState({ transferDialString: e.target.value })
-                    }
-                    placeholder="Enter the transfer destination..."
-                  />
-                  {this.state.attendedTransferStarted ? null :
-                    <BlindTranfer
-                      destination={state.transferDialString}
-                      session={props.session}
-                    />}
-                  <AttendedTransfer
-                    started={this.attendedProcess}
+                  <img src={dialpadIcon} />
+                </div>
+              )}
+              {props.phoneConfig.disabledButtons.includes('transfer') ? null : (
+                <div
+                  id={styles.actionButton}
+                  className={state.transferMenu ? styles.on : ''}
+                  onClick={() =>
+                    this.setState({ transferMenu: !state.transferMenu })
+                  }
+                >
+                  <img src={transferIcon} />
+                </div>
+              )}
+              <div
+                id={styles.transferMenu}
+                className={state.transferMenu ? '' : styles.closed}
+              >
+                <input
+                  id={styles.transferInput}
+                  onChange={(e) =>
+                    this.setState({ transferDialString: e.target.value })
+                  }
+                  placeholder='Enter the transfer destination...'
+                />
+                {this.state.attendedTransferStarted ? null : (
+                  <BlindTranfer
                     destination={state.transferDialString}
                     session={props.session}
                   />
-                </div>
+                )}
+                <AttendedTransfer
+                  started={this.attendedProcess}
+                  destination={state.transferDialString}
+                  session={props.session}
+                />
               </div>
-              <audio id={this.props.session.id} autoPlay />
-
-            </React.Fragment>
-        }
+            </div>
+            <audio id={this.props.session.id} autoPlay />
+          </React.Fragment>
+        )}
       </React.Fragment>
     )
   }

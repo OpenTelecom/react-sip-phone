@@ -1,4 +1,5 @@
-import SIPAccount from "../lib/SipAccount"
+// eslint-disable-next-line no-unused-vars
+import SIPAccount from '../lib/SipAccount'
 
 export const SIPACCOUNT_UNREGISTERED = 'SIPACCOUNT_UNREGISTERED'
 export const NEW_USERAGENT = 'NEW_USERAGENT'
