@@ -36,14 +36,16 @@ class Incoming extends React.Component<Props> {
 
   handleAccept() {
     toneManager.stopAll()
-    this.props.session.accept({
-      sessionDescriptionHandlerOptions: {
-        constraints: {
-          audio: true,
-          video: false
+    if (this.props.session.state === SessionState.Initial) {
+      this.props.session.accept({
+        sessionDescriptionHandlerOptions: {
+          constraints: {
+            audio: true,
+            video: false
+          }
         }
-      }
-    })
+      })
+    }
     this.props.acceptCall(this.props.session)
   }
 
@@ -57,7 +59,12 @@ class Incoming extends React.Component<Props> {
 
   handleDecline() {
     toneManager.stopAll()
-    this.props.session.reject()
+    if (
+      this.props.session.state !== SessionState.Terminated &&
+      this.props.session.state !== SessionState.Terminating
+    ) {
+      this.props.session.reject()
+    }
     this.props.declineCall(this.props.session)
   }
 
