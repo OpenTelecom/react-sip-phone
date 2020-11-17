@@ -167,7 +167,8 @@ class AttendedTransfer extends React.Component<Props> {
         disabledFeatures: [''],
         defaultDial: '',
         sessionsLimit: 0,
-        attendedTransferLimit: 0
+        attendedTransferLimit: 0,
+        autoAnswer: false
       }
       return (
         <React.Fragment>
