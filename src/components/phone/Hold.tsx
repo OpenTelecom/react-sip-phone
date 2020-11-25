@@ -4,6 +4,7 @@ import styles from './Phone.scss'
 // eslint-disable-next-line no-unused-vars
 import { Session, UserAgent } from 'sip.js'
 import { holdCallRequest, unHoldCallRequest } from '../../actions/sipSessions'
+import { GetStyleSize } from '../../util/getstyle'
 
 const holdIcon = require('./assets/phone_paused-24px.svg')
 
@@ -14,6 +15,7 @@ interface Props {
   unHoldCallRequest: Function
   onHold: Array<Object>
   sessions: Array<Object>
+  appSize: string
 }
 
 class Hold extends React.Component<Props> {
@@ -34,10 +36,12 @@ class Hold extends React.Component<Props> {
   }
 
   render() {
+    const props = this.props
+    const styleActionButton = GetStyleSize(props.appSize, 'actionButton', styles)
     return (
       <button
         className={this.checkHoldState() ? styles.on : ''}
-        id={styles.actionButton}
+        id={styleActionButton}
         onClick={() => this.hold()}
       >
         <img src={holdIcon} />
@@ -50,7 +54,8 @@ const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
-  onHold: state.sipSessions.onHold
+  onHold: state.sipSessions.onHold,
+  appSize: state.config.appConfig.appSize
 })
 const actions = {
   holdCallRequest,

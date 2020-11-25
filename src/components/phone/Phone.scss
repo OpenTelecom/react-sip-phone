@@ -6,7 +6,7 @@
 }
 
 @mixin action-buttons {
-  background-color: lightgray;
+  background-color: $action-buttons-color;
   margin: 10px;
 }
 
@@ -18,8 +18,25 @@
   align-items: center;
 }
 
-#incoming {
+@mixin actionButton {
+  @include common-button;
+  @include action-buttons;
+  &.on {
+    background-color: $almost-black;
+  }
+}
+
+#incomingSmall {
   @include flex-container;
+  font-size: 0.7em;
+}
+#incomingMedium {
+  @include flex-container;
+  font-size: 0.9em;
+}
+#incomingLarge {
+  @include flex-container;
+  font-size: 1em;
 }
 
 #dialpad {
@@ -28,7 +45,7 @@
   width: 100%;
   align-items: center;
   transition: all 0.3s ease, opacity 0.2s ease;
-  height: 320px;
+  // height: 320px;
   &.closed {
     visibility: hidden;
     opacity: 0;
@@ -41,9 +58,30 @@
   font-size: 25px;
 }
 
-.dialpadButton {
+.dialpadButtonSmall {
   @include common-button;
   @include phone-buttons;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  font-size: 1em;
+}
+
+.dialpadButtonMedium {
+  @include common-button;
+  @include phone-buttons;
+  width: 50px;
+  height: 50px;
+  margin: 8px;
+  font-size: 1.2em;
+}
+
+.dialpadButtonLarge {
+  @include common-button;
+  @include phone-buttons;
+  width: 60px;
+  height: 60px;
+  margin: 10px;
   font-size: 1.5em;
 }
 
@@ -57,24 +95,73 @@
   flex-direction: row;
 }
 
-#actionButton {
-  @include common-button;
-  @include action-buttons;
-  &.on {
-    background-color: gray;
-  }
+#actionButtonSmall {
+  @include actionButton;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+}
+#actionButtonMedium {
+  @include actionButton;
+  width: 50px;
+  height: 50px;
+  margin: 8px;
+}
+#actionButtonLarge {
+  @include actionButton;
+  width: 60px;
+  height: 60px;
+  margin: 10px;
 }
 
-.endCallButton {
+.endCallButtonSmall {
   @include common-button;
   @include action-buttons;
-  background-color: #ff6961;
+  background-color: $end-call-button-color;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+}
+.endCallButtonMedium {
+  @include common-button;
+  @include action-buttons;
+  background-color: $end-call-button-color;
+  width: 50px;
+  height: 50px;
+  margin: 8px;
+}
+.endCallButtonLarge {
+  @include common-button;
+  @include action-buttons;
+  background-color: $end-call-button-color;
+  width: 60px;
+  height: 60px;
+  margin: 10px;
 }
 
-.startCallButton {
+.startCallButtonSmall {
   @include common-button;
   @include action-buttons;
-  background-color: #15c73b;
+  background-color: $start-call-button-color;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+}
+.startCallButtonMedium {
+  @include common-button;
+  @include action-buttons;
+  background-color: $start-call-button-color;
+  width: 50px;
+  height: 50px;
+  margin: 8px;
+}
+.startCallButtonLarge {
+  @include common-button;
+  @include action-buttons;
+  background-color: $start-call-button-color;
+  width: 60px;
+  height: 60px;
+  margin: 10px;
 }
 
 .actionsContainer {
@@ -99,7 +186,26 @@
   padding: 5px 10px 5px 10px;
 }
 
-.transferButtons {
+.transferButtonSmall {
   @include common-button;
   @include phone-buttons;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+}
+
+.transferButtonMedium {
+  @include common-button;
+  @include phone-buttons;
+  width: 50px;
+  height: 50px;
+  margin: 8px;
+}
+
+.transferButtonLarge {
+  @include common-button;
+  @include phone-buttons;
+  width: 60px;
+  height: 60px;
+  margin: 10px;
 }

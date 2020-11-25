@@ -65,9 +65,9 @@ class Dialstring extends React.Component<Props> {
       return null
     } else {
       return (
-        <div className={styles.dialstringContainer}>
+        <div className={styles.dialstringInlineDiv}>
           <input
-            className={styles.dialInput}
+            className={styles.dialstringInlineInput}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 this.handleDial()
@@ -80,7 +80,7 @@ class Dialstring extends React.Component<Props> {
             }
           />
           <button
-            className={styles.dialButton}
+            className={styles.dialstringInlineButton}
             disabled={this.checkDialstring()}
             onClick={() => this.handleDial()}
           >

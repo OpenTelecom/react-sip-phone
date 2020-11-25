@@ -9,7 +9,7 @@
   border-radius: 100px;
   transition: all 0.2s;
   transition-delay: 300ms;
-  background-color: $primary-color;
+  background-color: $common-button-color;
   color: $almost-black;
   cursor: pointer;
   display: flex;
@@ -24,6 +24,11 @@
   &:active {
     transition: none;
     opacity: 0.5;
+  }
+  &:hover {
+    transition: all 0.1s;
+    transition-delay: 100ms;
+    filter: brightness(70%);
   }
 }
 

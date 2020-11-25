@@ -10,15 +10,6 @@
   align-items: center;
 }
 
-.userString {
-  padding: 2px;
-}
-
-.userStringLarge{
-  padding: 2px;
-  font-size: 25px;
-}
-
 #settingsButton {
   @include common-button;
   background: none;
@@ -26,14 +17,14 @@
   width: 24px;
   padding: 2px;
   &.on {
-    background-color: gray;
+    background-color: $on-settings-button-color;
   }
 }
 
 #settingsMenu {
   flex-direction: column;
   transition: all 0.2s ease;
-  height: 120px;
+  // height: 120px;
   width: 100%;
   justify-content: flex-start;
   &.closed {
@@ -41,10 +32,6 @@
     opacity: 0;
     height: 0;
   }
-}
-
-#dropdowns {
-  width: 100%;
 }
 
 .dropdownRow {

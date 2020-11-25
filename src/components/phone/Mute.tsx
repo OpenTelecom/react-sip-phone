@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import styles from './Phone.scss'
 import { Session, SessionState, UserAgent } from 'sip.js'
-
+import { GetStyleSize } from '../../util/getstyle'
 import {
   muteRequest,
   muteSuccess,
@@ -23,6 +23,7 @@ interface Props {
   unMuteRequest: Function
   unMuteSuccess: Function
   unMuteFail: Function
+  appSize: string
 }
 
 class Mute extends React.Component<Props> {
@@ -99,10 +100,12 @@ class Mute extends React.Component<Props> {
   }
 
   render() {
+    const props = this.props
+    const styleActionButton = GetStyleSize(props.appSize, 'actionButton', styles)
     return (
       <div
         className={this.state.onMute ? styles.on : ''}
-        id={styles.actionButton}
+        id={styleActionButton}
         onClick={() => this.mute()}
       >
         <img src={micOffIcon} />
@@ -114,7 +117,8 @@ class Mute extends React.Component<Props> {
 const mapStateToProps = (state: any) => ({
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
-  userAgent: state.sipAccounts.userAgent
+  userAgent: state.sipAccounts.userAgent,
+  appSize: state.config.appConfig.appSize
 })
 const actions = {
   muteRequest,

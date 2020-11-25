@@ -12,6 +12,7 @@ import styles from './Phone.scss'
 import { callDisconnect } from '../../util/TonePlayer'
 import toneManager from '../../util/ToneManager'
 import { statusMask, getDurationDisplay } from '../../util/sessions'
+import { GetStyleSize } from '../../util/getstyle'
 import { PhoneConfig } from '../../models'
 
 const endCallIcon = require('./assets/call_end-24px.svg')
@@ -130,6 +131,9 @@ class Phone extends React.Component<Props> {
         durationDisplay = <div>{getDurationDisplay(this.state.duration)}</div>
       }
     }
+    const styleActionButton = GetStyleSize(props.appSize, 'actionButton', styles)
+    const styleEndCallButton = GetStyleSize(props.appSize, 'endCallButton', styles)
+
     return (
       <React.Fragment>
         <hr style={{ width: '100%' }} />
@@ -159,7 +163,7 @@ class Phone extends React.Component<Props> {
                 <Mute session={props.session} />
               )}
               <button
-                className={styles.endCallButton}
+                className={styleEndCallButton}
                 disabled={state.ended}
                 onClick={() => this.endCall()}
               >
@@ -170,7 +174,7 @@ class Phone extends React.Component<Props> {
               )}
               {props.phoneConfig.disabledButtons.includes('numpad') ? null : (
                 <div
-                  id={styles.actionButton}
+                  id={styleActionButton}
                   className={state.dialpadOpen ? styles.on : ''}
                   onClick={() =>
                     this.setState({ dialpadOpen: !state.dialpadOpen })
@@ -181,7 +185,7 @@ class Phone extends React.Component<Props> {
               )}
               {props.phoneConfig.disabledButtons.includes('transfer') ? null : (
                 <div
-                  id={styles.actionButton}
+                  id={styleActionButton}
                   className={state.transferMenu ? styles.on : ''}
                   onClick={() =>
                     this.setState({ transferMenu: !state.transferMenu })

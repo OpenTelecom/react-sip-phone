@@ -46,8 +46,8 @@ export const ReactSipPhone = ({
           <div className={styles.container}
             style={{
               ...containerStyle,
-              width: `${width < 300 ? 300 : width}px`,
-              height: `${height < 600 ? 600 : height}px`
+              width: `${width < 150 ? 300 : width}px`,
+              height: `${height < 400 ? 400 : height}px`
             }}
           >
             <Status

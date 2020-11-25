@@ -11,6 +11,7 @@ interface Props {
   open: boolean
   session: Session
   deviceId: string
+  appSize: string
 }
 
 class Dialpad extends React.Component<Props> {
@@ -38,6 +39,7 @@ class Dialpad extends React.Component<Props> {
         text={value}
         letters={getButtonLetters(value)}
         click={() => this.handleClick(value)}
+        appSize={this.props.appSize}
       />
     )
   }
@@ -79,7 +81,8 @@ class Dialpad extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: any) => ({
-  deviceId: state.device.primaryAudioOutput
+  deviceId: state.device.primaryAudioOutput,
+  appSize: state.config.appConfig.appSize
 })
 const actions = {}
 export default connect(mapStateToProps, actions)(Dialpad)
