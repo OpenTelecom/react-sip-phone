@@ -101,10 +101,7 @@ export const getFullNumber = (number: string) => {
   // Add default country code
   // @ts-ignore
   const countrycode = phoneStore.getState().sipAccounts.sipAccount._config.defaultCountryCode
-  fullNumber = `${countrycode}${number}`
-  if (!fullNumber.startsWith('+')) {
-    fullNumber = `+${number}`
-  }
+  fullNumber = `+${countrycode}${fullNumber}`
   console.log(`fullNumber: ${fullNumber}`)
   return fullNumber
 }
