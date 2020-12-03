@@ -89,6 +89,10 @@ export class SessionStateHandler {
   }
 }
 
+const sanitizePhoneNumber = (number: string) => {
+  return number.replace(/[^\d+]/g, '')
+}
+
 export const getFullNumber = (number: string) => {
   if (number.length < 10) {
     return number
@@ -101,8 +105,11 @@ export const getFullNumber = (number: string) => {
   // Add default country code
   // @ts-ignore
   const countrycode = phoneStore.getState().sipAccounts.sipAccount._config.defaultCountryCode
-  fullNumber = `+${countrycode}${fullNumber}`
+
+  // add + & sanitize phone number to remove parentheses, space & dash
+  fullNumber = sanitizePhoneNumber(`+${countrycode}${fullNumber}`)
   console.log(`fullNumber: ${fullNumber}`)
+
   return fullNumber
 }
 
