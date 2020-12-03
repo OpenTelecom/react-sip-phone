@@ -98,6 +98,9 @@ export const getFullNumber = (number: string) => {
     return number
   }
   let fullNumber = `${number}`
+  // sanitize phone number to remove parentheses, space & dash
+  fullNumber = sanitizePhoneNumber(fullNumber)
+
   // Remove leading + if already set
   if (fullNumber.startsWith('+')) {
     fullNumber = fullNumber.substring(1)
@@ -106,8 +109,7 @@ export const getFullNumber = (number: string) => {
   // @ts-ignore
   const countrycode = phoneStore.getState().sipAccounts.sipAccount._config.defaultCountryCode
 
-  // add + & sanitize phone number to remove parentheses, space & dash
-  fullNumber = sanitizePhoneNumber(`+${countrycode}${fullNumber}`)
+  fullNumber = `+${countrycode}${fullNumber}`
   console.log(`fullNumber: ${fullNumber}`)
 
   return fullNumber
