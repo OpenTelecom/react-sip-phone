@@ -30,8 +30,12 @@ const App = () => {
           }
         }}>Dial</button>
       </div> : null}
+      <div>
+        <h3>React-Sip-Phone</h3>
       <ReactSipPhone
         name={name || ''}
+          width={300}
+          height={600}
         sipCredentials={{
           sipuri: sipuri || '',
           password: password || ''
@@ -51,10 +55,10 @@ const App = () => {
         appConfig={{
           mode: mode || '', // 'strict' will activate a simple and limited user experience. set to sessionLimit 1 if using 'strict'
           started: false, // (strict-mode only) keeps track of call button visability during strict-mode
-          appSize: 'large' // assign 'large' for larger font in status-name and session-status (not session remote-id/display name)
+          appSize: 'small' // assign 'large', 'medium' or 'small' to deine the font size & button size
         }}
-        width={0}
       />
+      </div>
     </React.Fragment>
   )
 }

@@ -12,11 +12,11 @@
   height: 80px;
   width: 80px;
   background: none;
-  // background-color: #15c73b;
 }
 
 .dialInput {
   @include common-input;
+  width: 100%;
 }
 
 .dialstringContainerStrict {
@@ -28,13 +28,26 @@
 
 }
 
-.dialstringContainer {
+.dialstringInlineDiv {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
   width: 100%;
-  border: 2px solid $almost-black;
-  border-radius: 100px;
-  padding: 0 0 0 20px;
+}
+
+.dialstringInlineInput {
+  flex:1;
+  border: 1px solid $border-dialerstring-color;
+  padding: 5px;
+  max-width: 300px;
+  min-width: 100px;
+  background-color: hsl(0,0%,100%);
+  border-radius: 10px;
+  font-size: 0.9em;
+}
+
+.dialstringInlineButton {
+  padding: 2px;
+  border: none;
+  background: white;
+  cursor: pointer;
 }

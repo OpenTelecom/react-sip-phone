@@ -21,6 +21,7 @@ import Phone from './Phone'
 import { getFullNumber } from '../../util/sessions'
 import { setLocalAudio, setRemoteAudio, cleanupMedia } from '../../util/audio'
 import SIPAccount from '../../lib/SipAccount'
+import { GetStyleSize } from '../../util/getstyle'
 
 const attendedIcon = require('./assets/phone_in_talk-24px.svg')
 const cancelIcon = require('./assets/call_end-24px.svg')
@@ -44,6 +45,7 @@ interface Props {
   closeSession: Function
   attendedTransfersList: Array<string>
   phoneConfig: PhoneConfig
+  appSize: string
 }
 
 class AttendedTransfer extends React.Component<Props> {
@@ -161,6 +163,10 @@ class AttendedTransfer extends React.Component<Props> {
   }
 
   render() {
+    const props = this.props
+    const styleEndCallButton = GetStyleSize(props.appSize, 'endCallButton', styles)
+    const styleTransferButton = GetStyleSize(props.appSize, 'transferButton', styles)
+
     if (this.state.attendedTransferSessionReady) {
       const phoneConfigAttended: PhoneConfig = {
         disabledButtons: ['numpad', 'transfer'],
@@ -178,7 +184,7 @@ class AttendedTransfer extends React.Component<Props> {
             phoneConfig={phoneConfigAttended}
           />
           <button
-            className={styles.transferButtons}
+            className={styleTransferButton}
             onClick={() => {
               this.props.started(false)
               this.connectAttendedTransfer(
@@ -193,7 +199,7 @@ class AttendedTransfer extends React.Component<Props> {
     } else if (this.state.attendedTransferSessionPending) {
       return (
         <button
-          className={styles.endCallButton}
+          className={styleEndCallButton}
           onClick={() => {
             this.props.started(false)
             this.cancelAttendedTransfer(
@@ -207,7 +213,7 @@ class AttendedTransfer extends React.Component<Props> {
     } else {
       return (
         <button
-          className={styles.transferButtons}
+          className={styleTransferButton}
           onClick={() => {
             this.props.started(true)
             this.attendedTransferCall()
@@ -226,7 +232,8 @@ const mapStateToProps = (state: any) => ({
   sessions: state.sipSessions.sessions,
   userAgent: state.sipAccounts.userAgent,
   attendedTransfersList: state.sipSessions.attendedTransfers,
-  phoneConfig: state.config.phoneConfig
+  phoneConfig: state.config.phoneConfig,
+  appSize: state.config.appConfig.appSize
 })
 const actions = {
   holdCallRequest,
@@ -238,7 +245,7 @@ const actions = {
   attendedTransferFail,
   attendedTransferLimitReached,
   stateChange,
-  closeSession,
+  closeSession
 }
 
 export default connect(mapStateToProps, actions)(AttendedTransfer)

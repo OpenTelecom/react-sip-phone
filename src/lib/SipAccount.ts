@@ -45,6 +45,8 @@ export default class SIPAccount {
       authorizationPassword: sipCredentials.password,
       userAgentString: 'OTF-react-sip-phone',
       hackWssInTransport: true,
+      reconnectionAttempts: 1000,
+      reconnectionDelay: 10,
       transportOptions,
       uri,
       sessionDescriptionHandlerFactoryOptions: {

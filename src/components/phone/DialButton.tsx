@@ -1,17 +1,20 @@
 import * as React from 'react'
 import styles from './Phone.scss'
+import { GetStyleSize } from '../../util/getstyle'
 
 interface Props {
   text: string
   click: Function
   letters: string
+  appSize: string
 }
 
-const DialButton = ({ text, click, letters }: Props) => {
+const DialButton = ({ text, click, letters, appSize }: Props) => {
+  const dialpadButtonStyle = GetStyleSize(appSize, 'dialpadButton', styles)
   return (
     <div
       id='sip-dial-button'
-      className={styles.dialpadButton}
+      className={dialpadButtonStyle}
       onClick={() => click()}
     >
       {text}

@@ -10,6 +10,7 @@ import {
   blindTransferFail
 } from '../../actions/sipSessions'
 import { getFullNumber } from '../../util/sessions'
+import { GetStyleSize } from '../../util/getstyle'
 import SIPAccount from '../../lib/SipAccount'
 
 const blindIcon = require('./assets/arrow_forward-24px.svg')
@@ -22,6 +23,7 @@ interface Props {
   blindTransferRequest: Function
   blindTransferSuccess: Function
   blindTransferFail: Function
+  appSize: string
 }
 
 class BlindTransfer extends React.Component<Props> {
@@ -43,10 +45,12 @@ class BlindTransfer extends React.Component<Props> {
   }
 
   render() {
+    const props = this.props
+    const styleTransferButton = GetStyleSize(props.appSize, 'transferButton', styles)
     return (
       <React.Fragment>
         <button
-          className={styles.transferButtons}
+          className={styleTransferButton}
           onClick={() => this.blindTransferCall()}
         >
           <img src={blindIcon} />
@@ -60,7 +64,8 @@ const mapStateToProps = (state: any) => ({
   sipAccount: state.sipAccounts.sipAccount,
   stateChanged: state.sipSessions.stateChanged,
   sessions: state.sipSessions.sessions,
-  userAgent: state.sipAccounts.userAgent
+  userAgent: state.sipAccounts.userAgent,
+  appSize: state.config.appConfig.appSize
 })
 const actions = {
   blindTransferRequest,
