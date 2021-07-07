@@ -2758,10 +2758,6 @@ var persistor = reduxPersist.persistStore(defaultStore);
 var phoneStore = defaultStore;
 var ReactSipPhone = function ReactSipPhone(_ref) {
   var name = _ref.name,
-      _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 300 : _ref$width,
-      _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 600 : _ref$height,
       phoneConfig = _ref.phoneConfig,
       sipConfig = _ref.sipConfig,
       appConfig = _ref.appConfig,
@@ -2780,10 +2776,7 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
     appConfig: appConfig
   }, React.createElement("div", {
     className: styles.container,
-    style: _extends(_extends({}, containerStyle), {}, {
-      width: (width < 300 ? 300 : width) + "px",
-      height: (height < 600 ? 600 : height) + "px"
-    })
+    style: _extends({}, containerStyle)
   }, React.createElement(Status$1, {
     phoneConfig: phoneConfig,
     appConfig: appConfig,

@@ -543,7 +543,8 @@
 ._32AFz {
   border: none;
   padding: none;
-  font-size: 1em; }
+  font-size: 1em;
+  width: 100%; }
   ._32AFz:focus {
     outline: none; }
 
