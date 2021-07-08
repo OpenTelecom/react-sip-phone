@@ -2119,11 +2119,11 @@ var Phone = /*#__PURE__*/function (_React$Component) {
       }
     }
 
-    return React.createElement(React.Fragment, null, React.createElement("hr", {
+    return React.createElement(React.Fragment, null, props.phoneConfig.disabledFeatures.includes('remoteid') ? null : React.createElement(React.Fragment, null, React.createElement("hr", {
       style: {
         width: '100%'
       }
-    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, React.createElement("br", null)), props.appSize === 'large' ? React.createElement("div", {
+    }), React.createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, React.createElement("br", null))), props.appSize === 'large' ? React.createElement("div", {
       className: styles$2.statusLarge
     }, statusMask(props.session.state)) : React.createElement("div", null, statusMask(props.session.state)), React.createElement("br", null), durationDisplay, state.ended ? null : React.createElement(React.Fragment, null, React.createElement(Dialpad$1, {
       open: state.dialpadOpen,
