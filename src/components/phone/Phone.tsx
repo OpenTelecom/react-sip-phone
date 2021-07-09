@@ -132,15 +132,17 @@ class Phone extends React.Component<Props> {
     }
     return (
       <React.Fragment>
-        <hr style={{ width: '100%' }} />
         {props.phoneConfig.disabledFeatures.includes('remoteid') ? null : (
-          <div>
-            {
-              // @ts-ignore
-              `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`
-            }
-            <br />
-          </div>
+          <React.Fragment>
+            <hr style={{ width: '100%' }} />
+            <div>
+              {
+                // @ts-ignore
+                `${props.session.remoteIdentity.uri.normal.user} - ${props.session.remoteIdentity._displayName}`
+              }
+              <br />
+            </div>
+          </React.Fragment>
         )}
         {props.appSize === 'large' ? (
           <div className={styles.statusLarge}>

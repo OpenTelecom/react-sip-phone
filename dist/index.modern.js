@@ -2117,11 +2117,11 @@ var Phone = /*#__PURE__*/function (_React$Component) {
       }
     }
 
-    return createElement(Fragment, null, createElement("hr", {
+    return createElement(Fragment, null, props.phoneConfig.disabledFeatures.includes('remoteid') ? null : createElement(Fragment, null, createElement("hr", {
       style: {
         width: '100%'
       }
-    }), props.phoneConfig.disabledFeatures.includes('remoteid') ? null : createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, createElement("br", null)), props.appSize === 'large' ? createElement("div", {
+    }), createElement("div", null, props.session.remoteIdentity.uri.normal.user + " - " + props.session.remoteIdentity._displayName, createElement("br", null))), props.appSize === 'large' ? createElement("div", {
       className: styles$2.statusLarge
     }, statusMask(props.session.state)) : createElement("div", null, statusMask(props.session.state)), createElement("br", null), durationDisplay, state.ended ? null : createElement(Fragment, null, createElement(Dialpad$1, {
       open: state.dialpadOpen,
@@ -2756,10 +2756,6 @@ var persistor = persistStore(defaultStore);
 var phoneStore = defaultStore;
 var ReactSipPhone = function ReactSipPhone(_ref) {
   var name = _ref.name,
-      _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 300 : _ref$width,
-      _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 600 : _ref$height,
       phoneConfig = _ref.phoneConfig,
       sipConfig = _ref.sipConfig,
       appConfig = _ref.appConfig,
@@ -2778,10 +2774,7 @@ var ReactSipPhone = function ReactSipPhone(_ref) {
     appConfig: appConfig
   }, createElement("div", {
     className: styles.container,
-    style: _extends(_extends({}, containerStyle), {}, {
-      width: (width < 300 ? 300 : width) + "px",
-      height: (height < 600 ? 600 : height) + "px"
-    })
+    style: _extends({}, containerStyle)
   }, createElement(Status$1, {
     phoneConfig: phoneConfig,
     appConfig: appConfig,
