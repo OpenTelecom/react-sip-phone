@@ -9,5 +9,5 @@ interface Props {
 declare class PhoneSessions extends React.Component<Props> {
     render(): JSX.Element;
 }
-declare const PS: import("react-redux").ConnectedComponent<typeof PhoneSessions, Pick<React.ClassAttributes<PhoneSessions> & Props, "phoneConfig" | "ref" | "key">>;
+declare const PS: import("react-redux").ConnectedComponent<typeof PhoneSessions, Pick<React.ClassAttributes<PhoneSessions> & Props, "ref" | "phoneConfig" | "key">>;
 export default PS;

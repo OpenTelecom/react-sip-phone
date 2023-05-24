@@ -17,7 +17,7 @@ export class SessionStateHandler {
 
   public stateChange = (newState: SessionState) => {
     switch (newState) {
-      case SessionState.Establishing:
+      case SessionState.Establishing: {
         holdAll(this.session.id)
         toneManager.playRing('ringback')
         phoneStore.dispatch({
@@ -26,7 +26,7 @@ export class SessionStateHandler {
 
         // check if session recieves a BYE message while sessionstate is establishing
         const myTransport = this.ua.transport as WebTransport
-        myTransport.on('message', (message: string) => {
+        myTransport.onMessage = (message: string) => {
           if (message.includes('BYE ') && message.indexOf('BYE ') === 0) {
             if (this.session.state === 'Establishing') {
               console.log(
@@ -45,13 +45,11 @@ export class SessionStateHandler {
                   type: STRICT_MODE_SHOW_CALL_BUTTON
                 })
               }, 5000)
-              return
-            } else {
-              return
             }
           }
-        })
+        }
         break
+      }
       case SessionState.Established:
         phoneStore.dispatch({
           type: SIPSESSION_STATECHANGE

@@ -36,15 +36,13 @@ export default class SIPAccount {
       server: sipConfig.websocket
     }
     const userAgentOptions: UserAgentOptions = {
-      autoStart: false,
-      autoStop: true,
       noAnswerTimeout: sipConfig.noAnswerTimeout || 30,
       logBuiltinEnabled: process.env.NODE_ENV !== 'production',
       logConfiguration: process.env.NODE_ENV !== 'production',
       logLevel: process.env.NODE_ENV !== 'production' ? 'debug' : 'error',
       authorizationPassword: sipCredentials.password,
       userAgentString: 'OTF-react-sip-phone',
-      hackWssInTransport: true,
+      contactParams: { transport: 'wss' },
       transportOptions,
       uri,
       sessionDescriptionHandlerFactoryOptions: {
@@ -73,8 +71,10 @@ export default class SIPAccount {
       // Push ua to store
       phoneStore.dispatch({ type: NEW_USERAGENT, payload: this._userAgent })
     })
-  }
 
+    // Autostop behavior
+    window.addEventListener('unload', () => this._userAgent.stop())
+  }
 
   setupDelegate() {
     this._userAgent.delegate = {

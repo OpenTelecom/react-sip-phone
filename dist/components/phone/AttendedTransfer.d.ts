@@ -33,5 +33,5 @@ declare class AttendedTransfer extends React.Component<Props> {
     holdAll(): void;
     render(): JSX.Element;
 }
-declare const _default: import("react-redux").ConnectedComponent<typeof AttendedTransfer, Pick<React.ClassAttributes<AttendedTransfer> & Props, "ref" | "key" | "started" | "session" | "destination">>;
+declare const _default: import("react-redux").ConnectedComponent<typeof AttendedTransfer, Pick<React.ClassAttributes<AttendedTransfer> & Props, "session" | "destination" | "started" | "ref" | "key">>;
 export default _default;

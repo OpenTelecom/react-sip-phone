@@ -1,1 +1,1 @@
-export declare const getButtonLetters: (value: string) => "" | "1" | "ABC" | "DEF" | "GHI" | "JKL" | "MNO" | "PQRS" | "TUV" | "WXYZ" | "+";
+export declare const getButtonLetters: (value: string) => "1" | "ABC" | "DEF" | "GHI" | "JKL" | "MNO" | "PQRS" | "TUV" | "WXYZ" | "+" | "";

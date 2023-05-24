@@ -15,5 +15,5 @@ declare class Incoming extends React.Component<Props> {
     handleDecline(): void;
     render(): JSX.Element;
 }
-declare const _default: import("react-redux").ConnectedComponent<typeof Incoming, Pick<React.ClassAttributes<Incoming> & Props, "ref" | "key" | "session" | "autoanswer">>;
+declare const _default: import("react-redux").ConnectedComponent<typeof Incoming, Pick<React.ClassAttributes<Incoming> & Props, "session" | "autoanswer" | "ref" | "key">>;
 export default _default;

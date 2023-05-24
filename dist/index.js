@@ -43,7 +43,7 @@ function _assertThisInitialized(self) {
   return self;
 }
 
-var styles = {"container":"_1H7C6"};
+var styles = {"container":"_styles__container__1H7C6"};
 
 var NEW_USERAGENT = 'NEW_USERAGENT';
 var NEW_ACCOUNT = 'NEW_ACCOUNT';
@@ -856,38 +856,39 @@ var SessionStateHandler = function SessionStateHandler(session, ua) {
   this.stateChange = function (newState) {
     switch (newState) {
       case sip_js.SessionState.Establishing:
-        holdAll(_this.session.id);
-        toneManager.playRing('ringback');
-        phoneStore.dispatch({
-          type: SIPSESSION_STATECHANGE
-        });
-        var myTransport = _this.ua.transport;
-        myTransport.on('message', function (message) {
-          if (message.includes('BYE ') && message.indexOf('BYE ') === 0) {
-            if (_this.session.state === 'Establishing') {
-              console.log(message + " session has recieved a BYE message when the session state is establishing");
+        {
+          holdAll(_this.session.id);
+          toneManager.playRing('ringback');
+          phoneStore.dispatch({
+            type: SIPSESSION_STATECHANGE
+          });
+          var myTransport = _this.ua.transport;
 
-              _this.session.cancel();
+          myTransport.onMessage = function (message) {
+            if (message.includes('BYE ') && message.indexOf('BYE ') === 0) {
+              if (_this.session.state === 'Establishing') {
+                console.log(message + " session has recieved a BYE message when the session state is establishing");
 
-              _this.session.dispose();
+                _this.session.cancel();
 
-              setTimeout(function () {
-                phoneStore.dispatch({
-                  type: CLOSE_SESSION,
-                  payload: _this.session.id
-                });
-                toneManager.stopAll();
-                phoneStore.dispatch({
-                  type: STRICT_MODE_SHOW_CALL_BUTTON
-                });
-              }, 5000);
-              return;
-            } else {
-              return;
+                _this.session.dispose();
+
+                setTimeout(function () {
+                  phoneStore.dispatch({
+                    type: CLOSE_SESSION,
+                    payload: _this.session.id
+                  });
+                  toneManager.stopAll();
+                  phoneStore.dispatch({
+                    type: STRICT_MODE_SHOW_CALL_BUTTON
+                  });
+                }, 5000);
+              }
             }
-          }
-        });
-        break;
+          };
+
+          break;
+        }
 
       case sip_js.SessionState.Established:
         phoneStore.dispatch({
@@ -1062,15 +1063,15 @@ var SIPAccount = /*#__PURE__*/function () {
       server: sipConfig.websocket
     };
     var userAgentOptions = {
-      autoStart: false,
-      autoStop: true,
       noAnswerTimeout: sipConfig.noAnswerTimeout || 30,
       logBuiltinEnabled: process.env.NODE_ENV !== 'production',
       logConfiguration: process.env.NODE_ENV !== 'production',
       logLevel: process.env.NODE_ENV !== 'production' ? 'debug' : 'error',
       authorizationPassword: sipCredentials.password,
       userAgentString: 'OTF-react-sip-phone',
-      hackWssInTransport: true,
+      contactParams: {
+        transport: 'wss'
+      },
       transportOptions: transportOptions,
       uri: uri,
       sessionDescriptionHandlerFactoryOptions: {
@@ -1101,6 +1102,10 @@ var SIPAccount = /*#__PURE__*/function () {
         type: NEW_USERAGENT,
         payload: _this._userAgent
       });
+    });
+
+    window.addEventListener('unload', function () {
+      return _this._userAgent.stop();
     });
   }
 
@@ -1243,7 +1248,7 @@ var actions = {
 };
 var SipWrapper$1 = reactRedux.connect(mapStateToProps, actions)(SipWrapper);
 
-var styles$1 = {"container":"_Adysl","incoming":"_14y58","dialpad":"_24i7u","closed":"_3nIZK","statusLarge":"_3G14Z","dialpadButton":"_38DZj","dialpadButtonLetters":"_N-jqm","dialpadRow":"_19SxG","actionButton":"_1hhhF","on":"_3ZwLv","endCallButton":"_3z8u3","startCallButton":"_3UW76","actionsContainer":"_2kDeL","transferMenu":"_1yjIy","transferInput":"_2tho8","transferButtons":"_Rc_m0","userString":"_gelBY","userStringLarge":"_rgh4W","settingsButton":"_3TfJl","settingsMenu":"_6JtnT","dropdowns":"_2FMhO","dropdownRow":"_2NuIJ","dropdownIcon":"_1K5Gw"};
+var styles$1 = {"container":"_Status__container__Adysl","incoming":"_Status__incoming__14y58","dialpad":"_Status__dialpad__24i7u","closed":"_Status__closed__3nIZK","statusLarge":"_Status__statusLarge__3G14Z","dialpadButton":"_Status__dialpadButton__38DZj","dialpadButtonLetters":"_Status__dialpadButtonLetters__N-jqm","dialpadRow":"_Status__dialpadRow__19SxG","actionButton":"_Status__actionButton__1hhhF","on":"_Status__on__3ZwLv","endCallButton":"_Status__endCallButton__3z8u3","startCallButton":"_Status__startCallButton__3UW76","actionsContainer":"_Status__actionsContainer__2kDeL","transferMenu":"_Status__transferMenu__1yjIy","transferInput":"_Status__transferInput__2tho8","transferButtons":"_Status__transferButtons__Rc_m0","userString":"_Status__userString__gelBY","userStringLarge":"_Status__userStringLarge__rgh4W","settingsButton":"_Status__settingsButton__3TfJl","settingsMenu":"_Status__settingsMenu__6JtnT","dropdowns":"_Status__dropdowns__2FMhO","dropdownRow":"_Status__dropdownRow__2NuIJ","dropdownIcon":"_Status__dropdownIcon__1K5Gw"};
 
 var settingsIcon = require('./assets/settings-24px.svg');
 
@@ -1379,7 +1384,7 @@ var actions$1 = {
 };
 var Status$1 = reactRedux.connect(mapStateToProps$1, actions$1)(Status);
 
-var styles$2 = {"container":"_33s4p","incoming":"_3dASG","dialpad":"_-iUpI","closed":"_1Yn0M","statusLarge":"_3n9O3","dialpadButton":"_2Mev0","dialpadButtonLetters":"_30C7x","dialpadRow":"_ftZ8R","actionButton":"_1gnBl","on":"_11LDZ","endCallButton":"_EoCL2","startCallButton":"_PaJuy","actionsContainer":"_25gV2","transferMenu":"_1yYD-","transferInput":"_ovMXl","transferButtons":"_1-bn8"};
+var styles$2 = {"container":"_Phone__container__33s4p","incoming":"_Phone__incoming__3dASG","dialpad":"_Phone__dialpad__-iUpI","closed":"_Phone__closed__1Yn0M","statusLarge":"_Phone__statusLarge__3n9O3","dialpadButton":"_Phone__dialpadButton__2Mev0","dialpadButtonLetters":"_Phone__dialpadButtonLetters__30C7x","dialpadRow":"_Phone__dialpadRow__ftZ8R","actionButton":"_Phone__actionButton__1gnBl","on":"_Phone__on__11LDZ","endCallButton":"_Phone__endCallButton__EoCL2","startCallButton":"_Phone__startCallButton__PaJuy","actionsContainer":"_Phone__actionsContainer__25gV2","transferMenu":"_Phone__transferMenu__1yYD-","transferInput":"_Phone__transferInput__ovMXl","transferButtons":"_Phone__transferButtons__1-bn8"};
 
 var DialButton = function DialButton(_ref) {
   var text = _ref.text,
@@ -2377,7 +2382,7 @@ var mapStateToProps$9 = function mapStateToProps(state) {
 
 var PS = reactRedux.connect(mapStateToProps$9)(PhoneSessions);
 
-var styles$3 = {"container":"_2iAE_","dialButton":"_3GsXr","dialButtonStrict":"_tfL15","dialInput":"_32AFz","dialstringContainerStrict":"_2qSFk","dialstringContainer":"_2sye_"};
+var styles$3 = {"container":"_Dialstring__container__2iAE_","dialButton":"_Dialstring__dialButton__3GsXr","dialButtonStrict":"_Dialstring__dialButtonStrict__tfL15","dialInput":"_Dialstring__dialInput__32AFz","dialstringContainerStrict":"_Dialstring__dialstringContainerStrict__2qSFk","dialstringContainer":"_Dialstring__dialstringContainer__2sye_"};
 
 var callIcon = require('./assets/call-24px.svg');
 

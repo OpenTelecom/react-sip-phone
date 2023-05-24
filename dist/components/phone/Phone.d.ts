@@ -29,5 +29,5 @@ declare class Phone extends React.Component<Props> {
     handleCounter(): void;
     render(): JSX.Element;
 }
-declare const _default: import("react-redux").ConnectedComponent<typeof Phone, Pick<React.ClassAttributes<Phone> & Props, "phoneConfig" | "ref" | "key" | "session">>;
+declare const _default: import("react-redux").ConnectedComponent<typeof Phone, Pick<React.ClassAttributes<Phone> & Props, "session" | "phoneConfig" | "ref" | "key">>;
 export default _default;

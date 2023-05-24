@@ -15,5 +15,5 @@ declare class Dialpad extends React.Component<Props> {
     sendDTMF(value: string): void;
     render(): JSX.Element;
 }
-declare const _default: import("react-redux").ConnectedComponent<typeof Dialpad, Pick<React.ClassAttributes<Dialpad> & Props, "ref" | "key" | "session" | "open">>;
+declare const _default: import("react-redux").ConnectedComponent<typeof Dialpad, Pick<React.ClassAttributes<Dialpad> & Props, "open" | "session" | "ref" | "key">>;
 export default _default;

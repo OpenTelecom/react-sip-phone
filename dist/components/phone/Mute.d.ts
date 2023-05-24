@@ -17,5 +17,5 @@ declare class Mute extends React.Component<Props> {
     mute(): Promise<unknown> | undefined;
     render(): JSX.Element;
 }
-declare const _default: import("react-redux").ConnectedComponent<typeof Mute, Pick<React.ClassAttributes<Mute> & Props, "ref" | "key" | "session">>;
+declare const _default: import("react-redux").ConnectedComponent<typeof Mute, Pick<React.ClassAttributes<Mute> & Props, "session" | "ref" | "key">>;
 export default _default;

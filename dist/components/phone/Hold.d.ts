@@ -13,5 +13,5 @@ declare class Hold extends React.Component<Props> {
     checkHoldState(): boolean;
     render(): JSX.Element;
 }
-declare const _default: import("react-redux").ConnectedComponent<typeof Hold, Pick<React.ClassAttributes<Hold> & Props, "ref" | "key" | "session">>;
+declare const _default: import("react-redux").ConnectedComponent<typeof Hold, Pick<React.ClassAttributes<Hold> & Props, "session" | "ref" | "key">>;
 export default _default;

@@ -67,7 +67,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
-    "sip.js": "^0.16.1",
+    "sip.js": "^0.21.2",
     "tone": "^13.8.25"
   }
 }

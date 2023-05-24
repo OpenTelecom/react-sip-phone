@@ -14,5 +14,5 @@ declare class BlindTransfer extends React.Component<Props> {
     blindTransferCall(): void;
     render(): JSX.Element;
 }
-declare const _default: import("react-redux").ConnectedComponent<typeof BlindTransfer, Pick<React.ClassAttributes<BlindTransfer> & Props, "ref" | "key" | "session" | "destination">>;
+declare const _default: import("react-redux").ConnectedComponent<typeof BlindTransfer, Pick<React.ClassAttributes<BlindTransfer> & Props, "session" | "destination" | "ref" | "key">>;
 export default _default;
