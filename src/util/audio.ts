@@ -61,9 +61,7 @@ export const setRemoteAudio = (session: Session) => {
     })
 
     attachAndPlay()
-    // @ts-ignore
-  } else if (mediaElement) {
-    // @ts-ignore
+  } else if (mediaElement && typeof mediaElement.setSinkId === 'function') {
     mediaElement
       .setSinkId(deviceId)
       .catch((err) => {
