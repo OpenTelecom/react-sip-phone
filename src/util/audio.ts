@@ -8,15 +8,17 @@ import {
   AUDIO_SINKID_NOT_ALLOWED
 } from '../actions/device'
 
+type MediaElementWithSinkId = HTMLMediaElement & {
+  setSinkId?: (sinkId: string) => Promise<void>
+}
+
 // adds track from getReceiver stream to <audio id={sessionId}> in Phone.tsx
 export const setRemoteAudio = (session: Session) => {
   console.log('setRemoteAudio')
   const state = phoneStore.getState()
   // @ts-ignore
   const deviceId = state.device.primaryAudioOutput
-  const mediaElement = document.getElementById(
-    session.id
-  ) as HTMLMediaElement | null
+  const mediaElement = document.getElementById(session.id) as MediaElementWithSinkId | null
   const remoteStream = new MediaStream()
 
   // @ts-ignore
@@ -34,10 +36,8 @@ export const setRemoteAudio = (session: Session) => {
       return
     }
 
-    // @ts-ignore
     mediaElement.srcObject = remoteStream
-
-    // @ts-ignore
+    
     const playResult = mediaElement.play()
 
     if (playResult && typeof playResult.catch === 'function') {
