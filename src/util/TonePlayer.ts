@@ -1,6 +1,6 @@
-const Tone = require('tone');
+const Tone = require('tone')
 
-const DTMF_MATRIX = {
+const DTMF_MATRIX: Record<string, number[]> = {
   1: [697, 1209],
   2: [697, 1336],
   3: [697, 1477],
