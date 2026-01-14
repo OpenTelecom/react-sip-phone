@@ -8,14 +8,19 @@ import {
   AUDIO_SINKID_NOT_ALLOWED
 } from '../actions/device'
 
+type MediaElementWithSinkId = HTMLMediaElement & {
+  setSinkId?: (sinkId: string) => Promise<void>
+}
+
 // adds track from getReceiver stream to <audio id={sessionId}> in Phone.tsx
 export const setRemoteAudio = (session: Session) => {
   console.log('setRemoteAudio')
   const state = phoneStore.getState()
   // @ts-ignore
   const deviceId = state.device.primaryAudioOutput
-  const mediaElement = document.getElementById(session.id)
+  const mediaElement = document.getElementById(session.id) as MediaElementWithSinkId | null
   const remoteStream = new MediaStream()
+
   // @ts-ignore
   session.sessionDescriptionHandler.peerConnection
     .getReceivers()
@@ -25,32 +30,55 @@ export const setRemoteAudio = (session: Session) => {
       }
     })
 
+  const attachAndPlay = () => {
+    if (!mediaElement) {
+      phoneStore.dispatch({ type: REMOTE_AUDIO_FAIL })
+      return
+    }
+
+    mediaElement.srcObject = remoteStream
+    
+    const playResult = mediaElement.play()
+
+    if (playResult && typeof playResult.catch === 'function') {
+      playResult.catch((e) => {
+        console.warn('Autoplay blocked or play interrupted:', e)
+      })
+    }
+
+    // dispatch connected after attempting to attach audio.
+    phoneStore.dispatch({ type: REMOTE_AUDIO_CONNECTED })
+  }
+
   // checks for browser compatibility
-  // @ts-ignore
-  if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
-    console.log('safari')
+  // 1) If setSinkId isn't supported (common in Safari/iOS), skip routing and just attach/play
+  // 2) If setSinkId exists but fails (e.g., iOS 26+ NotAllowedError requires user gesture),
+  //    swallow the error so the rest of the chain still executes.
+  if (mediaElement && typeof mediaElement.setSinkId !== 'function') {
+    console.log('safari or setSinkId not supported')
     phoneStore.dispatch({
       type: AUDIO_SINKID_NOT_ALLOWED
     })
-    // @ts-ignore
-    mediaElement.srcObject = remoteStream
-    // @ts-ignore
-    mediaElement.play()
 
-    // @ts-ignore
-  } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
-    // @ts-ignore
-    mediaElement.setSinkId(deviceId).then(() => {
-      // @ts-ignore
-      mediaElement.srcObject = remoteStream
-      // @ts-ignore
-      mediaElement.play()
-    })
+    attachAndPlay()
+  } else if (mediaElement && typeof mediaElement.setSinkId === 'function') {
+    mediaElement
+      .setSinkId(deviceId)
+      .catch((err) => {
+        // Any failure => fall back to default output, but never block audio attach/play
+        phoneStore.dispatch({ type: AUDIO_SINKID_NOT_ALLOWED })
+        console.warn('setSinkId failed, falling back to default output:', err)
+        // swallow error so the rest runs
+      })
+      .finally(() => {
+        attachAndPlay()
+      })
   } else {
     phoneStore.dispatch({
       type: REMOTE_AUDIO_FAIL
     })
   }
+  // dispatch connected after attempting to attach audio.
   phoneStore.dispatch({
     type: REMOTE_AUDIO_CONNECTED
   })
