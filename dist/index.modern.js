@@ -578,17 +578,42 @@ var setRemoteAudio = function setRemoteAudio(session) {
     }
   });
 
-  if (mediaElement && typeof mediaElement.sinkId === 'undefined') {
-    console.log('safari');
+  var attachAndPlay = function attachAndPlay() {
+    if (!mediaElement) {
+      phoneStore.dispatch({
+        type: REMOTE_AUDIO_FAIL
+      });
+      return;
+    }
+
+    mediaElement.srcObject = remoteStream;
+    var playResult = mediaElement.play();
+
+    if (playResult && typeof playResult["catch"] === 'function') {
+      playResult["catch"](function (e) {
+        console.warn('Autoplay blocked or play interrupted:', e);
+      });
+    }
+
+    phoneStore.dispatch({
+      type: REMOTE_AUDIO_CONNECTED
+    });
+  };
+
+  if (mediaElement && typeof mediaElement.setSinkId !== 'function') {
+    console.log('safari or setSinkId not supported');
     phoneStore.dispatch({
       type: AUDIO_SINKID_NOT_ALLOWED
     });
-    mediaElement.srcObject = remoteStream;
-    mediaElement.play();
-  } else if (mediaElement && typeof mediaElement.sinkId !== 'undefined') {
-    mediaElement.setSinkId(deviceId).then(function () {
-      mediaElement.srcObject = remoteStream;
-      mediaElement.play();
+    attachAndPlay();
+  } else if (mediaElement && typeof mediaElement.setSinkId === 'function') {
+    mediaElement.setSinkId(deviceId)["catch"](function (err) {
+      phoneStore.dispatch({
+        type: AUDIO_SINKID_NOT_ALLOWED
+      });
+      console.warn('setSinkId failed, falling back to default output:', err);
+    })["finally"](function () {
+      attachAndPlay();
     });
   } else {
     phoneStore.dispatch({
