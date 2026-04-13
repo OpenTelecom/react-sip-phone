@@ -13,6 +13,10 @@ interface Props {
   deviceId: string
 }
 
+const urlParams = new URLSearchParams(window.location.search)
+
+const urlParamsPlayDTMFToneSound = urlParams.get('playDTMFToneSound')
+
 class Dialpad extends React.Component<Props> {
   topRow: any = []
   middleRow: any = []
@@ -45,7 +49,12 @@ class Dialpad extends React.Component<Props> {
   handleClick(value: string) {
     if (this.props.session.state === SessionState.Established) {
       this.sendDTMF(value)
-      playDTMF(value, this.props.deviceId)
+      if (
+        urlParamsPlayDTMFToneSound &&
+        JSON.parse(urlParamsPlayDTMFToneSound) === true
+      ) {
+        playDTMF(value, this.props.deviceId)
+      }
     }
   }
 

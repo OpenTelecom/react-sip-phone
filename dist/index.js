@@ -1461,6 +1461,9 @@ var getButtonLetters = function getButtonLetters(value) {
   }
 };
 
+var urlParams = new URLSearchParams(window.location.search);
+var urlParamsPlayDTMFToneSound = urlParams.get('playDTMFToneSound');
+
 var Dialpad = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(Dialpad, _React$Component);
 
@@ -1505,7 +1508,10 @@ var Dialpad = /*#__PURE__*/function (_React$Component) {
   _proto.handleClick = function handleClick(value) {
     if (this.props.session.state === sip_js.SessionState.Established) {
       this.sendDTMF(value);
-      playDTMF(value, this.props.deviceId);
+
+      if (urlParamsPlayDTMFToneSound && JSON.parse(urlParamsPlayDTMFToneSound) === true) {
+        playDTMF(value, this.props.deviceId);
+      }
     }
   };
 
