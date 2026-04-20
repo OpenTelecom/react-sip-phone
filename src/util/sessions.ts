@@ -89,16 +89,29 @@ export class SessionStateHandler {
   }
 }
 
+const sanitizePhoneNumber = (number: string) => {
+  return number.replace(/[^\d+]/g, '')
+}
+
 export const getFullNumber = (number: string) => {
   if (number.length < 10) {
     return number
   }
-  // @ts-ignore
-  let fullNumber = `+${phoneStore.getState().sipAccounts.sipAccount._config.defaultCountryCode}${number}`
-  if (number.includes('+') && number.length === 10) {
-    fullNumber = `${number}`
+  let fullNumber = `${number}`
+  // sanitize phone number to remove parentheses, space & dash
+  fullNumber = sanitizePhoneNumber(fullNumber)
+
+  // Remove leading + if already set
+  if (fullNumber.startsWith('+')) {
+    fullNumber = fullNumber.substring(1)
   }
-  console.log(fullNumber)
+  // Add default country code
+  // @ts-ignore
+  const countrycode = phoneStore.getState().sipAccounts.sipAccount._config.defaultCountryCode
+
+  fullNumber = `+${countrycode}${fullNumber}`
+  console.log(`fullNumber: ${fullNumber}`)
+
   return fullNumber
 }
 
