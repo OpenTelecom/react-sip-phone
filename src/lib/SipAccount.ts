@@ -11,6 +11,7 @@ import {
 } from 'sip.js'
 
 import { TransportOptions } from 'sip.js/lib/platform/web'
+import { InviterOptions } from "sip.js/lib/api"
 import { phoneStore } from '../index'
 import { NEW_USERAGENT } from '../actions/sipAccounts'
 import { SessionStateHandler, getFullNumber } from '../util/sessions'
@@ -118,7 +119,7 @@ export default class SIPAccount {
     })
   }
 
-  makeCall(number: string) {
+  makeCall(number: string, options: InviterOptions) {
     const state = phoneStore.getState()
     // @ts-ignore
     const sessionsLimit: number = state.config.phoneConfig.sessionsLimit
@@ -146,7 +147,7 @@ export default class SIPAccount {
 
       if (target) {
         console.log(`Calling ${number}`)
-        const inviter = new Inviter(this._userAgent, target)
+        const inviter = new Inviter(this._userAgent, target, options)
         // An Inviter is a Session
         const outgoingSession: Session = inviter
         // Setup outgoing session delegate
